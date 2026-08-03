@@ -1,0 +1,332 @@
+/* ── Tokens ── */
+:root {
+  --walnut: #3b2a1a;
+  --cream: #f5f0e8;
+  --gold: #c8a96e;
+  --gold-d: #a8854a;
+  --text: #2c1f10;
+  --text-muted: #7a6a58;
+  --radius: 10px;
+}
+
+.home { width: 100%; overflow-x: hidden; }
+
+/* ── Shared ── */
+.section-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold-d);
+  margin-bottom: 10px;
+}
+.section-header { text-align: center; margin-bottom: 48px; }
+.section-header h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 36px; color: var(--walnut); margin: 0; }
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity .2s, transform .15s;
+}
+.btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 28px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(255,255,255,.85);
+  text-decoration: none;
+  border: 1.5px solid rgba(255,255,255,.3);
+  transition: border-color .2s, background .2s;
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,.7); background: rgba(255,255,255,.08); }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 26px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--walnut);
+  text-decoration: none;
+  border: 1.5px solid var(--walnut);
+  transition: background .2s, color .2s;
+}
+.btn-outline:hover { background: var(--walnut); color: var(--cream); }
+
+/* ── SLIDER ── */
+.hero-slider {
+  position: relative;
+  min-height: 560px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  transition: background .6s ease;
+}
+.hero-content {
+  flex: 1;
+  padding: 80px 64px;
+  z-index: 2;
+}
+.hero-eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.hero-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 58px;
+  font-weight: 700;
+  line-height: 1.12;
+  color: #fff;
+  margin: 0 0 20px;
+}
+.hero-sub { font-size: 18px; color: rgba(255,255,255,.65); margin: 0 0 36px; }
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.hero-visual {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+.hero-placeholder {
+  width: 340px;
+  height: 340px;
+  border: 2px dashed;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: .5;
+  transition: border-color .6s;
+}
+
+.slider-dots {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: background .3s, transform .3s;
+}
+.dot--active { transform: scale(1.4); }
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 3;
+  transition: background .2s;
+}
+.arrow:hover { background: rgba(255,255,255,.25); }
+.arrow--left { left: 20px; }
+.arrow--right { right: 20px; }
+
+/* ── GIỚI THIỆU ── */
+.about-section { padding: 96px 0; background: #fff; }
+.about-section .section-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+  align-items: center;
+}
+.about-text h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 36px; color: var(--walnut); margin: 0 0 20px; line-height: 1.25; }
+.about-text p { color: var(--text-muted); line-height: 1.8; margin-bottom: 36px; }
+.stats { display: flex; gap: 32px; margin-bottom: 36px; }
+.stat { display: flex; flex-direction: column; }
+.stat strong { font-family: 'Playfair Display', Georgia, serif; font-size: 28px; color: var(--walnut); }
+.stat span { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.about-img .img-placeholder {
+  width: 100%;
+  height: 380px;
+  background: var(--cream);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  gap: 12px;
+}
+
+/* ── SẢN PHẨM BÁN CHẠY ── */
+.products-section { padding: 96px 0; background: var(--cream); }
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+.product-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+}
+.product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(59,42,26,.1); }
+.product-img {
+  position: relative;
+  height: 200px;
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.product-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--walnut);
+  color: var(--cream);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: .5px;
+}
+.product-info { padding: 18px; }
+.product-cat { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+.product-info h3 { font-size: 15px; font-weight: 600; color: var(--walnut); margin: 6px 0 14px; }
+.product-footer { display: flex; align-items: center; justify-content: space-between; }
+.product-price { font-family: 'Playfair Display', Georgia, serif; font-size: 16px; color: var(--gold-d); }
+.btn-add {
+  background: var(--walnut);
+  color: var(--cream);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.btn-add:hover { background: var(--gold-d); }
+
+/* ── PHÒNG ── */
+.rooms-section { padding: 96px 0; background: #fff; }
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.room-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 32px;
+  background: var(--cream);
+  border-radius: 14px;
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  transition: border-color .2s, transform .2s;
+}
+.room-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+.room-icon { font-size: 36px; margin-bottom: 14px; }
+.room-card h3 { font-size: 17px; font-weight: 600; color: var(--walnut); margin: 0 0 8px; }
+.room-card p { font-size: 14px; color: var(--text-muted); margin: 0; line-height: 1.6; }
+
+/* ── LIÊN HỆ ── */
+.contact-section { padding: 96px 0; background: var(--walnut); }
+.contact-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+  align-items: start;
+}
+.contact-text h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 36px; margin: 0 0 16px; }
+.contact-text p { margin-bottom: 28px; line-height: 1.7; }
+.contact-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.contact-list li { color: rgba(255,255,255,.8); font-size: 15px; }
+
+.contact-form { display: flex; flex-direction: column; gap: 14px; }
+.contact-form input,
+.contact-form textarea {
+  padding: 13px 16px;
+  border-radius: var(--radius);
+  border: 1.5px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  transition: border-color .2s;
+  font-family: inherit;
+  resize: vertical;
+}
+.contact-form input::placeholder,
+.contact-form textarea::placeholder { color: rgba(255,255,255,.4); }
+.contact-form input:focus,
+.contact-form textarea:focus { border-color: var(--gold); }
+
+/* ── FOOTER ── */
+.footer { background: #1a0f05; padding: 64px 0 0; }
+.footer-inner {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 48px;
+}
+.footer-brand .footer-logo { font-size: 20px; color: var(--cream); display: block; margin-bottom: 12px; }
+.footer-brand p { font-size: 14px; color: rgba(255,255,255,.45); margin: 0; }
+.footer-links { display: flex; flex-direction: column; gap: 10px; }
+.footer-links h4 { color: var(--cream); font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 4px; }
+.footer-links a { color: rgba(255,255,255,.5); font-size: 14px; text-decoration: none; transition: color .2s; }
+.footer-links a:hover { color: var(--gold); }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,.08); padding: 20px 24px; text-align: center; }
+.footer-bottom p { color: rgba(255,255,255,.3); font-size: 13px; margin: 0; }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .hero-slider { flex-direction: column; min-height: auto; }
+  .hero-content { padding: 60px 24px 32px; }
+  .hero-title { font-size: 38px; }
+  .hero-visual { display: none; }
+  .about-section .section-inner { grid-template-columns: 1fr; gap: 40px; }
+  .products-grid { grid-template-columns: 1fr; }
+  .rooms-grid { grid-template-columns: repeat(2, 1fr); }
+  .contact-inner { grid-template-columns: 1fr; gap: 40px; }
+  .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+}
