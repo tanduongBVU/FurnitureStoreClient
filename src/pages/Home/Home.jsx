@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import api from "../../services/api";
+import { useCart } from "../../contexts/CartContext";
 import "./Home.css";
 
 // ── Data ──────────────────────────────────────────────
@@ -27,13 +29,6 @@ const slides = [
   },
 ];
 
-const bestSellers = [
-  { id: 1, name: "Sofa Bắc Âu Oslo", price: "18.500.000", category: "Phòng khách", tag: "Bán chạy" },
-  { id: 2, name: "Bàn ăn Walnut 6 ghế", price: "24.900.000", category: "Phòng ăn", tag: "Mới" },
-  { id: 3, name: "Giường ngủ Nordic", price: "14.200.000", category: "Phòng ngủ", tag: "Bán chạy" },
-  { id: 4, name: "Kệ TV tối giản", price: "8.700.000", category: "Phòng khách", tag: "" },
-];
-
 const rooms = [
   { id: 1, label: "Phòng Khách", icon: "🛋️", desc: "Sofa, kệ TV, bàn trà, tủ trang trí" },
   { id: 2, label: "Phòng Ngủ", icon: "🛏️", desc: "Giường, tủ quần áo, bàn đầu giường" },
@@ -47,6 +42,46 @@ const rooms = [
 export default function Home() {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef(null);
+  const { addToCart } = useCart();
+
+  const [bestSellers, setBestSellers] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  const [contactForm, setContactForm] = useState({ name: "", phone: "", email: "", message: "" });
+  const [contactSending, setContactSending] = useState(false);
+  const [contactStatus, setContactStatus] = useState(""); // "", "success", "error"
+  const setContactField = (f, v) => setContactForm(p => ({ ...p, [f]: v }));
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setContactSending(true);
+    setContactStatus("");
+    try {
+      await api.post("/Contacts", {
+        name: contactForm.name,
+        phone: contactForm.phone,
+        email: contactForm.email,
+        message: contactForm.message,
+        status: "Mới",
+      });
+      setContactStatus("success");
+      setContactForm({ name: "", phone: "", email: "", message: "" });
+    } catch {
+      setContactStatus("error");
+    } finally {
+      setContactSending(false);
+    }
+  };
+
+  useEffect(() => {
+    api.get("/Products")
+      .then(res => {
+        const best = res.data.filter(p => p.isBestSeller).slice(0, 4);
+        setBestSellers(best);
+      })
+      .catch(() => setBestSellers([]))
+      .finally(() => setLoadingProducts(false));
+  }, []);
 
   const goTo = (idx) => {
     setCurrent((idx + slides.length) % slides.length);
@@ -58,6 +93,7 @@ export default function Home() {
   }, [current]);
 
   const slide = slides[current];
+  const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
 
   return (
     <div className="home">
@@ -131,24 +167,40 @@ export default function Home() {
             <span className="eyebrow">Được yêu thích nhất</span>
             <h2>Sản phẩm bán chạy</h2>
           </div>
-          <div className="products-grid">
-            {bestSellers.map((p) => (
-              <div className="product-card" key={p.id}>
-                <div className="product-img">
-                  <span style={{ fontSize: 40 }}>🪑</span>
-                  {p.tag && <span className="product-tag">{p.tag}</span>}
-                </div>
-                <div className="product-info">
-                  <span className="product-cat">{p.category}</span>
-                  <h3>{p.name}</h3>
-                  <div className="product-footer">
-                    <strong className="product-price">{p.price} ₫</strong>
-                    <button className="btn-add">+ Thêm</button>
+
+          {loadingProducts ? (
+            <p style={{ textAlign: "center", color: "var(--text-muted)" }}>Đang tải sản phẩm...</p>
+          ) : bestSellers.length === 0 ? (
+            <p style={{ textAlign: "center", color: "var(--text-muted)" }}>
+              Chưa có sản phẩm nào được đánh dấu bán chạy.
+            </p>
+          ) : (
+            <div className="products-grid">
+              {bestSellers.map((p) => (
+                <Link to={`/products/${p.id}`} className="product-card" key={p.id}>
+                  <div className="product-img">
+                    {p.image
+                      ? <img src={p.image} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => e.target.style.display = "none"} />
+                      : <span style={{ fontSize: 40 }}>🪑</span>
+                    }
+                    <span className="product-tag">Bán chạy</span>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                  <div className="product-info">
+                    <span className="product-cat">{p.category}</span>
+                    <h3>{p.name}</h3>
+                    <div className="product-footer">
+                      <strong className="product-price">{formatPrice(p.price)}</strong>
+                      <button
+                        className="btn-add"
+                        onClick={(e) => { e.preventDefault(); addToCart(p, 1); }}
+                      >+ Thêm</button>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+
           <div style={{ textAlign: "center", marginTop: 40 }}>
             <Link to="/products" className="btn-outline">Xem tất cả sản phẩm →</Link>
           </div>
@@ -188,13 +240,52 @@ export default function Home() {
               <li>🕐 Thứ 2 – Thứ 7: 8:00 – 20:00</li>
             </ul>
           </div>
-          <form className="contact-form" onSubmit={(e) => e.preventDefault()}>
-            <input type="text" placeholder="Họ và tên" />
-            <input type="tel" placeholder="Số điện thoại" />
-            <input type="email" placeholder="Email" />
-            <textarea rows={4} placeholder="Nội dung cần tư vấn..." />
-            <button type="submit" className="btn-primary" style={{ background: "#c8a96e", color: "#1a1208", width: "100%", justifyContent: "center" }}>
-              Gửi yêu cầu
+          <form className="contact-form" onSubmit={handleContactSubmit}>
+            {contactStatus === "success" && (
+              <p style={{ color: "#7ab87a", fontSize: 14, margin: 0 }}>
+                ✓ Gửi yêu cầu thành công! Chúng tôi sẽ liên hệ lại sớm nhất.
+              </p>
+            )}
+            {contactStatus === "error" && (
+              <p style={{ color: "#e07a7a", fontSize: 14, margin: 0 }}>
+                ⚠️ Gửi thất bại, vui lòng thử lại sau.
+              </p>
+            )}
+            <input
+              type="text"
+              placeholder="Họ và tên"
+              value={contactForm.name}
+              onChange={e => setContactField("name", e.target.value)}
+              required
+            />
+            <input
+              type="tel"
+              placeholder="Số điện thoại"
+              value={contactForm.phone}
+              onChange={e => setContactField("phone", e.target.value)}
+              required
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={contactForm.email}
+              onChange={e => setContactField("email", e.target.value)}
+              required
+            />
+            <textarea
+              rows={4}
+              placeholder="Nội dung cần tư vấn..."
+              value={contactForm.message}
+              onChange={e => setContactField("message", e.target.value)}
+              required
+            />
+            <button
+              type="submit"
+              className="btn-primary"
+              style={{ background: "#c8a96e", color: "#1a1208", width: "100%", justifyContent: "center" }}
+              disabled={contactSending}
+            >
+              {contactSending ? "Đang gửi..." : "Gửi yêu cầu"}
             </button>
           </form>
         </div>
