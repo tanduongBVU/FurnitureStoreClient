@@ -243,3 +243,95 @@
     display: flex;
   }
 }
+
+/* ── Thêm vào cuối file Navbar.css ── */
+.navbar__cart {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  text-decoration: none;
+  margin-right: 8px;
+  line-height: 1;
+}
+.navbar__cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: #c8a96e;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Thêm vào cuối file Navbar.css (nối tiếp phần navbar__cart đã thêm trước đó) ── */
+.navbar__login-link {
+  font-size: 14px;
+  color: #3b2a1a;
+  text-decoration: none;
+  font-weight: 500;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+.navbar__login-link:hover { color: #a8854a; }
+
+.navbar__account { position: relative; margin-right: 8px; }
+.navbar__account-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #3b2a1a;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: background .15s;
+}
+.navbar__account-btn:hover { background: rgba(59,42,26,.06); }
+
+.navbar__account-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #fff;
+  border: 1px solid #e5ddd0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(59,42,26,.12);
+  padding: 12px;
+  min-width: 200px;
+  z-index: 50;
+}
+.navbar__account-email { font-size: 12px; color: #7a6a58; margin: 0 0 10px; padding: 0 4px; word-break: break-all; }
+.navbar__account-dropdown button {
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(239,68,68,.08);
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s;
+}
+.navbar__account-dropdown button:hover { background: #ef4444; color: #fff; }
+
+.navbar__mobile-user { padding: 8px 24px; font-size: 13px; color: #7a6a58; margin: 0; }
+.navbar__mobile-logout {
+  background: none;
+  border: none;
+  text-align: left;
+  color: #b91c1c;
+  font-family: inherit;
+  cursor: pointer;
+}
