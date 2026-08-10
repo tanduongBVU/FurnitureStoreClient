@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useSettings } from "../../contexts/SettingsContext";
 import "./About.css";
 
-// ── Data ──────────────────────────────────────────────
+// ── Data (các phần chưa đưa vào CMS — sửa trực tiếp ở đây khi cần) ──
 
 const values = [
   { icon: "🌿", title: "Tự nhiên", desc: "Chỉ sử dụng gỗ tự nhiên có chứng nhận FSC, thân thiện với môi trường." },
@@ -25,13 +26,6 @@ const steps = [
   { step: "04", title: "Kiểm định", desc: "Kiểm tra chất lượng 100% sản phẩm trước khi xuất xưởng." },
   { step: "05", title: "Giao & Lắp đặt", desc: "Giao hàng đúng hẹn, lắp đặt hoàn thiện tại công trình." },
   { step: "06", title: "Bảo hành", desc: "Theo dõi, hỗ trợ và bảo hành dài hạn sau khi bàn giao." },
-];
-
-const team = [
-  { name: "Nguyễn Minh Khoa", role: "Giám đốc điều hành", exp: "20 năm kinh nghiệm", avatar: "NMK" },
-  { name: "Trần Thị Lan Anh", role: "Giám đốc Thiết kế", exp: "15 năm kinh nghiệm", avatar: "TLA" },
-  { name: "Lê Hoàng Phúc", role: "Trưởng xưởng sản xuất", exp: "18 năm kinh nghiệm", avatar: "LHP" },
-  { name: "Phạm Thu Hà", role: "Trưởng phòng Kinh doanh", exp: "12 năm kinh nghiệm", avatar: "PTH" },
 ];
 
 const projects = [
@@ -58,33 +52,103 @@ const partners = [
   { name: "ISO 9001", icon: "✅" },
 ];
 
+// Lấy chữ cái đầu từ tên để hiển thị avatar khi chưa có ảnh thật
+function getInitials(name = "") {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .map(w => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 3);
+}
+
 // ── Component ─────────────────────────────────────────
 export default function About() {
+  const { get } = useSettings();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+
+  // Đội ngũ lãnh đạo — nội dung lấy từ Admin → Giao diện, có fallback giữ nguyên giá trị cũ
+  const team = [
+    {
+      image: get("aboutpage.team.member1.image", ""),
+      name: get("aboutpage.team.member1.name", "Nguyễn Minh Khoa"),
+      role: get("aboutpage.team.member1.role", "Giám đốc điều hành"),
+      exp: get("aboutpage.team.member1.exp", "20 năm kinh nghiệm"),
+    },
+    {
+      image: get("aboutpage.team.member2.image", ""),
+      name: get("aboutpage.team.member2.name", "Trần Thị Lan Anh"),
+      role: get("aboutpage.team.member2.role", "Giám đốc Thiết kế"),
+      exp: get("aboutpage.team.member2.exp", "15 năm kinh nghiệm"),
+    },
+    {
+      image: get("aboutpage.team.member3.image", ""),
+      name: get("aboutpage.team.member3.name", "Lê Hoàng Phúc"),
+      role: get("aboutpage.team.member3.role", "Trưởng xưởng sản xuất"),
+      exp: get("aboutpage.team.member3.exp", "18 năm kinh nghiệm"),
+    },
+    {
+      image: get("aboutpage.team.member4.image", ""),
+      name: get("aboutpage.team.member4.name", "Phạm Thu Hà"),
+      role: get("aboutpage.team.member4.role", "Trưởng phòng Kinh doanh"),
+      exp: get("aboutpage.team.member4.exp", "12 năm kinh nghiệm"),
+    },
+  ];
+
+  // Ảnh banner đầu trang và ảnh xưởng sản xuất giờ là 2 key riêng biệt
+  const bannerImage = get("aboutpage.banner.image", "");
+  const companyImage = get("aboutpage.company.image", "");
 
   return (
     <div className="about-page">
 
-      {/* ── BANNER ── */}
+      {/* ── BANNER (full-bleed, nội dung canh giữa) ── */}
       <section className="about-banner">
+        <div className="about-banner-bg">
+          {bannerImage ? (
+            <img src={bannerImage} alt="Showroom LuxWood" className="about-banner-bg-img" />
+          ) : (
+            <div className="about-banner-bg-placeholder">
+              <span style={{ fontSize: 72 }}>🏠</span>
+              <p>Ảnh showroom</p>
+            </div>
+          )}
+        </div>
+        <div className="about-banner-overlay" />
         <div className="about-banner__content">
           <span className="eyebrow" style={{ color: "#c8a96e" }}>Về chúng tôi</span>
-          <h1>Nghệ thuật kiến tạo<br />không gian sống</h1>
-          <p>Hơn 15 năm đồng hành cùng hàng nghìn gia đình Việt Nam trong hành trình tạo nên tổ ấm hoàn hảo.</p>
+          <h1>
+            {get("aboutpage.banner.title", "Nghệ thuật kiến tạo\nkhông gian sống")
+              .split("\n")
+              .map((line, i, arr) => (
+                <span key={i}>
+                  {line}
+                  {i < arr.length - 1 && <br />}
+                </span>
+              ))}
+          </h1>
+          <p>{get("aboutpage.banner.description", "Hơn 15 năm đồng hành cùng hàng nghìn gia đình Việt Nam trong hành trình tạo nên tổ ấm hoàn hảo.")}</p>
           <div className="about-banner__stats">
-            <div className="banner-stat"><strong>15+</strong><span>Năm kinh nghiệm</span></div>
+            <div className="banner-stat">
+              <strong>{get("aboutpage.banner.stat1Number", "15+")}</strong>
+              <span>{get("aboutpage.banner.stat1Label", "Năm kinh nghiệm")}</span>
+            </div>
             <div className="banner-stat-divider" />
-            <div className="banner-stat"><strong>500+</strong><span>Sản phẩm</span></div>
+            <div className="banner-stat">
+              <strong>{get("aboutpage.banner.stat2Number", "500+")}</strong>
+              <span>{get("aboutpage.banner.stat2Label", "Sản phẩm")}</span>
+            </div>
             <div className="banner-stat-divider" />
-            <div className="banner-stat"><strong>10.000+</strong><span>Khách hàng</span></div>
+            <div className="banner-stat">
+              <strong>{get("aboutpage.banner.stat3Number", "10.000+")}</strong>
+              <span>{get("aboutpage.banner.stat3Label", "Khách hàng")}</span>
+            </div>
             <div className="banner-stat-divider" />
-            <div className="banner-stat"><strong>200+</strong><span>Dự án lớn</span></div>
-          </div>
-        </div>
-        <div className="about-banner__img">
-          <div className="banner-img-placeholder">
-            <span style={{ fontSize: 72 }}>🏠</span>
-            <p>Ảnh showroom</p>
+            <div className="banner-stat">
+              <strong>{get("aboutpage.banner.stat4Number", "200+")}</strong>
+              <span>{get("aboutpage.banner.stat4Label", "Dự án lớn")}</span>
+            </div>
           </div>
         </div>
       </section>
@@ -93,21 +157,25 @@ export default function About() {
       <section className="company-section">
         <div className="section-inner two-col">
           <div className="company-img">
-            <div className="img-placeholder tall">
-              <span style={{ fontSize: 56 }}>🪵</span>
-              <p>Ảnh xưởng sản xuất</p>
-            </div>
+            {companyImage ? (
+              <img src={companyImage} alt="Xưởng sản xuất LuxWood" className="img-real tall" />
+            ) : (
+              <div className="img-placeholder tall">
+                <span style={{ fontSize: 56 }}>🪵</span>
+                <p>Ảnh xưởng sản xuất</p>
+              </div>
+            )}
             <div className="img-badge">
-              <strong>2009</strong>
+              <strong>{get("aboutpage.company.year", "2009")}</strong>
               <span>Năm thành lập</span>
             </div>
           </div>
           <div className="company-text">
             <span className="eyebrow">Câu chuyện của chúng tôi</span>
-            <h2>Từ xưởng mộc nhỏ đến thương hiệu nội thất hàng đầu</h2>
-            <p>LuxWood được thành lập năm 2009 bởi nghệ nhân Nguyễn Minh Khoa với niềm đam mê về gỗ và khát vọng mang đến những sản phẩm nội thất chất lượng cao cho người Việt.</p>
-            <p>Từ một xưởng mộc nhỏ tại Bình Dương với 5 thợ lành nghề, chúng tôi đã phát triển thành doanh nghiệp với hơn 200 nhân sự, showroom tại TP.HCM và Hà Nội, phục vụ hàng nghìn khách hàng trên toàn quốc.</p>
-            <p>Mỗi sản phẩm LuxWood là sự kết hợp giữa kỹ thuật gia công hiện đại và tay nghề thủ công tinh xảo — tạo nên những tác phẩm vừa đẹp, vừa bền, vừa mang hơi thở tự nhiên.</p>
+            <h2>{get("aboutpage.company.title", "Từ xưởng mộc nhỏ đến thương hiệu nội thất hàng đầu")}</h2>
+            <p>{get("aboutpage.company.paragraph1", "LuxWood được thành lập năm 2009 bởi nghệ nhân Nguyễn Minh Khoa với niềm đam mê về gỗ và khát vọng mang đến những sản phẩm nội thất chất lượng cao cho người Việt.")}</p>
+            <p>{get("aboutpage.company.paragraph2", "Từ một xưởng mộc nhỏ tại Bình Dương với 5 thợ lành nghề, chúng tôi đã phát triển thành doanh nghiệp với hơn 200 nhân sự, showroom tại TP.HCM và Hà Nội, phục vụ hàng nghìn khách hàng trên toàn quốc.")}</p>
+            <p>{get("aboutpage.company.paragraph3", "Mỗi sản phẩm LuxWood là sự kết hợp giữa kỹ thuật gia công hiện đại và tay nghề thủ công tinh xảo — tạo nên những tác phẩm vừa đẹp, vừa bền, vừa mang hơi thở tự nhiên.")}</p>
             <Link to="/products" className="btn-dark">Khám phá sản phẩm →</Link>
           </div>
         </div>
@@ -207,10 +275,16 @@ export default function About() {
           <div className="team-grid">
             {team.map((t, i) => (
               <div className="team-card" key={i}>
-                <div className="team-avatar">{t.avatar}</div>
-                <div className="team-img-placeholder">
-                  <span style={{ fontSize: 40 }}>👤</span>
-                </div>
+                {t.image ? (
+                  <img src={t.image} alt={t.name} className="team-avatar-real" />
+                ) : (
+                  <>
+                    <div className="team-avatar">{getInitials(t.name)}</div>
+                    <div className="team-img-placeholder">
+                      <span style={{ fontSize: 40 }}>👤</span>
+                    </div>
+                  </>
+                )}
                 <h3>{t.name}</h3>
                 <span className="team-role">{t.role}</span>
                 <span className="team-exp">{t.exp}</span>

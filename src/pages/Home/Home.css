@@ -72,19 +72,50 @@
 }
 .btn-outline:hover { background: var(--walnut); color: var(--cream); }
 
-/* ── SLIDER ── */
+/* ── SLIDER (full-bleed, ảnh phủ kín, chữ căn giữa banner) ── */
 .hero-slider {
   position: relative;
-  min-height: 560px;
-  display: flex;
-  align-items: center;
+  height: 88vh;
+  min-height: 620px;
+  max-height: 820px;
   overflow: hidden;
   transition: background .6s ease;
 }
+
+.hero-bg-image {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,.72) 0%,
+    rgba(0,0,0,.35) 32%,
+    rgba(0,0,0,.05) 60%,
+    rgba(0,0,0,.15) 100%
+  );
+}
+
 .hero-content {
-  flex: 1;
-  padding: 80px 64px;
+  position: absolute;
+  inset: 0;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 24px;
+  max-width: 720px;
+  margin: 0 auto;
 }
 .hero-eyebrow {
   display: block;
@@ -96,34 +127,15 @@
 }
 .hero-title {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 58px;
+  font-size: 54px;
   font-weight: 700;
   line-height: 1.12;
   color: #fff;
   margin: 0 0 20px;
+  text-shadow: 0 2px 20px rgba(0,0,0,.25);
 }
-.hero-sub { font-size: 18px; color: rgba(255,255,255,.65); margin: 0 0 36px; }
-.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
-
-.hero-visual {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-}
-.hero-placeholder {
-  width: 340px;
-  height: 340px;
-  border: 2px dashed;
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  opacity: .5;
-  transition: border-color .6s;
-}
+.hero-sub { font-size: 17px; color: rgba(255,255,255,.8); margin: 0 0 32px; }
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
 
 .slider-dots {
   position: absolute;
@@ -135,14 +147,15 @@
   z-index: 3;
 }
 .dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  width: 34px;
+  height: 3px;
+  border-radius: 2px;
   border: none;
   cursor: pointer;
-  transition: background .3s, transform .3s;
+  transition: background .3s, opacity .3s;
+  opacity: .6;
 }
-.dot--active { transform: scale(1.4); }
+.dot--active { opacity: 1; }
 
 .arrow {
   position: absolute;
@@ -177,18 +190,13 @@
 .stat { display: flex; flex-direction: column; }
 .stat strong { font-family: 'Playfair Display', Georgia, serif; font-size: 28px; color: var(--walnut); }
 .stat span { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
-.about-img .img-placeholder {
+
+.about-real-img {
   width: 100%;
   height: 380px;
-  background: var(--cream);
+  object-fit: cover;
   border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  font-size: 14px;
-  gap: 12px;
+  display: block;
 }
 
 /* ── SẢN PHẨM BÁN CHẠY ── */
@@ -320,10 +328,10 @@
   .footer-inner { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 768px) {
-  .hero-slider { flex-direction: column; min-height: auto; }
-  .hero-content { padding: 60px 24px 32px; }
-  .hero-title { font-size: 38px; }
-  .hero-visual { display: none; }
+  .hero-slider { height: 70vh; min-height: 480px; }
+  .hero-content { padding: 0 24px; }
+  .hero-title { font-size: 34px; }
+  .hero-sub { font-size: 15px; }
   .about-section .section-inner { grid-template-columns: 1fr; gap: 40px; }
   .products-grid { grid-template-columns: 1fr; }
   .rooms-grid { grid-template-columns: repeat(2, 1fr); }

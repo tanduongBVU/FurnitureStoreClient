@@ -2,32 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 import { useCart } from "../../contexts/CartContext";
+import { useSettings } from "../../contexts/SettingsContext";
 import "./Home.css";
-
-// ── Data ──────────────────────────────────────────────
-const slides = [
-  {
-    id: 1,
-    title: "Không gian sống\nđẳng cấp",
-    sub: "Nội thất cao cấp — tinh tế từng đường nét",
-    bg: "#2c1f10",
-    accent: "#c8a96e",
-  },
-  {
-    id: 2,
-    title: "Chất liệu\ntự nhiên",
-    sub: "Gỗ óc chó, gỗ sồi nhập khẩu chính hãng",
-    bg: "#1a2c20",
-    accent: "#7ab87a",
-  },
-  {
-    id: 3,
-    title: "Thiết kế\nriêng cho bạn",
-    sub: "Tư vấn & thi công theo yêu cầu",
-    bg: "#1a1f2c",
-    accent: "#6e9ec8",
-  },
-];
 
 const rooms = [
   { id: 1, label: "Phòng Khách", icon: "🛋️", desc: "Sofa, kệ TV, bàn trà, tủ trang trí" },
@@ -43,6 +19,34 @@ export default function Home() {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef(null);
   const { addToCart } = useCart();
+  const { get } = useSettings();
+
+  const slides = [
+    {
+      id: 1,
+      title: get("hero.slide1.title", "Không gian sống\nđẳng cấp"),
+      sub: get("hero.slide1.subtitle", "Nội thất cao cấp — tinh tế từng đường nét"),
+      bg: get("hero.slide1.bg", "#2c1f10"),
+      accent: get("hero.slide1.accent", "#c8a96e"),
+      img: get("hero.slide1.image", "https://loremflickr.com/900/700/livingroom,luxury"),
+    },
+    {
+      id: 2,
+      title: get("hero.slide2.title", "Chất liệu\ntự nhiên"),
+      sub: get("hero.slide2.subtitle", "Gỗ óc chó, gỗ sồi nhập khẩu chính hãng"),
+      bg: get("hero.slide2.bg", "#1a2c20"),
+      accent: get("hero.slide2.accent", "#7ab87a"),
+      img: get("hero.slide2.image", "https://loremflickr.com/900/700/woodfurniture,walnut"),
+    },
+    {
+      id: 3,
+      title: get("hero.slide3.title", "Thiết kế\nriêng cho bạn"),
+      sub: get("hero.slide3.subtitle", "Tư vấn & thi công theo yêu cầu"),
+      bg: get("hero.slide3.bg", "#1a1f2c"),
+      accent: get("hero.slide3.accent", "#6e9ec8"),
+      img: get("hero.slide3.image", "https://loremflickr.com/900/700/furniture,craftsman"),
+    },
+  ];
 
   const [bestSellers, setBestSellers] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -100,6 +104,13 @@ export default function Home() {
 
       {/* ── SLIDER ── */}
       <section className="hero-slider" style={{ background: slide.bg }}>
+        <img
+          src={slide.img}
+          alt={slide.title.replace("\n", " ")}
+          className="hero-bg-image"
+        />
+        <div className="hero-overlay" />
+
         <div className="hero-content">
           <span className="hero-eyebrow" style={{ color: slide.accent }}>LuxWood Collection 2025</span>
           <h1 className="hero-title" style={{ "--accent": slide.accent }}>
@@ -115,19 +126,14 @@ export default function Home() {
             <Link to="/about" className="btn-ghost">Về chúng tôi</Link>
           </div>
         </div>
-        <div className="hero-visual">
-          <div className="hero-placeholder" style={{ borderColor: slide.accent }}>
-            <span style={{ color: slide.accent, fontSize: 48 }}>🛋️</span>
-            <p style={{ color: slide.accent, opacity: 0.6, fontSize: 13, marginTop: 12 }}>Ảnh sản phẩm</p>
-          </div>
-        </div>
+
         {/* Dots */}
         <div className="slider-dots">
           {slides.map((_, i) => (
             <button
               key={i}
               className={`dot ${i === current ? "dot--active" : ""}`}
-              style={{ background: i === current ? slide.accent : "rgba(255,255,255,0.3)" }}
+              style={{ background: i === current ? slide.accent : "rgba(255,255,255,0.4)" }}
               onClick={() => goTo(i)}
             />
           ))}
@@ -142,20 +148,25 @@ export default function Home() {
         <div className="section-inner">
           <div className="about-text">
             <span className="eyebrow">Về LuxWood</span>
-            <h2>Hơn 15 năm kiến tạo<br />không gian sống đẹp</h2>
-            <p>Chúng tôi tin rằng một ngôi nhà đẹp bắt đầu từ những món đồ nội thất được làm ra với tâm huyết. Mỗi sản phẩm của LuxWood đều được chọn lọc từ gỗ tự nhiên cao cấp, gia công thủ công tỉ mỉ và qua kiểm định chất lượng nghiêm ngặt.</p>
+            <h2>
+              {get("about.title", "Hơn 15 năm kiến tạo\nkhông gian sống đẹp").split("\n").map((line, i, arr) => (
+                <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+              ))}
+            </h2>
+            <p>{get("about.description", "Chúng tôi tin rằng một ngôi nhà đẹp bắt đầu từ những món đồ nội thất được làm ra với tâm huyết. Mỗi sản phẩm của LuxWood đều được chọn lọc từ gỗ tự nhiên cao cấp, gia công thủ công tỉ mỉ và qua kiểm định chất lượng nghiêm ngặt.")}</p>
             <div className="stats">
-              <div className="stat"><strong>500+</strong><span>Sản phẩm</span></div>
-              <div className="stat"><strong>10.000+</strong><span>Khách hàng</span></div>
-              <div className="stat"><strong>15+</strong><span>Năm kinh nghiệm</span></div>
+              <div className="stat"><strong>{get("about.stat1Number", "500+")}</strong><span>{get("about.stat1Label", "Sản phẩm")}</span></div>
+              <div className="stat"><strong>{get("about.stat2Number", "10.000+")}</strong><span>{get("about.stat2Label", "Khách hàng")}</span></div>
+              <div className="stat"><strong>{get("about.stat3Number", "15+")}</strong><span>{get("about.stat3Label", "Năm kinh nghiệm")}</span></div>
             </div>
             <Link to="/about" className="btn-outline">Tìm hiểu thêm →</Link>
           </div>
           <div className="about-img">
-            <div className="img-placeholder">
-              <span style={{ fontSize: 64 }}>🏠</span>
-              <p>Ảnh showroom</p>
-            </div>
+            <img
+              src={get("about.image", "https://loremflickr.com/800/600/furniture,showroom")}
+              alt="Showroom LuxWood"
+              className="about-real-img"
+            />
           </div>
         </div>
       </section>
@@ -234,10 +245,10 @@ export default function Home() {
             <h2 style={{ color: "#fff" }}>Bạn cần tư vấn?</h2>
             <p style={{ color: "rgba(255,255,255,0.7)" }}>Đội ngũ chuyên gia của chúng tôi sẵn sàng hỗ trợ bạn chọn lựa nội thất phù hợp nhất.</p>
             <ul className="contact-list">
-              <li>📍 123 Đường Nội Thất, Quận 1, TP.HCM</li>
-              <li>📞 0909 123 456</li>
-              <li>✉️ hello@luxwood.vn</li>
-              <li>🕐 Thứ 2 – Thứ 7: 8:00 – 20:00</li>
+              <li>📍 {get("footer.address", "123 Đường Nội Thất, Quận 1, TP.HCM")}</li>
+              <li>📞 {get("footer.phone", "0909 123 456")}</li>
+              <li>✉️ {get("footer.email", "hello@luxwood.vn")}</li>
+              <li>🕐 {get("footer.hours", "Thứ 2 – Thứ 7: 8:00 – 20:00")}</li>
             </ul>
           </div>
           <form className="contact-form" onSubmit={handleContactSubmit}>
