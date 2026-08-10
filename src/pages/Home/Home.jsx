@@ -28,7 +28,7 @@ export default function Home() {
       sub: get("hero.slide1.subtitle", "Nội thất cao cấp — tinh tế từng đường nét"),
       bg: get("hero.slide1.bg", "#2c1f10"),
       accent: get("hero.slide1.accent", "#c8a96e"),
-      img: get("hero.slide1.image", ""),
+      img: get("hero.slide1.image", "https://loremflickr.com/900/700/livingroom,luxury"),
     },
     {
       id: 2,
@@ -36,7 +36,7 @@ export default function Home() {
       sub: get("hero.slide2.subtitle", "Gỗ óc chó, gỗ sồi nhập khẩu chính hãng"),
       bg: get("hero.slide2.bg", "#1a2c20"),
       accent: get("hero.slide2.accent", "#7ab87a"),
-      img: get("hero.slide2.image", ""),
+      img: get("hero.slide2.image", "https://loremflickr.com/900/700/woodfurniture,walnut"),
     },
     {
       id: 3,
@@ -44,7 +44,7 @@ export default function Home() {
       sub: get("hero.slide3.subtitle", "Tư vấn & thi công theo yêu cầu"),
       bg: get("hero.slide3.bg", "#1a1f2c"),
       accent: get("hero.slide3.accent", "#6e9ec8"),
-      img: get("hero.slide3.image", ""),
+      img: get("hero.slide3.image", "https://loremflickr.com/900/700/furniture,craftsman"),
     },
   ];
 
@@ -104,13 +104,11 @@ export default function Home() {
 
       {/* ── SLIDER ── */}
       <section className="hero-slider" style={{ background: slide.bg }}>
-        {slide.img && (
-          <img
-            src={slide.img}
-            alt={slide.title.replace("\n", " ")}
-            className="hero-bg-image"
-          />
-        )}
+        <img
+          src={slide.img}
+          alt={slide.title.replace("\n", " ")}
+          className="hero-bg-image"
+        />
         <div className="hero-overlay" />
 
         <div className="hero-content">
@@ -164,13 +162,11 @@ export default function Home() {
             <Link to="/about" className="btn-outline">Tìm hiểu thêm →</Link>
           </div>
           <div className="about-img">
-            {get("about.image", "") && (
-              <img
-                src={get("about.image", "")}
-                alt="Showroom LuxWood"
-                className="about-real-img"
-              />
-            )}
+            <img
+              src={get("about.image", "https://loremflickr.com/800/600/furniture,showroom")}
+              alt="Showroom LuxWood"
+              className="about-real-img"
+            />
           </div>
         </div>
       </section>
@@ -230,13 +226,29 @@ export default function Home() {
             <h2>Nội thất theo từng phòng</h2>
           </div>
           <div className="rooms-grid">
-            {rooms.map((r) => (
-              <Link to="/products" className="room-card" key={r.id}>
-                <span className="room-icon">{r.icon}</span>
-                <h3>{r.label}</h3>
-                <p>{r.desc}</p>
-              </Link>
-            ))}
+            {rooms.map((r) => {
+              const roomImage = get(`rooms.room${r.id}.image`, "");
+              return (
+                <Link to="/products" className="room-card" key={r.id}>
+                  <div className="room-img">
+                    {roomImage ? (
+                      <>
+                        <img src={roomImage} alt={r.label} />
+                        <span className="room-icon">{r.icon}</span>
+                      </>
+                    ) : (
+                      <div className="room-img-placeholder">
+                        <span style={{ fontSize: 40 }}>{r.icon}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="room-card-body">
+                    <h3>{r.label}</h3>
+                    <p>{r.desc}</p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
