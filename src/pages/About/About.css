@@ -57,24 +57,50 @@
 }
 .btn-outline-dark:hover { background: var(--walnut); color: var(--cream); }
 
-/* ── BANNER ── */
+/* ── BANNER (full-bleed: ảnh phủ kín nền, nội dung đè lên trên, canh giữa) ── */
 .about-banner {
-  min-height: 520px;
+  position: relative;
+  min-height: 560px;
   background: var(--walnut);
   display: flex;
   align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
-.about-banner__content { flex: 1; padding: 80px 64px; }
+.about-banner-bg { position: absolute; inset: 0; z-index: 0; }
+.about-banner-bg-img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  object-fit: cover;
+  display: block;
+}
+.about-banner-bg-placeholder {
+  width: 100%; height: 100%; min-height: 560px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: rgba(200,169,110,.5); font-size: 13px; gap: 12px;
+}
+.about-banner-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(180deg, rgba(59,42,26,.72) 0%, rgba(59,42,26,.85) 100%);
+}
+.about-banner__content {
+  position: relative; z-index: 2;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 80px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .about-banner__content h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 52px; color: #fff; margin: 12px 0 20px; line-height: 1.15; }
 .about-banner__content p { color: rgba(255,255,255,.65); font-size: 17px; margin-bottom: 40px; line-height: 1.7; }
-.about-banner__stats { display: flex; align-items: center; gap: 32px; flex-wrap: wrap; }
-.banner-stat { display: flex; flex-direction: column; }
+.about-banner__stats { display: flex; align-items: center; justify-content: center; gap: 32px; flex-wrap: wrap; }
+.banner-stat { display: flex; flex-direction: column; align-items: center; }
 .banner-stat strong { font-family: 'Playfair Display', Georgia, serif; font-size: 32px; color: var(--gold); }
 .banner-stat span { font-size: 13px; color: rgba(255,255,255,.55); margin-top: 2px; }
 .banner-stat-divider { width: 1px; height: 40px; background: rgba(255,255,255,.15); }
-.about-banner__img { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
-.banner-img-placeholder { width: 360px; height: 360px; border: 2px dashed rgba(200,169,110,.4); border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: rgba(200,169,110,.5); font-size: 13px; gap: 12px; }
 
 /* ── COMPANY ── */
 .company-section { padding: 96px 0; background: #fff; }
@@ -82,6 +108,7 @@
 .company-text p { color: var(--text-muted); line-height: 1.8; margin-bottom: 16px; }
 .company-text p:last-of-type { margin-bottom: 32px; }
 .company-img { position: relative; }
+.img-real.tall { width: 100%; height: 420px; object-fit: cover; border-radius: 16px; display: block; }
 .img-badge { position: absolute; bottom: -20px; right: -20px; background: var(--gold); border-radius: 12px; padding: 20px 24px; text-align: center; }
 .img-badge strong { display: block; font-family: 'Playfair Display', Georgia, serif; font-size: 28px; color: var(--walnut); }
 .img-badge span { font-size: 12px; color: var(--walnut); opacity: .7; }
@@ -138,6 +165,7 @@
 .team-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(59,42,26,.1); }
 .team-avatar { display: none; }
 .team-img-placeholder { width: 88px; height: 88px; background: var(--cream); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+.team-avatar-real { width: 88px; height: 88px; object-fit: cover; border-radius: 50%; margin: 0 auto 16px; display: block; }
 .team-card h3 { font-size: 16px; font-weight: 600; color: var(--walnut); margin: 0 0 6px; }
 .team-role { display: block; font-size: 13px; color: var(--gold-d); font-weight: 500; margin-bottom: 4px; }
 .team-exp { display: block; font-size: 12px; color: var(--text-muted); }
@@ -187,10 +215,10 @@
   .partners-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 768px) {
-  .about-banner { flex-direction: column; }
+  .about-banner { min-height: 460px; }
   .about-banner__content { padding: 60px 24px 40px; }
   .about-banner__content h1 { font-size: 36px; }
-  .about-banner__img { display: none; }
+  .about-banner__stats { gap: 20px; }
   .two-col { grid-template-columns: 1fr; gap: 40px; }
   .mission-grid { grid-template-columns: 1fr; }
   .values-grid { grid-template-columns: 1fr; }

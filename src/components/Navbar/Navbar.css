@@ -115,9 +115,12 @@
   font-weight: 600;
 }
 
-/* ── CTA Button ── */
+/* ── CTA Button + khu vực hành động (giỏ hàng / tài khoản / nút CTA) ── */
 .navbar__actions {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .navbar__cta {
@@ -133,6 +136,8 @@
   border: 2px solid var(--walnut);
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 
 .navbar__cta:hover {
@@ -226,6 +231,7 @@
   margin-top: 12px;
   text-align: center;
   padding: 12px 20px;
+  margin-left: 0;
 }
 
 /* ── Responsive ── */
@@ -244,7 +250,7 @@
   }
 }
 
-/* ── Thêm vào cuối file Navbar.css ── */
+/* ── Giỏ hàng ── */
 .navbar__cart {
   position: relative;
   display: inline-flex;
@@ -254,6 +260,7 @@
   text-decoration: none;
   margin-right: 8px;
   line-height: 1;
+  flex-shrink: 0;
 }
 .navbar__cart-badge {
   position: absolute;
@@ -272,7 +279,7 @@
   justify-content: center;
 }
 
-/* ── Thêm vào cuối file Navbar.css (nối tiếp phần navbar__cart đã thêm trước đó) ── */
+/* ── Đăng nhập / Tài khoản ── */
 .navbar__login-link {
   font-size: 14px;
   color: #3b2a1a;
@@ -280,10 +287,17 @@
   font-weight: 500;
   margin-right: 8px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .navbar__login-link:hover { color: #a8854a; }
 
-.navbar__account { position: relative; margin-right: 8px; }
+.navbar__account {
+  position: relative;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
 .navbar__account-btn {
   background: none;
   border: none;
