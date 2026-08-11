@@ -75,6 +75,12 @@ const Navbar = () => {
               {accountOpen && (
                 <div className="navbar__account-dropdown">
                   <p className="navbar__account-email">{user.email}</p>
+                  <Link to="/orders" className="navbar__account-link" onClick={() => setAccountOpen(false)}>
+                    Đơn hàng của tôi
+                  </Link>
+                  <Link to="/account" className="navbar__account-link" onClick={() => setAccountOpen(false)}>
+                    Tài khoản của tôi
+                  </Link>
                   <button onClick={handleLogout}>Đăng xuất</button>
                 </div>
               )}
@@ -117,6 +123,8 @@ const Navbar = () => {
         {isLoggedIn ? (
           <>
             <p className="navbar__mobile-user">Xin chào, {user.name}</p>
+            <Link to="/orders" className="navbar__mobile-link">Đơn hàng của tôi</Link>
+            <Link to="/account" className="navbar__mobile-link">Tài khoản của tôi</Link>
             <button className="navbar__mobile-link navbar__mobile-logout" onClick={handleLogout}>
               Đăng xuất
             </button>

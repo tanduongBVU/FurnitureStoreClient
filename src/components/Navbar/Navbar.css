@@ -325,6 +325,19 @@
   z-index: 50;
 }
 .navbar__account-email { font-size: 12px; color: #7a6a58; margin: 0 0 10px; padding: 0 4px; word-break: break-all; }
+.navbar__account-link {
+  display: block;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: #3b2a1a;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background .15s;
+  margin-bottom: 4px;
+}
+.navbar__account-link:hover { background: rgba(59,42,26,.06); }
 .navbar__account-dropdown button {
   width: 100%;
   padding: 9px 12px;
