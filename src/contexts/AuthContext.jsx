@@ -38,6 +38,20 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
+  // Cập nhật tên, số điện thoại & địa chỉ — dùng cho trang Tài khoản cá nhân
+  const updateProfile = async (form) => {
+    const res = await api.put("/Auth/me", form);
+    const updated = { ...user, name: res.data.name, phone: res.data.phone, address: res.data.address };
+    localStorage.setItem("clientUser", JSON.stringify(updated));
+    setUser(updated);
+    return updated;
+  };
+
+  // Đổi mật khẩu — yêu cầu nhập đúng mật khẩu hiện tại (backend tự kiểm tra)
+  const changePassword = async (currentPassword, newPassword) => {
+    await api.put("/Auth/change-password", { currentPassword, newPassword });
+  };
+
   const logout = () => {
     localStorage.removeItem("clientToken");
     localStorage.removeItem("clientUser");
@@ -45,7 +59,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isLoggedIn: !!user }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, updateProfile, changePassword, isLoggedIn: !!user }}
+    >
       {children}
     </AuthContext.Provider>
   );
