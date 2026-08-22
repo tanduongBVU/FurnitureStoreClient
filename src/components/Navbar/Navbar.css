@@ -7,12 +7,13 @@
   --gold-dark: #a8854a;
   --text-nav: #2c1f10;
   --nav-height: 72px;
+  --banner-h: 0px;
 }
 
 /* ── Base ── */
 .navbar {
   position: fixed;
-  top: 0;
+  top: var(--banner-h, 0px);
   left: 0;
   right: 0;
   z-index: 1000;
@@ -21,7 +22,7 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid transparent;
-  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, top 0.2s ease;
 }
 
 .navbar--scrolled {
@@ -32,13 +33,13 @@
 
 /* ── Container ── */
 .navbar__container {
-  max-width: 1200px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 0 24px;
   height: 100%;
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 20px;
 }
 
 /* ── Logo ── */
@@ -72,19 +73,22 @@
 .navbar__links {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 2px;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .navbar__link {
   position: relative;
   text-decoration: none;
   color: var(--text-nav);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.3px;
-  padding: 6px 14px;
+  padding: 6px 10px;
   border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: color 0.2s ease;
 }
 
@@ -113,6 +117,127 @@
 .navbar__link--active {
   color: var(--walnut);
   font-weight: 600;
+}
+
+/* ── Dropdown "Sản Phẩm" theo danh mục phòng (desktop) ── */
+.navbar__dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.navbar__link--dropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* "Dịch Vụ" dùng thẻ <button> (không có trang riêng để trỏ tới, chỉ mở dropdown) thay vì
+   <Link> như các mục khác — reset toàn bộ style mặc định của button để trông giống hệt
+   .navbar__link (nền trong suốt, không viền, không outline khi bấm chuột). Vẫn giữ outline
+   khi điều hướng bằng bàn phím (:focus-visible) để không phá khả năng tiếp cận (a11y). */
+button.navbar__link {
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+}
+button.navbar__link:focus:not(:focus-visible) {
+  outline: none;
+}
+button.navbar__link:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.navbar__dropdown-arrow {
+  display: inline-block;
+  font-size: 11px;
+  transition: transform 0.2s ease;
+  transform-origin: center;
+}
+
+.navbar__dropdown-arrow--open {
+  transform: rotate(180deg);
+}
+
+.navbar__dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  background: #fff;
+  border: 1px solid #e5ddd0;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(59, 42, 26, 0.14);
+  padding: 10px;
+  min-width: 220px;
+  z-index: 50;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+}
+
+.navbar__dropdown-menu--open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.navbar__dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--text-nav);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.navbar__dropdown-item:hover {
+  background: rgba(200, 169, 110, 0.14);
+  color: var(--walnut);
+}
+
+.navbar__dropdown-item--all {
+  font-weight: 600;
+  color: var(--gold-dark);
+  border-bottom: 1px solid rgba(200, 169, 110, 0.25);
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 4px;
+  padding-bottom: 12px;
+}
+
+.navbar__dropdown-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ── Link "Khuyến Mãi" — cố tình nổi bật màu đỏ để bắt mắt ── */
+.navbar__link--promo {
+  color: #b91c1c;
+  font-weight: 700;
+}
+.navbar__link--promo:hover {
+  color: #b91c1c;
+}
+.navbar__link--promo::after {
+  background: #b91c1c;
+}
+.navbar__mobile-link--promo {
+  color: #b91c1c;
+  font-weight: 700;
+}
+.navbar__mobile-link--promo:hover {
+  color: #b91c1c;
 }
 
 /* ── CTA Button + khu vực hành động (giỏ hàng / tài khoản / nút CTA) ── */
@@ -201,7 +326,7 @@
 }
 
 .navbar__mobile--open {
-  max-height: 320px;
+  max-height: 640px;
   opacity: 1;
   padding-top: 16px;
   padding-bottom: 24px;
@@ -227,6 +352,61 @@
   font-weight: 600;
 }
 
+/* ── Accordion "Sản Phẩm" / "Dịch Vụ" theo danh mục (mobile) ── */
+.navbar__mobile-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar__mobile-link--toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.navbar__mobile-caret {
+  font-size: 12px;
+  transition: transform 0.2s ease;
+}
+
+.navbar__mobile-caret--open {
+  transform: rotate(180deg);
+}
+
+.navbar__mobile-submenu {
+  display: flex;
+  flex-direction: column;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.navbar__mobile-submenu--open {
+  max-height: 320px;
+}
+
+.navbar__mobile-sublink {
+  text-decoration: none;
+  color: var(--text-nav);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 0 10px 16px;
+  border-bottom: 1px solid rgba(200, 169, 110, 0.15);
+  opacity: 0.85;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.navbar__mobile-sublink:hover {
+  color: var(--walnut);
+  opacity: 1;
+}
+
 .navbar__cta--mobile {
   margin-top: 12px;
   text-align: center;
@@ -235,7 +415,7 @@
 }
 
 /* ── Responsive ── */
-@media (max-width: 768px) {
+@media (max-width: 1100px) {
   .navbar__links,
   .navbar__actions {
     display: none;

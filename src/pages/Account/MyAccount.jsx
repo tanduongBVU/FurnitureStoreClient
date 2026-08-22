@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../services/api";
+import Reveal from "../../components/Reveal/Reveal";
 import "./MyAccount.css";
 
 export default function MyAccount() {
@@ -95,7 +96,7 @@ export default function MyAccount() {
 
       <div className="section-inner myaccount-body">
         {/* ── Hồ sơ cá nhân ── */}
-        <div className="account-card">
+        <Reveal as="div" className="account-card" direction="left">
           <h2>Hồ sơ cá nhân</h2>
           {loadingProfile ? (
             <p className="account-loading">Đang tải thông tin...</p>
@@ -141,10 +142,10 @@ export default function MyAccount() {
               </button>
             </form>
           )}
-        </div>
+        </Reveal>
 
         {/* ── Đổi mật khẩu ── */}
-        <div className="account-card">
+        <Reveal as="div" className="account-card" direction="right" delay={120}>
           <h2>Đổi mật khẩu</h2>
           <form onSubmit={handleChangePassword} className="account-form">
             {pwMsg.text && (
@@ -183,7 +184,7 @@ export default function MyAccount() {
               {savingPw ? "Đang đổi..." : "Đổi mật khẩu"}
             </button>
           </form>
-        </div>
+        </Reveal>
       </div>
     </div>
   );

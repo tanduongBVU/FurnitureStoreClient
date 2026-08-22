@@ -1,21 +1,34 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext(null);
 const STORAGE_KEY = "luxwood_cart";
 
+// Mỗi tài khoản có giỏ hàng riêng — khách chưa đăng nhập dùng key "guest"
+const getStorageKey = (userId) => (userId ? `${STORAGE_KEY}_user_${userId}` : `${STORAGE_KEY}_guest`);
+
+const loadCart = (userId) => {
+  try {
+    const saved = localStorage.getItem(getStorageKey(userId));
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+};
+
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const { user } = useAuth();
+  const [cart, setCart] = useState(() => loadCart(user?.id));
+
+  // Mỗi khi tài khoản đổi (đăng nhập / đăng xuất / đăng ký tài khoản mới)
+  // => nạp lại đúng giỏ hàng của tài khoản đó, không dùng chung nữa
+  useEffect(() => {
+    setCart(loadCart(user?.id));
+  }, [user?.id]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
-  }, [cart]);
+    localStorage.setItem(getStorageKey(user?.id), JSON.stringify(cart));
+  }, [cart, user?.id]);
 
   const addToCart = (product, quantity = 1) => {
     setCart(prev => {

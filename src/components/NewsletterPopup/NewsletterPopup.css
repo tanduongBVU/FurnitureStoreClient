@@ -1,0 +1,53 @@
+.newsletter-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 18, 8, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: newsletter-fade-in 0.25s ease;
+}
+
+.newsletter-popup-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px 32px 28px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(59, 42, 26, 0.25);
+  animation: newsletter-pop-in 0.3s ease;
+}
+
+.newsletter-popup-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: #f4f0e8;
+  color: #7a6a58;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.newsletter-popup-close:hover {
+  background: #e5ddd0;
+}
+
+@keyframes newsletter-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes newsletter-pop-in {
+  from { opacity: 0; transform: scale(0.94) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}

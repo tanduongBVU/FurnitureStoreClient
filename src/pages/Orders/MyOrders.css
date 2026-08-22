@@ -9,9 +9,9 @@
 
 .myorders-page { width: 100%; min-height: 60vh; background: #fff; }
 
-.section-inner { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+.myorders-page .section-inner { max-width: 900px; margin: 0 auto; padding: 0 24px; }
 
-.eyebrow { display: block; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-d); margin-bottom: 10px; }
+.myorders-page .eyebrow { display: block; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-d); margin-bottom: 10px; }
 
 .myorders-header {
   background: var(--walnut);
@@ -22,7 +22,7 @@
 
 .myorders-body { padding: 48px 24px 96px; }
 
-.btn-dark {
+.myorders-page .btn-dark {
   display: inline-flex;
   align-items: center;
   padding: 13px 28px;
@@ -36,7 +36,7 @@
   transition: background .2s, color .2s;
   margin-top: 20px;
 }
-.btn-dark:hover { background: var(--gold-d); border-color: var(--gold-d); }
+.myorders-page .btn-dark:hover { background: var(--gold-d); border-color: var(--gold-d); }
 
 /* ── Loading / Empty ── */
 .myorders-loading, .myorders-empty {

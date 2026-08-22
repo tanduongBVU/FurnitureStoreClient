@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSettings } from "../../contexts/SettingsContext";
+import Reveal from "../../components/Reveal/Reveal";
 import "./About.css";
 
 // ── Data (các phần chưa đưa vào CMS — sửa trực tiếp ở đây khi cần) ──
@@ -104,6 +105,8 @@ export default function About() {
     <div className="about-page">
 
       {/* ── BANNER (full-bleed, nội dung canh giữa) ── */}
+      {/* Không bọc Reveal — đây là phần đầu trang, luôn hiện ngay khi vào trang,
+          không cần chờ cuộn tới mới hiện. */}
       <section className="about-banner">
         <div className="about-banner-bg">
           {bannerImage ? (
@@ -156,7 +159,7 @@ export default function About() {
       {/* ── GIỚI THIỆU CÔNG TY ── */}
       <section className="company-section">
         <div className="section-inner two-col">
-          <div className="company-img">
+          <Reveal as="div" className="company-img" direction="left">
             {companyImage ? (
               <img src={companyImage} alt="Xưởng sản xuất LuxWood" className="img-real tall" />
             ) : (
@@ -169,15 +172,15 @@ export default function About() {
               <strong>{get("aboutpage.company.year", "2009")}</strong>
               <span>Năm thành lập</span>
             </div>
-          </div>
-          <div className="company-text">
+          </Reveal>
+          <Reveal as="div" className="company-text" direction="right" delay={120}>
             <span className="eyebrow">Câu chuyện của chúng tôi</span>
             <h2>{get("aboutpage.company.title", "Từ xưởng mộc nhỏ đến thương hiệu nội thất hàng đầu")}</h2>
             <p>{get("aboutpage.company.paragraph1", "LuxWood được thành lập năm 2009 bởi nghệ nhân Nguyễn Minh Khoa với niềm đam mê về gỗ và khát vọng mang đến những sản phẩm nội thất chất lượng cao cho người Việt.")}</p>
             <p>{get("aboutpage.company.paragraph2", "Từ một xưởng mộc nhỏ tại Bình Dương với 5 thợ lành nghề, chúng tôi đã phát triển thành doanh nghiệp với hơn 200 nhân sự, showroom tại TP.HCM và Hà Nội, phục vụ hàng nghìn khách hàng trên toàn quốc.")}</p>
             <p>{get("aboutpage.company.paragraph3", "Mỗi sản phẩm LuxWood là sự kết hợp giữa kỹ thuật gia công hiện đại và tay nghề thủ công tinh xảo — tạo nên những tác phẩm vừa đẹp, vừa bền, vừa mang hơi thở tự nhiên.")}</p>
             <Link to="/products" className="btn-dark">Khám phá sản phẩm →</Link>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -185,21 +188,21 @@ export default function About() {
       <section className="mission-section">
         <div className="section-inner">
           <div className="mission-grid">
-            <div className="mission-card mission-card--dark">
+            <Reveal as="div" className="mission-card mission-card--dark" delay={0}>
               <span className="mission-icon">🎯</span>
               <h3>Sứ mệnh</h3>
               <p>Mang đến những sản phẩm nội thất gỗ tự nhiên chất lượng cao, giúp mỗi gia đình Việt Nam có được không gian sống đẹp, bền vững và đậm chất riêng.</p>
-            </div>
-            <div className="mission-card mission-card--gold">
+            </Reveal>
+            <Reveal as="div" className="mission-card mission-card--gold" delay={100}>
               <span className="mission-icon">🔭</span>
               <h3>Tầm nhìn</h3>
               <p>Trở thành thương hiệu nội thất gỗ tự nhiên uy tín hàng đầu Đông Nam Á vào năm 2030, được khách hàng tin tưởng và lựa chọn vì chất lượng và giá trị bền vững.</p>
-            </div>
-            <div className="mission-card mission-card--light">
+            </Reveal>
+            <Reveal as="div" className="mission-card mission-card--light" delay={200}>
               <span className="mission-icon">💡</span>
               <h3>Triết lý</h3>
               <p>Chúng tôi tin rằng một ngôi nhà đẹp không chỉ đến từ thiết kế — mà từ những vật liệu chân thật, tự nhiên và câu chuyện đằng sau mỗi món đồ.</p>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -207,17 +210,17 @@ export default function About() {
       {/* ── GIÁ TRỊ CỐT LÕI ── */}
       <section className="values-section">
         <div className="section-inner">
-          <div className="section-header">
+          <Reveal as="div" className="section-header">
             <span className="eyebrow">Nền tảng của chúng tôi</span>
             <h2>Giá trị cốt lõi</h2>
-          </div>
+          </Reveal>
           <div className="values-grid">
             {values.map((v, i) => (
-              <div className="value-card" key={i}>
+              <Reveal as="div" className="value-card" key={i} delay={Math.min(i * 80, 320)}>
                 <span className="value-icon">{v.icon}</span>
                 <h3>{v.title}</h3>
                 <p>{v.desc}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -226,20 +229,20 @@ export default function About() {
       {/* ── VÌ SAO CHỌN CHÚNG TÔI ── */}
       <section className="whyus-section">
         <div className="section-inner two-col">
-          <div className="whyus-text">
+          <Reveal as="div" className="whyus-text" direction="left">
             <span className="eyebrow">Lợi thế của LuxWood</span>
             <h2>Vì sao chọn chúng tôi?</h2>
             <p>Chúng tôi không chỉ bán sản phẩm — chúng tôi cung cấp trải nghiệm hoàn chỉnh từ lúc bạn bước vào showroom đến khi đặt chiếc ghế cuối cùng vào nhà.</p>
-          </div>
+          </Reveal>
           <div className="whyus-list">
             {whyUs.map((w, i) => (
-              <div className="whyus-item" key={i}>
+              <Reveal as="div" className="whyus-item" key={i} direction="right" delay={Math.min(i * 90, 360)}>
                 <span className="whyus-num">{w.num}</span>
                 <div>
                   <h4>{w.title}</h4>
                   <p>{w.desc}</p>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -248,18 +251,18 @@ export default function About() {
       {/* ── QUY TRÌNH ── */}
       <section className="process-section">
         <div className="section-inner">
-          <div className="section-header">
+          <Reveal as="div" className="section-header">
             <span className="eyebrow">Cách chúng tôi làm việc</span>
             <h2>Quy trình làm việc</h2>
-          </div>
+          </Reveal>
           <div className="process-grid">
             {steps.map((s, i) => (
-              <div className="process-card" key={i}>
+              <Reveal as="div" className="process-card" key={i} delay={Math.min(i * 70, 420)}>
                 <span className="process-step">{s.step}</span>
                 <h3>{s.title}</h3>
                 <p>{s.desc}</p>
                 {i < steps.length - 1 && <div className="process-arrow">→</div>}
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -268,13 +271,13 @@ export default function About() {
       {/* ── ĐỘI NGŨ ── */}
       <section className="team-section">
         <div className="section-inner">
-          <div className="section-header">
+          <Reveal as="div" className="section-header">
             <span className="eyebrow">Con người LuxWood</span>
             <h2>Đội ngũ lãnh đạo</h2>
-          </div>
+          </Reveal>
           <div className="team-grid">
             {team.map((t, i) => (
-              <div className="team-card" key={i}>
+              <Reveal as="div" className="team-card" key={i} delay={Math.min(i * 80, 320)}>
                 {t.image ? (
                   <img src={t.image} alt={t.name} className="team-avatar-real" />
                 ) : (
@@ -288,7 +291,7 @@ export default function About() {
                 <h3>{t.name}</h3>
                 <span className="team-role">{t.role}</span>
                 <span className="team-exp">{t.exp}</span>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -297,13 +300,13 @@ export default function About() {
       {/* ── DỰ ÁN TIÊU BIỂU ── */}
       <section className="projects-section">
         <div className="section-inner">
-          <div className="section-header">
+          <Reveal as="div" className="section-header">
             <span className="eyebrow">Công trình nổi bật</span>
             <h2>Dự án tiêu biểu</h2>
-          </div>
+          </Reveal>
           <div className="projects-grid">
             {projects.map((p, i) => (
-              <div className="project-card" key={i}>
+              <Reveal as="div" className="project-card" key={i} delay={Math.min((i % 3) * 90, 270)}>
                 <div className="project-img-placeholder">
                   <span style={{ fontSize: 40 }}>{p.icon}</span>
                 </div>
@@ -312,7 +315,7 @@ export default function About() {
                   <h3>{p.name}</h3>
                   <span className="project-type">{p.type}</span>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -321,11 +324,11 @@ export default function About() {
       {/* ── TESTIMONIALS ── */}
       <section className="testimonials-section">
         <div className="section-inner">
-          <div className="section-header">
+          <Reveal as="div" className="section-header">
             <span className="eyebrow" style={{ color: "#c8a96e" }}>Phản hồi thực tế</span>
             <h2 style={{ color: "#fff" }}>Khách hàng nói gì về chúng tôi</h2>
-          </div>
-          <div className="testimonial-box">
+          </Reveal>
+          <Reveal as="div" className="testimonial-box" delay={120}>
             <div className="testimonial-stars">
               {"★".repeat(testimonials[activeTestimonial].rating)}
             </div>
@@ -339,7 +342,7 @@ export default function About() {
                 <span>{testimonials[activeTestimonial].role}</span>
               </div>
             </div>
-          </div>
+          </Reveal>
           <div className="testimonial-dots">
             {testimonials.map((_, i) => (
               <button
@@ -355,16 +358,16 @@ export default function About() {
       {/* ── ĐỐI TÁC ── */}
       <section className="partners-section">
         <div className="section-inner">
-          <div className="section-header">
+          <Reveal as="div" className="section-header">
             <span className="eyebrow">Hệ sinh thái LuxWood</span>
             <h2>Đối tác & Chứng nhận</h2>
-          </div>
+          </Reveal>
           <div className="partners-grid">
             {partners.map((p, i) => (
-              <div className="partner-card" key={i}>
+              <Reveal as="div" className="partner-card" key={i} delay={Math.min(i * 60, 300)}>
                 <span className="partner-icon">{p.icon}</span>
                 <span className="partner-name">{p.name}</span>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -372,14 +375,14 @@ export default function About() {
 
       {/* ── CTA ── */}
       <section className="about-cta">
-        <div className="section-inner" style={{ textAlign: "center" }}>
+        <Reveal as="div" className="section-inner" style={{ textAlign: "center" }}>
           <h2>Sẵn sàng tạo nên không gian sống trong mơ?</h2>
           <p>Đội ngũ tư vấn của chúng tôi luôn sẵn sàng hỗ trợ bạn.</p>
           <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
             <Link to="/products" className="btn-dark">Xem sản phẩm</Link>
             <a href="tel:0909123456" className="btn-outline-dark">Gọi ngay: 0909 123 456</a>
           </div>
-        </div>
+        </Reveal>
       </section>
 
     </div>

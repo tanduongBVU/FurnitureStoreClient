@@ -38,6 +38,20 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
+  // Đăng nhập bằng Google — nhận idToken do Google Identity Services cấp ở phía trình
+  // duyệt (xem GoogleLoginButton.jsx), gửi thẳng lên Backend để verify + đăng nhập/tạo
+  // tài khoản. Cùng shape response { token, id, name, email, role } như login/register
+  // thường, nên tái dùng đúng logic lưu localStorage + setUser, không lệch state.
+  const loginWithGoogle = async (idToken) => {
+    const res = await api.post("/Auth/google", { idToken });
+    const { token, id, name, email, role } = res.data;
+    const userData = { id, name, email, role };
+    localStorage.setItem("clientToken", token);
+    localStorage.setItem("clientUser", JSON.stringify(userData));
+    setUser(userData);
+    return userData;
+  };
+
   // Cập nhật tên, số điện thoại & địa chỉ — dùng cho trang Tài khoản cá nhân
   const updateProfile = async (form) => {
     const res = await api.put("/Auth/me", form);
@@ -60,7 +74,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, updateProfile, changePassword, isLoggedIn: !!user }}
+      value={{ user, login, register, loginWithGoogle, logout, updateProfile, changePassword, isLoggedIn: !!user }}
     >
       {children}
     </AuthContext.Provider>

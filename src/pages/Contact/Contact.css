@@ -1,0 +1,190 @@
+.contact-page {
+  min-height: 70vh;
+  padding-bottom: 60px;
+}
+
+/* Class dùng chung trong toàn site nhưng KHÔNG có định nghĩa global — mỗi trang tự khai báo
+   scoped theo class gốc của trang đó (xem cùng pattern ở .products-page .section-inner trong
+   Products.css). Thiếu dòng này khiến nội dung chạy full-width sát mép thay vì canh giữa. */
+.contact-page .section-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.contact-hero {
+  background: #3b2a1a;
+  padding: 56px 0;
+  margin-bottom: 48px;
+  text-align: left;
+}
+.contact-hero h1 {
+  color: #fff;
+  margin: 0 0 8px;
+}
+.contact-hero p {
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+}
+
+.contact-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+/* ── Cột thông tin ── */
+.contact-info-col h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  color: #3b2a1a;
+  margin: 8px 0 12px;
+}
+.contact-info-desc {
+  color: #7a6a58;
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0 0 28px;
+}
+
+.contact-info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.contact-info-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.contact-info-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #f4efe6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.contact-info-list li strong {
+  display: block;
+  font-size: 14px;
+  color: #3b2a1a;
+  margin-bottom: 2px;
+}
+.contact-info-list li span {
+  font-size: 13px;
+  color: #7a6a58;
+  line-height: 1.5;
+}
+
+.contact-map {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e5ddd0;
+}
+.contact-map iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ── Cột form ── */
+.contact-form-col {
+  background: #fff;
+  border: 1px solid #e5ddd0;
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.contact-form-col h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  color: #3b2a1a;
+  margin: 0 0 4px;
+}
+
+.contact-form-msg {
+  font-size: 13px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+.contact-form-msg--success {
+  background: #f0f9f0;
+  color: #2d5a2d;
+  border: 1px solid #bfe6bf;
+}
+.contact-form-msg--error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.contact-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.contact-form-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2c1f10;
+}
+.contact-form-field input,
+.contact-form-field textarea {
+  padding: 12px 14px;
+  border: 1.5px solid #e5ddd0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  color: #2c1f10;
+  color-scheme: light;
+  transition: border-color 0.2s;
+  resize: vertical;
+}
+.contact-form-field input:focus,
+.contact-form-field textarea:focus {
+  border-color: #c8a96e;
+}
+
+.contact-form-submit {
+  margin-top: 8px;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: #a8854a;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.contact-form-submit:hover:not(:disabled) {
+  opacity: 0.88;
+}
+.contact-form-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .contact-body {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .contact-hero {
+    padding: 40px 0;
+  }
+}

@@ -1,8 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import api from "../../services/api";
 import { useCart } from "../../contexts/CartContext";
 import { useSettings } from "../../contexts/SettingsContext";
+import Reveal from "../../components/Reveal/Reveal";
+import WishlistButton from "../../components/WishlistButton/WishlistButton";
+import CompareButton from "../../components/CompareButton/CompareButton";
+import RatingStars from "../../components/RatingStars/RatingStars";
+import NewsletterForm from "../../components/NewsletterForm/NewsletterForm";
 import "./Home.css";
 
 const rooms = [
@@ -14,12 +19,30 @@ const rooms = [
   { id: 6, label: "Ban Công", icon: "🌿", desc: "Bàn ghế ngoài trời, xích đu, đèn sân vườn" },
 ];
 
+// Nếu sản phẩm đang giảm giá, trả về bản sao với price = giá đã giảm
+// (dùng khi thêm vào giỏ để giỏ hàng luôn tính đúng giá đang bán, không phải giá gốc)
+const withSalePrice = (p) =>
+  p.discountPercent > 0
+    ? { ...p, price: Math.round(p.price * (1 - p.discountPercent / 100)) }
+    : p;
+
 // ── Component ─────────────────────────────────────────
 export default function Home() {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef(null);
   const { addToCart } = useCart();
   const { get } = useSettings();
+  const location = useLocation();
+
+  // Nếu URL có #contact (VD: bấm "Liên Hệ" ở Navbar từ trang khác) → tự cuộn mượt xuống
+  useEffect(() => {
+    if (location.hash === "#contact") {
+      const t = setTimeout(() => {
+        document.getElementById("contact")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+      return () => clearTimeout(t);
+    }
+  }, [location]);
 
   const slides = [
     {
@@ -28,7 +51,7 @@ export default function Home() {
       sub: get("hero.slide1.subtitle", "Nội thất cao cấp — tinh tế từng đường nét"),
       bg: get("hero.slide1.bg", "#2c1f10"),
       accent: get("hero.slide1.accent", "#c8a96e"),
-      img: get("hero.slide1.image", "https://loremflickr.com/900/700/livingroom,luxury"),
+      img: get("hero.slide1.image", "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1600&q=80&auto=format&fit=crop"),
     },
     {
       id: 2,
@@ -36,7 +59,7 @@ export default function Home() {
       sub: get("hero.slide2.subtitle", "Gỗ óc chó, gỗ sồi nhập khẩu chính hãng"),
       bg: get("hero.slide2.bg", "#1a2c20"),
       accent: get("hero.slide2.accent", "#7ab87a"),
-      img: get("hero.slide2.image", "https://loremflickr.com/900/700/woodfurniture,walnut"),
+      img: get("hero.slide2.image", "https://images.unsplash.com/photo-1621295693450-080546d2ec8e?w=1600&q=80&auto=format&fit=crop"),
     },
     {
       id: 3,
@@ -44,7 +67,7 @@ export default function Home() {
       sub: get("hero.slide3.subtitle", "Tư vấn & thi công theo yêu cầu"),
       bg: get("hero.slide3.bg", "#1a1f2c"),
       accent: get("hero.slide3.accent", "#6e9ec8"),
-      img: get("hero.slide3.image", "https://loremflickr.com/900/700/furniture,craftsman"),
+      img: get("hero.slide3.image", "https://images.unsplash.com/photo-1687180498602-5a1046defaa4?w=1600&q=80&auto=format&fit=crop"),
     },
   ];
 
@@ -98,6 +121,7 @@ export default function Home() {
 
   const slide = slides[current];
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
+  const salePriceOf = (p) => p.price * (1 - (p.discountPercent || 0) / 100);
 
   return (
     <div className="home">
@@ -146,7 +170,7 @@ export default function Home() {
       {/* ── GIỚI THIỆU ── */}
       <section className="about-section">
         <div className="section-inner">
-          <div className="about-text">
+          <Reveal as="div" className="about-text" direction="left">
             <span className="eyebrow">Về LuxWood</span>
             <h2>
               {get("about.title", "Hơn 15 năm kiến tạo\nkhông gian sống đẹp").split("\n").map((line, i, arr) => (
@@ -160,24 +184,24 @@ export default function Home() {
               <div className="stat"><strong>{get("about.stat3Number", "15+")}</strong><span>{get("about.stat3Label", "Năm kinh nghiệm")}</span></div>
             </div>
             <Link to="/about" className="btn-outline">Tìm hiểu thêm →</Link>
-          </div>
-          <div className="about-img">
+          </Reveal>
+          <Reveal as="div" className="about-img" direction="right" delay={120}>
             <img
-              src={get("about.image", "https://loremflickr.com/800/600/furniture,showroom")}
+              src={get("about.image", "https://images.unsplash.com/photo-1680503397090-0483be73406f?w=1200&q=80&auto=format&fit=crop")}
               alt="Showroom LuxWood"
               className="about-real-img"
             />
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* ── SẢN PHẨM BÁN CHẠY ── */}
       <section className="products-section">
         <div className="section-inner">
-          <div className="section-header">
+          <Reveal as="div" className="section-header">
             <span className="eyebrow">Được yêu thích nhất</span>
             <h2>Sản phẩm bán chạy</h2>
-          </div>
+          </Reveal>
 
           {loadingProducts ? (
             <p style={{ textAlign: "center", color: "var(--text-muted)" }}>Đang tải sản phẩm...</p>
@@ -187,28 +211,58 @@ export default function Home() {
             </p>
           ) : (
             <div className="products-grid">
-              {bestSellers.map((p) => (
-                <Link to={`/products/${p.id}`} className="product-card" key={p.id}>
-                  <div className="product-img">
-                    {p.image
-                      ? <img src={p.image} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => e.target.style.display = "none"} />
-                      : <span style={{ fontSize: 40 }}>🪑</span>
-                    }
-                    <span className="product-tag">Bán chạy</span>
-                  </div>
-                  <div className="product-info">
-                    <span className="product-cat">{p.category}</span>
-                    <h3>{p.name}</h3>
-                    <div className="product-footer">
-                      <strong className="product-price">{formatPrice(p.price)}</strong>
-                      <button
-                        className="btn-add"
-                        onClick={(e) => { e.preventDefault(); addToCart(p, 1); }}
-                      >+ Thêm</button>
+              {bestSellers.map((p, idx) => {
+                const hasDiscount = p.discountPercent > 0;
+                return (
+                  <Reveal as="div" key={p.id} delay={Math.min(idx * 80, 320)}>
+                  <Link to={`/products/${p.id}`} className="product-card">
+                    <div className="product-img">
+                      {p.image
+                        ? <img src={p.image} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => e.target.style.display = "none"} />
+                        : <span style={{ fontSize: 40 }}>🪑</span>
+                      }
+                      <span className="product-tag">Bán chạy</span>
+                      {hasDiscount && (
+                        <span
+                          style={{
+                            position: "absolute", top: 52, right: 12,
+                            background: "#c0392b", color: "#fff", fontSize: 11, fontWeight: 700,
+                            padding: "4px 10px", borderRadius: 20, letterSpacing: .5,
+                          }}
+                        >
+                          -{p.discountPercent}%
+                        </span>
+                      )}
+                      <WishlistButton product={p} />
+                      <CompareButton product={p} />
                     </div>
-                  </div>
-                </Link>
-              ))}
+                    <div className="product-info">
+                      <span className="product-cat">{p.category}</span>
+                      <h3>{p.name}</h3>
+                      <RatingStars avg={p.averageRating} count={p.reviewCount} />
+                      <div className="product-footer">
+                        {hasDiscount ? (
+                          <span style={{ display: "flex", flexDirection: "column" }}>
+                            <strong className="product-price" style={{ color: "#b3492f" }}>{formatPrice(salePriceOf(p))}</strong>
+                            <span style={{ fontSize: 12, color: "#9a9186", textDecoration: "line-through" }}>{formatPrice(p.price)}</span>
+                          </span>
+                        ) : (
+                          <strong className="product-price">{formatPrice(p.price)}</strong>
+                        )}
+                        <button
+                          className="btn-add"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            // Thêm vào giỏ đúng giá đã giảm (nếu có), không dùng giá gốc
+                            addToCart({ ...p, price: hasDiscount ? salePriceOf(p) : p.price }, 1);
+                          }}
+                        >+ Thêm</button>
+                      </div>
+                    </div>
+                  </Link>
+                  </Reveal>
+                );
+              })}
             </div>
           )}
 
@@ -221,15 +275,16 @@ export default function Home() {
       {/* ── PHÒNG ── */}
       <section className="rooms-section">
         <div className="section-inner">
-          <div className="section-header">
+          <Reveal as="div" className="section-header">
             <span className="eyebrow">Danh mục</span>
             <h2>Nội thất theo từng phòng</h2>
-          </div>
+          </Reveal>
           <div className="rooms-grid">
-            {rooms.map((r) => {
+            {rooms.map((r, idx) => {
               const roomImage = get(`rooms.room${r.id}.image`, "");
               return (
-                <Link to="/products" className="room-card" key={r.id}>
+                <Reveal as="div" key={r.id} delay={Math.min(idx * 70, 350)}>
+                <Link to="/products" className="room-card">
                   <div className="room-img">
                     {roomImage ? (
                       <>
@@ -247,6 +302,7 @@ export default function Home() {
                     <p>{r.desc}</p>
                   </div>
                 </Link>
+                </Reveal>
               );
             })}
           </div>
@@ -254,9 +310,9 @@ export default function Home() {
       </section>
 
       {/* ── LIÊN HỆ ── */}
-      <section className="contact-section">
+      <section className="contact-section" id="contact">
         <div className="section-inner contact-inner">
-          <div className="contact-text">
+          <Reveal as="div" className="contact-text" direction="left">
             <span className="eyebrow" style={{ color: "#c8a96e" }}>Liên hệ</span>
             <h2 style={{ color: "#fff" }}>Bạn cần tư vấn?</h2>
             <p style={{ color: "rgba(255,255,255,0.7)" }}>Đội ngũ chuyên gia của chúng tôi sẵn sàng hỗ trợ bạn chọn lựa nội thất phù hợp nhất.</p>
@@ -266,8 +322,8 @@ export default function Home() {
               <li>✉️ {get("footer.email", "hello@luxwood.vn")}</li>
               <li>🕐 {get("footer.hours", "Thứ 2 – Thứ 7: 8:00 – 20:00")}</li>
             </ul>
-          </div>
-          <form className="contact-form" onSubmit={handleContactSubmit}>
+          </Reveal>
+          <Reveal as="form" className="contact-form" direction="right" delay={120} onSubmit={handleContactSubmit}>
             {contactStatus === "success" && (
               <p style={{ color: "#7ab87a", fontSize: 14, margin: 0 }}>
                 ✓ Gửi yêu cầu thành công! Chúng tôi sẽ liên hệ lại sớm nhất.
@@ -314,7 +370,7 @@ export default function Home() {
             >
               {contactSending ? "Đang gửi..." : "Gửi yêu cầu"}
             </button>
-          </form>
+          </Reveal>
         </div>
       </section>
 
@@ -324,12 +380,19 @@ export default function Home() {
           <div className="footer-brand">
             <span className="footer-logo">⬡ <strong>LuxWood</strong></span>
             <p>Không gian sống — tinh tế từng đường nét.</p>
+            <div style={{ marginTop: 20 }}>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 10 }}>
+                Đăng ký nhận tin khuyến mãi mới nhất
+              </p>
+              <NewsletterForm variant="inline" />
+            </div>
           </div>
           <div className="footer-links">
             <h4>Trang</h4>
             <Link to="/">Trang chủ</Link>
             <Link to="/about">Giới thiệu</Link>
             <Link to="/products">Sản phẩm</Link>
+            <Link to="/sale">Khuyến mãi</Link>
           </div>
           <div className="footer-links">
             <h4>Danh mục</h4>

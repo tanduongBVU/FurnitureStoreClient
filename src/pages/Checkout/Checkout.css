@@ -1,5 +1,5 @@
 .checkout-page { width: 100%; padding: 48px 0 100px; min-height: 60vh; }
-.section-inner { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+.checkout-page .section-inner { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 
 .checkout-title { font-family: 'Playfair Display', Georgia, serif; font-size: 32px; color: var(--walnut, #3b2a1a); margin: 0 0 36px; }
 
@@ -71,3 +71,90 @@
 }
 .checkout-guest-note a { color: #a8854a; font-weight: 600; text-decoration: none; }
 .checkout-guest-note a:hover { text-decoration: underline; }
+/* ══════════════════════════════════════════════════════
+   BỔ SUNG cho phần mã giảm giá — dán thêm vào CUỐI file
+   Checkout.css hiện có (không thay thế, chỉ nối thêm).
+   ══════════════════════════════════════════════════════ */
+
+.checkout-coupon {
+  margin: 16px 0;
+  padding-top: 16px;
+  border-top: 1px dashed #e5ddd0;
+}
+
+.checkout-coupon__form {
+  display: flex;
+  gap: 8px;
+}
+.checkout-coupon__form input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1.5px solid #e5ddd0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  text-transform: uppercase;
+  color-scheme: light;
+}
+.checkout-coupon__form input:focus {
+  border-color: #c8a96e;
+}
+.checkout-coupon__form button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #3b2a1a;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.checkout-coupon__form button:hover:not(:disabled) {
+  opacity: 0.88;
+}
+.checkout-coupon__form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkout-coupon__applied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0f9f0;
+  border: 1px solid #bfe6bf;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #2d5a2d;
+}
+.checkout-coupon__applied button {
+  border: none;
+  background: transparent;
+  color: #7a6a58;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.checkout-coupon__error {
+  color: #b91c1c;
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+
+.checkout-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #7a6a58;
+  padding: 6px 0;
+}
+.checkout-summary-row--discount {
+  color: #b91c1c;
+  font-weight: 600;
+}

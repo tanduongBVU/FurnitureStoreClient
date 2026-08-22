@@ -1,0 +1,104 @@
+.newsletter-form {
+  width: 100%;
+}
+
+/* ── Biến thể inline (dùng trong Footer) ── */
+.newsletter-form--inline .newsletter-form__row {
+  display: flex;
+  gap: 8px;
+}
+.newsletter-form--inline input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+.newsletter-form--inline input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+.newsletter-form--inline input:focus {
+  border-color: #c8a96e;
+}
+.newsletter-form--inline button {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  background: #c8a96e;
+  color: #1a1208;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: opacity 0.2s;
+}
+.newsletter-form--inline button:hover:not(:disabled) { opacity: 0.88; }
+.newsletter-form--inline button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Biến thể modal (dùng trong Popup) ── */
+.newsletter-form--modal {
+  text-align: center;
+}
+.newsletter-form__icon {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 12px;
+}
+.newsletter-form--modal h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px;
+  color: var(--walnut, #3b2a1a);
+  margin: 0 0 8px;
+}
+.newsletter-form--modal p {
+  font-size: 14px;
+  color: var(--text-muted, #7a6a58);
+  margin: 0 0 20px;
+}
+.newsletter-form--modal .newsletter-form__row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.newsletter-form--modal input {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #e5ddd0;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  color-scheme: light;
+  transition: border-color 0.2s;
+}
+.newsletter-form--modal input:focus {
+  border-color: #c8a96e;
+}
+.newsletter-form--modal button {
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: var(--gold-d, #a8854a);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.2s;
+}
+.newsletter-form--modal button:hover:not(:disabled) { opacity: 0.88; }
+.newsletter-form--modal button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Thông báo chung ── */
+.newsletter-form__msg {
+  font-size: 13px;
+  margin: 8px 0 0;
+}
+.newsletter-form__msg--success { color: #7ab87a; }
+.newsletter-form__msg--error { color: #e07a7a; }
+.newsletter-form--modal .newsletter-form__msg--error { color: #b91c1c; }
