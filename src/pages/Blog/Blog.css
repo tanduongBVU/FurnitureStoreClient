@@ -1,0 +1,266 @@
+:root {
+  --walnut: #3b2a1a;
+  --cream: #f5f0e8;
+  --gold: #c8a96e;
+  --gold-d: #a8854a;
+  --text: #2c1f10;
+  --text-muted: #7a6a58;
+  --radius: 10px;
+}
+
+.blog-page { width: 100%; }
+
+/* LƯU Ý: .section-inner luôn scope theo trang (.blog-page .section-inner),
+   KHÔNG dùng bare ".section-inner" — tránh lặp lại lỗi trùng class từng gặp
+   ở nhiều trang trước đây. */
+.blog-page .section-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.blog-page .eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold-d);
+  margin-bottom: 10px;
+}
+
+/* ── Hero ── */
+.blog-hero {
+  padding: 120px 0 56px;
+  background: var(--walnut);
+  text-align: center;
+}
+.blog-hero h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 40px;
+  color: #fff;
+  margin: 0 0 12px;
+}
+.blog-hero p {
+  color: rgba(255,255,255,0.75);
+  font-size: 15px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ── Bộ lọc chủ đề ── */
+.blog-category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 40px 0 32px;
+}
+.blog-cat-tab {
+  padding: 9px 18px;
+  border-radius: 999px;
+  border: 1.5px solid #e5ddd0;
+  background: #fff;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.blog-cat-tab:hover { border-color: var(--gold); color: var(--walnut); }
+.blog-cat-tab--active {
+  background: var(--walnut);
+  border-color: var(--walnut);
+  color: var(--cream);
+}
+
+/* ── Grid danh sách ── */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  padding-bottom: 80px;
+}
+.blog-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #eee2d2;
+  transition: transform .2s, box-shadow .2s;
+}
+.blog-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(59,42,26,.1); }
+
+.blog-card-img {
+  height: 190px;
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.blog-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.blog-card-img-placeholder { font-size: 36px; }
+
+.blog-card-body { padding: 20px; }
+.blog-card-cat {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold-d);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.blog-card-body h3 {
+  font-size: 17px;
+  color: var(--walnut);
+  margin: 8px 0 8px;
+  line-height: 1.35;
+}
+.blog-card-excerpt {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0 0 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.blog-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ── Trang chi tiết bài viết ── */
+.blog-detail {
+  max-width: 760px;
+  padding-top: 120px;
+  padding-bottom: 80px;
+}
+.blog-breadcrumb {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.blog-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.blog-breadcrumb a:hover { color: var(--walnut); }
+
+.blog-detail-cat {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold-d);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 10px;
+}
+.blog-detail-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 34px;
+  color: var(--walnut);
+  line-height: 1.25;
+  margin: 0 0 14px;
+}
+.blog-detail-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+
+.blog-detail-img {
+  width: 100%;
+  height: 380px;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+.blog-detail-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Nội dung render từ rich text editor (HTML do Admin soạn) */
+.blog-detail-content {
+  font-size: 16px;
+  line-height: 1.9;
+  color: var(--text);
+}
+.blog-detail-content p { margin: 0 0 18px; }
+.blog-detail-content h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
+  color: var(--walnut);
+  margin: 36px 0 16px;
+}
+.blog-detail-content h3 {
+  font-size: 19px;
+  color: var(--walnut);
+  margin: 28px 0 14px;
+}
+.blog-detail-content img {
+  width: 100%;
+  border-radius: 12px;
+  margin: 24px 0;
+  display: block;
+}
+.blog-detail-content ul,
+.blog-detail-content ol { margin: 0 0 18px; padding-left: 24px; }
+.blog-detail-content a { color: var(--gold-d); }
+.blog-detail-content blockquote {
+  border-left: 3px solid var(--gold);
+  margin: 24px 0;
+  padding: 4px 20px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.blog-detail-back { margin-top: 48px; }
+
+/* ── Trạng thái loading / rỗng / lỗi (dùng chung, không phụ thuộc Products.css) ── */
+.blog-page .loading-box,
+.blog-page .empty-box,
+.blog-page .error-box {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text-muted);
+}
+.blog-page .error-box { color: #b91c1c; }
+.blog-page .spinner {
+  width: 32px; height: 32px;
+  border: 3px solid #e5ddd0;
+  border-top-color: var(--gold-d);
+  border-radius: 50%;
+  margin: 0 auto 14px;
+  animation: blog-spin .8s linear infinite;
+}
+@keyframes blog-spin { to { transform: rotate(360deg); } }
+
+.blog-page .btn-outline {
+  display: inline-flex;
+  align-items: center;
+  padding: 11px 26px;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--walnut);
+  text-decoration: none;
+  border: 1.5px solid var(--walnut);
+  transition: background .2s, color .2s;
+}
+.blog-page .btn-outline:hover { background: var(--walnut); color: var(--cream); }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .blog-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .blog-grid { grid-template-columns: 1fr; }
+  .blog-hero { padding: 100px 0 40px; }
+  .blog-hero h1 { font-size: 28px; }
+  .blog-detail-title { font-size: 26px; }
+  .blog-detail-img { height: 220px; }
+}

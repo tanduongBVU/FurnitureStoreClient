@@ -1,0 +1,123 @@
+.pr-section {
+  margin-top: 56px;
+  padding-top: 40px;
+  border-top: 1px solid #eee2d2;
+}
+
+.pr-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.pr-header h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
+  color: #3b2a1a;
+  margin: 0;
+}
+
+.pr-summary { display: flex; align-items: center; gap: 10px; }
+.pr-summary-text { font-size: 14px; color: #7a6a58; }
+.pr-summary-text strong { color: #3b2a1a; font-size: 16px; }
+
+/* ── Sao ── */
+.pr-stars { display: inline-flex; gap: 2px; line-height: 1; }
+.pr-star { color: #ddd0ba; }
+.pr-star--filled { color: #c8a96e; }
+.pr-stars--interactive .pr-star { cursor: pointer; transition: transform .1s ease; }
+.pr-stars--interactive .pr-star:hover { transform: scale(1.15); }
+
+/* ── Danh sách review ── */
+.pr-loading, .pr-empty {
+  color: #7a6a58;
+  font-size: 14px;
+  padding: 16px 0;
+}
+
+.pr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+.pr-item {
+  padding: 18px 20px;
+  background: #fdfbf8;
+  border: 1px solid #eee2d2;
+  border-radius: 12px;
+}
+.pr-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.pr-item-name { font-weight: 600; color: #3b2a1a; font-size: 14px; }
+.pr-item-date { font-size: 12px; color: #9a8b78; }
+.pr-item-comment {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: #4a3c2c;
+  line-height: 1.6;
+}
+
+/* ── Form gửi đánh giá / ghi chú trạng thái ── */
+.pr-form-wrap {
+  padding-top: 8px;
+}
+.pr-note {
+  font-size: 14px;
+  color: #7a6a58;
+  background: #f5f0e8;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 0;
+}
+.pr-note a { color: #a8854a; font-weight: 600; }
+.pr-note--success { background: rgba(34,197,94,.1); color: #16a34a; }
+.pr-note--error { background: rgba(239,68,68,.08); color: #b91c1c; margin-bottom: 12px; }
+
+.pr-form {
+  border: 1px solid #eee2d2;
+  border-radius: 12px;
+  padding: 20px 22px;
+}
+.pr-form h3 {
+  font-size: 15px;
+  color: #3b2a1a;
+  margin: 0 0 16px;
+}
+.pr-form-row { margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; }
+.pr-form-row label { font-size: 13px; font-weight: 600; color: #3b2a1a; }
+.pr-form-row textarea {
+  border: 1px solid #e5ddd0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color .2s;
+}
+.pr-form-row textarea:focus { border-color: #c8a96e; }
+
+.pr-submit-btn {
+  background: #3b2a1a;
+  color: #f5f0e8;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+.pr-submit-btn:hover:not(:disabled) { background: #a8854a; }
+.pr-submit-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+@media (max-width: 640px) {
+  .pr-header { flex-direction: column; align-items: flex-start; }
+}

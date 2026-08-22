@@ -9,9 +9,9 @@
 
 .myaccount-page { width: 100%; min-height: 60vh; background: #fff; }
 
-.section-inner { max-width: 640px; margin: 0 auto; padding: 0 24px; }
+.myaccount-page .section-inner { max-width: 640px; margin: 0 auto; padding: 0 24px; }
 
-.eyebrow { display: block; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-d); margin-bottom: 10px; }
+.myaccount-page .eyebrow { display: block; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-d); margin-bottom: 10px; }
 
 .myaccount-header {
   background: var(--walnut);
@@ -68,7 +68,7 @@
 .account-msg--success { background: rgba(122,184,122,.15); color: #3f7a3f; }
 .account-msg--error { background: rgba(224,122,122,.15); color: #b94141; }
 
-.btn-dark {
+.myaccount-page .btn-dark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -84,8 +84,8 @@
   font-family: inherit;
   align-self: flex-start;
 }
-.btn-dark:hover:not(:disabled) { background: var(--gold-d); border-color: var(--gold-d); }
-.btn-dark:disabled { opacity: .6; cursor: not-allowed; }
+.myaccount-page .btn-dark:hover:not(:disabled) { background: var(--gold-d); border-color: var(--gold-d); }
+.myaccount-page .btn-dark:disabled { opacity: .6; cursor: not-allowed; }
 
 @media (max-width: 600px) {
   .myaccount-header { padding: 120px 0 36px; }

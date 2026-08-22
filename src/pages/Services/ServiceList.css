@@ -1,0 +1,118 @@
+.service-list-page { width: 100%; min-height: 60vh; }
+.service-list-page .section-inner { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+
+.service-list-hero {
+  background: var(--walnut, #3b2a1a);
+  padding: 72px 0 40px;
+  text-align: center;
+  color: #fff;
+}
+.service-list-hero .eyebrow { color: var(--gold, #c8a96e); }
+.service-list-hero h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 42px; margin: 0 0 12px; }
+.service-list-hero p { color: rgba(255,255,255,.65); font-size: 15px; max-width: 520px; margin: 0 auto; }
+
+.service-list-body { padding: 40px 0 80px; }
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.service-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  display: block;
+  box-shadow: 0 2px 10px rgba(59,42,26,.05);
+  transition: transform .2s, box-shadow .2s;
+}
+.service-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(59,42,26,.12); }
+
+.service-card__img {
+  height: 200px;
+  background: var(--cream, #f5f0e8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.service-card__img img { width: 100%; height: 100%; object-fit: cover; }
+.service-card__placeholder { font-size: 44px; opacity: .4; }
+
+.service-card__body { padding: 20px; }
+.service-card__body h3 { font-size: 17px; font-weight: 700; color: var(--walnut, #3b2a1a); margin: 0 0 10px; }
+.service-card__body p {
+  font-size: 13px;
+  color: var(--text-muted, #7a6a58);
+  line-height: 1.6;
+  margin: 0 0 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.service-card__more { font-size: 13px; font-weight: 600; color: var(--gold-d, #a8854a); }
+
+/* ── Trang chi tiết ── */
+.service-detail-hero {
+  position: relative;
+  height: 320px;
+  background: var(--walnut, #3b2a1a);
+  overflow: hidden;
+}
+.service-detail-hero__img { width: 100%; height: 100%; object-fit: cover; }
+.service-detail-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0.55));
+}
+.service-detail-hero__content {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  color: #fff;
+}
+.service-detail-hero__content h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 34px; margin: 8px 0 0; color: #fff; }
+.service-detail-back { color: rgba(255,255,255,0.85); font-size: 13px; text-decoration: none; }
+.service-detail-back:hover { text-decoration: underline; }
+
+.service-detail-body { padding: 40px 0 60px; }
+.service-detail-content {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 14px;
+  padding: 32px;
+  border: 1px solid #e5ddd0;
+}
+.service-detail-summary {
+  font-size: 15px;
+  color: var(--text-muted, #7a6a58);
+  font-style: italic;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #efe9de;
+}
+.service-detail-html { font-size: 14px; line-height: 1.8; color: #3b2a1a; }
+.service-detail-html img { max-width: 100%; border-radius: 10px; margin: 12px 0; }
+
+/* ── States ── */
+.service-list-page .loading-box,
+.service-list-page .empty-box { text-align: center; padding: 100px 20px; color: var(--text-muted, #7a6a58); }
+.service-list-page .spinner { width: 36px; height: 36px; margin: 0 auto 16px; border: 3px solid #e5ddd0; border-top-color: var(--gold, #c8a96e); border-radius: 50%; animation: service-spin .7s linear infinite; }
+@keyframes service-spin { to { transform: rotate(360deg); } }
+.service-list-page .error-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 14px 18px; color: #b91c1c; font-size: 14px; margin-bottom: 24px; }
+
+@media (max-width: 1024px) {
+  .service-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .service-grid { grid-template-columns: 1fr; }
+  .service-list-hero h1 { font-size: 30px; }
+  .service-detail-hero { height: 240px; }
+}

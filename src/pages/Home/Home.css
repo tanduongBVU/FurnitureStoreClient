@@ -12,12 +12,12 @@
 .home { width: 100%; overflow-x: hidden; }
 
 /* ── Shared ── */
-.section-inner {
+.home .section-inner {
   max-width: 1160px;
   margin: 0 auto;
   padding: 0 24px;
 }
-.eyebrow {
+.home .eyebrow {
   display: block;
   font-size: 12px;
   font-weight: 600;
@@ -26,8 +26,8 @@
   color: var(--gold-d);
   margin-bottom: 10px;
 }
-.section-header { text-align: center; margin-bottom: 48px; }
-.section-header h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 36px; color: var(--walnut); margin: 0; }
+.home .section-header { text-align: center; margin-bottom: 48px; }
+.home .section-header h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 36px; color: var(--walnut); margin: 0; }
 
 .btn-primary {
   display: inline-flex;
@@ -58,7 +58,7 @@
 }
 .btn-ghost:hover { border-color: rgba(255,255,255,.7); background: rgba(255,255,255,.08); }
 
-.btn-outline {
+.home .btn-outline {
   display: inline-flex;
   align-items: center;
   padding: 11px 26px;
@@ -70,7 +70,7 @@
   border: 1.5px solid var(--walnut);
   transition: background .2s, color .2s;
 }
-.btn-outline:hover { background: var(--walnut); color: var(--cream); }
+.home .btn-outline:hover { background: var(--walnut); color: var(--cream); }
 
 /* ── SLIDER (full-bleed, ảnh phủ kín, chữ căn giữa banner) ── */
 .hero-slider {
@@ -206,22 +206,34 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
 }
-.product-card {
+.home .product-card {
+  display: block;
   background: #fff;
   border-radius: 14px;
   overflow: hidden;
-  transition: transform .2s, box-shadow .2s;
+  border: 1.5px solid #d8c5a0;
+  box-shadow: 0 8px 22px rgba(59,42,26,.14);
+  transition: transform .2s, box-shadow .2s, border-color .2s;
 }
-.product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(59,42,26,.1); }
-.product-img {
+.home .product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(59,42,26,.22);
+  border-color: var(--gold-d);
+}
+.home .product-img {
   position: relative;
   height: 200px;
   background: var(--cream);
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 14px 14px 0 0;
+  overflow: hidden;
 }
-.product-tag {
+.home .product-img img {
+  border-radius: inherit;
+}
+.home .product-tag {
   position: absolute;
   top: 12px;
   left: 12px;
@@ -233,11 +245,38 @@
   border-radius: 20px;
   letter-spacing: .5px;
 }
-.product-info { padding: 18px; }
-.product-cat { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-.product-info h3 { font-size: 15px; font-weight: 600; color: var(--walnut); margin: 6px 0 14px; }
-.product-footer { display: flex; align-items: center; justify-content: space-between; }
-.product-price { font-family: 'Playfair Display', Georgia, serif; font-size: 16px; color: var(--gold-d); }
+.home .product-info { padding: 18px; background: #fff; }
+.home .product-cat { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+.home .product-info h3 { font-size: 15px; font-weight: 600; color: var(--walnut); margin: 6px 0 14px; }
+.home .product-footer { display: flex; align-items: center; justify-content: space-between; }
+.home .product-price { font-family: 'Playfair Display', Georgia, serif; font-size: 16px; color: var(--gold-d); }
+.home .product-price--sale { color: #b91c1c; }
+.home .product-price-original {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  font-size: 12px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Bỏ style link mặc định (xanh + gạch chân) do Bootstrap áp lên thẻ <a>.
+   LƯU Ý: chính .product-card là thẻ <a> (không phải có <a> nằm bên trong),
+   nên phải nhắm thẳng vào "a.product-card", không phải ".product-card a" */
+.home a.product-card,
+.home a.product-card:visited,
+.home a.product-card:hover,
+.home a.product-card:active {
+  text-decoration: none;
+  color: inherit;
+}
+/* Chặn thêm ở từng phần tử con để chắc chắn không bị gạch chân
+   (text-decoration của thẻ cha <a> có thể "vẽ xuyên" qua con) */
+.home .product-info h3,
+.home .product-price,
+.home .product-cat {
+  text-decoration: none;
+}
+
 .btn-add {
   background: var(--walnut);
   color: var(--cream);
@@ -314,7 +353,13 @@
 .room-card-body p { font-size: 14px; color: var(--text-muted); margin: 0; line-height: 1.6; }
 
 /* ── LIÊN HỆ ── */
-.contact-section { padding: 96px 0; background: var(--walnut); }
+.contact-section {
+  padding: 96px 0;
+  background: var(--walnut);
+  /* Bù trừ chiều cao navbar (fixed, ~72px) để khi cuộn tới #contact
+     không bị navbar che mất phần đầu section */
+  scroll-margin-top: 88px;
+}
 .contact-inner {
   display: grid;
   grid-template-columns: 1fr 1fr;

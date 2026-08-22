@@ -1,0 +1,209 @@
+.compare-page {
+  min-height: 70vh;
+  padding-bottom: 40px;
+}
+
+.compare-header {
+  background: #3b2a1a;
+  padding: 48px 0;
+  margin-bottom: 32px;
+}
+.compare-header h1 {
+  color: #fff;
+  margin: 0 0 8px;
+}
+.compare-header p {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.compare-empty {
+  text-align: center;
+  padding: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.compare-empty h2 {
+  margin: 8px 0 0;
+  color: var(--walnut, #3b2a1a);
+}
+.compare-empty p {
+  color: var(--text-muted, #7a6a58);
+  margin-bottom: 12px;
+}
+
+.compare-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+.compare-clear-all {
+  border: 1px solid #e5ddd0;
+  background: #fff;
+  color: #7a6a58;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.compare-clear-all:hover {
+  background: #faf7f2;
+}
+
+.compare-table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid #e5ddd0;
+  background: #fff;
+}
+
+/* table-fixed: mỗi cột giữ ĐÚNG width đã khai báo, không tự co giãn theo nội dung dài
+   (như mô tả sản phẩm) — đây là nguyên nhân chính khiến các cột trước đây bị lệch nhau. */
+.compare-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 16px;
+  border-bottom: 1px solid #efe9de;
+  border-left: 1px solid #efe9de;
+  vertical-align: top;
+  font-size: 13px;
+  color: #3b2a1a;
+  overflow-wrap: break-word;
+}
+.compare-table th:first-child,
+.compare-table td:first-child {
+  border-left: none;
+}
+.compare-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Cột nhãn (Danh mục, Giá, ...) cố định width riêng, các cột sản phẩm chia đều phần còn lại
+   — width ở đây chỉ là GIÁ TRỊ KHỞI ĐẦU cho table-layout: fixed tính toán, không phải ép cứng
+   tuyệt đối, nhưng vì cộng các % lại đúng 100% nên mọi cột sản phẩm sẽ luôn bằng nhau. */
+.compare-table__label-col {
+  width: 140px;
+  background: #faf7f2;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.compare-table__row-label {
+  font-weight: 600;
+  color: #7a6a58;
+}
+
+/* 2 sản phẩm → mỗi cột 40%; 3 → ~28.6%; 4 → ~22%. Dùng data-count trên <table>
+   (set trong Compare.jsx) để chọn đúng công thức chia cột theo số sản phẩm đang so sánh. */
+.compare-table[data-count="2"] th:not(.compare-table__label-col),
+.compare-table[data-count="2"] td:not(.compare-table__label-col) {
+  width: calc((100% - 140px) / 2);
+}
+.compare-table[data-count="3"] th:not(.compare-table__label-col),
+.compare-table[data-count="3"] td:not(.compare-table__label-col) {
+  width: calc((100% - 140px) / 3);
+}
+.compare-table[data-count="4"] th:not(.compare-table__label-col),
+.compare-table[data-count="4"] td:not(.compare-table__label-col) {
+  width: calc((100% - 140px) / 4);
+}
+
+.compare-product-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  padding: 8px 4px 0;
+}
+
+.compare-product-remove {
+  position: absolute;
+  top: 0;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: #f4f0e8;
+  color: #7a6a58;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.compare-product-remove:hover {
+  background: #fecaca;
+  color: #b91c1c;
+}
+
+.compare-product-img {
+  width: 90px;
+  height: 90px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f4f0e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.compare-product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.compare-product-name {
+  font-weight: 700;
+  color: #2c1f10;
+  text-align: center;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.compare-product-name:hover {
+  color: #a8854a;
+}
+
+.compare-product-add-btn {
+  margin-top: 4px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #a8854a;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.compare-product-add-btn:disabled {
+  background: #d8d0c2;
+  cursor: not-allowed;
+}
+
+@media (max-width: 720px) {
+  .compare-table {
+    table-layout: auto;
+    min-width: 560px;
+  }
+  .compare-table[data-count] th:not(.compare-table__label-col),
+  .compare-table[data-count] td:not(.compare-table__label-col) {
+    width: 180px;
+  }
+}

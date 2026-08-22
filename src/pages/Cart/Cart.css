@@ -1,5 +1,5 @@
 .cart-page { width: 100%; padding: 48px 0 100px; min-height: 60vh; }
-.section-inner { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+.cart-page .section-inner { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 
 .cart-title { font-family: 'Playfair Display', Georgia, serif; font-size: 32px; color: var(--walnut, #3b2a1a); margin: 0 0 36px; }
 

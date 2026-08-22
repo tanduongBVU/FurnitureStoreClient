@@ -1,0 +1,46 @@
+/* ══════════════════════════════════════════════════════════════
+   Hiệu ứng hover/transition dùng CHUNG cho toàn bộ web Client.
+   Import file này 1 LẦN DUY NHẤT ở main.jsx (entry point).
+
+   Nguyên tắc: chỉ chuẩn hoá TỐC ĐỘ + ĐỘ MƯỢT chuyển động (easing),
+   KHÔNG ghi đè transform/màu sắc/box-shadow đã định nghĩa riêng ở
+   từng trang — tránh xung đột với CSS hiện có của các trang.
+   ══════════════════════════════════════════════════════════════ */
+
+a, button,
+.btn-primary, .btn-outline, .btn-ghost, .btn-add, .btn-primary-solid,
+.product-card, .room-card, .blog-card, .blog-cat-tab,
+.cat-tab, .navbar__cta, .navbar__link,
+input, textarea, select {
+  transition:
+    transform .25s cubic-bezier(.2, .8, .2, 1),
+    box-shadow .25s ease,
+    background-color .2s ease,
+    border-color .2s ease,
+    color .2s ease,
+    opacity .2s ease;
+}
+
+/* ── Hiệu ứng nhấn nút: nhún nhẹ khi bấm để tạo phản hồi rõ ràng ── */
+.btn-primary:active,
+.btn-outline:active,
+.btn-ghost:active,
+.btn-add:active,
+.btn-primary-solid:active {
+  transform: scale(0.96);
+}
+
+/* ── Ảnh trong card phóng nhẹ khi hover cả card ── */
+.product-card .product-img img,
+.blog-card-img img {
+  transition: transform .45s ease;
+}
+.product-card:hover .product-img img,
+.blog-card:hover .blog-card-img img {
+  transform: scale(1.06);
+}
+
+/* Người dùng bật "giảm hiệu ứng chuyển động" → tắt hết animation/transition */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

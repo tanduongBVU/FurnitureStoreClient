@@ -1,0 +1,21 @@
+.reveal {
+  opacity: 0;
+  transition: opacity .7s ease, transform .7s cubic-bezier(.16,.84,.44,1);
+  will-change: opacity, transform;
+}
+.reveal--up    { transform: translateY(28px); }
+.reveal--down  { transform: translateY(-28px); }
+.reveal--left  { transform: translateX(28px); }
+.reveal--right { transform: translateX(-28px); }
+.reveal--fade  { transform: none; }
+
+.reveal--visible {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+/* Người dùng bật "giảm hiệu ứng chuyển động" trong hệ điều hành/trình duyệt
+   → tắt animation, hiện nội dung ngay, tôn trọng lựa chọn accessibility của họ */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: none; opacity: 1; transform: none; }
+}

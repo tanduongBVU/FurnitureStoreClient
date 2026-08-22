@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import Reveal from "../../components/Reveal/Reveal";
+import GoogleLoginButton from "../../components/GoogleLoginButton/GoogleLoginButton";
 import "./Login.css";
 
 const Login = () => {
@@ -28,9 +30,13 @@ const Login = () => {
     }
   };
 
+  const handleGoogleSuccess = () => {
+    navigate(redirectTo, { replace: true });
+  };
+
   return (
     <div className="auth-page">
-      <div className="auth-card">
+      <Reveal as="div" className="auth-card">
         <div className="auth-logo">
           <span className="auth-logo-icon">⬡</span>
           <span className="auth-logo-text">LuxWood</span>
@@ -39,6 +45,14 @@ const Login = () => {
         <p className="auth-desc">Chào mừng bạn quay lại LuxWood</p>
 
         {error && <div className="auth-error">⚠️ {error}</div>}
+
+        <div className="auth-google-wrap">
+          <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={setError} />
+        </div>
+
+        <div className="auth-divider">
+          <span>hoặc</span>
+        </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -69,7 +83,7 @@ const Login = () => {
         <p className="auth-switch">
           Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
         </p>
-      </div>
+      </Reveal>
     </div>
   );
 };

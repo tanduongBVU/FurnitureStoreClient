@@ -1,5 +1,5 @@
 .auth-page {
-  min-height: 80vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,3 +47,30 @@
 .auth-switch { text-align: center; font-size: 14px; color: var(--text-muted, #7a6a58); margin: 24px 0 0; }
 .auth-switch a { color: var(--gold-d, #a8854a); font-weight: 600; text-decoration: none; }
 .auth-switch a:hover { text-decoration: underline; }
+
+/* ══════════════════════════════════════════════════════
+   BỔ SUNG cho nút đăng nhập Google — dán thêm vào CUỐI
+   file Login.css hiện có (không thay thế, chỉ nối thêm).
+   ══════════════════════════════════════════════════════ */
+
+.auth-google-wrap {
+  margin: 20px 0 4px;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--text-muted, #7a6a58);
+  font-size: 12px;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e5ddd0;
+}

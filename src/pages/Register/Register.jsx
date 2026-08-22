@@ -4,7 +4,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import "../Login/Login.css";
 
 const Register = () => {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", password: "", confirmPassword: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", address: "", password: "", confirmPassword: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -30,6 +30,7 @@ const Register = () => {
         name: form.name,
         email: form.email,
         phone: form.phone,
+        address: form.address,
         password: form.password,
       });
       navigate("/", { replace: true });
@@ -81,6 +82,15 @@ const Register = () => {
               value={form.phone}
               onChange={e => set("phone", e.target.value)}
               required
+            />
+          </div>
+          <div className="form-group">
+            <label>Địa chỉ (không bắt buộc)</label>
+            <input
+              type="text"
+              placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
+              value={form.address}
+              onChange={e => set("address", e.target.value)}
             />
           </div>
           <div className="form-group">

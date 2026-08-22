@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
+import Reveal from "../../components/Reveal/Reveal";
 import "./MyOrders.css";
 
 // Suy ra màu badge theo nội dung trạng thái (Admin có thể đặt tự do nên không cố định danh sách)
@@ -72,10 +73,19 @@ export default function MyOrders() {
           </div>
         ) : (
           <div className="orders-list">
-            {orders.map((o) => {
+            {orders.map((o, idx) => {
               const isOpen = openId === o.id;
               return (
-                <div className={`order-card ${isOpen ? "order-card--open" : ""}`} key={o.id}>
+                // Reveal chỉ bọc ở cấp order-card (không bọc riêng order-details bên trong) —
+                // vì phần chi tiết ẩn/hiện theo state khi bấm mở, nếu Reveal lại tự theo dõi
+                // riêng phần đó, IntersectionObserver có thể chưa kịp trigger lúc vừa bấm mở
+                // (phần tử vừa render ra) khiến nó bị đứng khuất không hiện.
+                <Reveal
+                  as="div"
+                  className={`order-card ${isOpen ? "order-card--open" : ""}`}
+                  key={o.id}
+                  delay={Math.min(idx * 70, 350)}
+                >
                   <button className="order-summary" onClick={() => toggleOrder(o.id)}>
                     <div className="order-summary__left">
                       <span className="order-code">Đơn hàng #{o.id}</span>
@@ -128,7 +138,7 @@ export default function MyOrders() {
                       </div>
                     </div>
                   )}
-                </div>
+                </Reveal>
               );
             })}
           </div>

@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../contexts/CartContext";
+import Reveal from "../../components/Reveal/Reveal";
 import "./Cart.css";
 
 const Cart = () => {
@@ -11,12 +12,12 @@ const Cart = () => {
     return (
       <div className="cart-page">
         <div className="section-inner">
-          <div className="cart-empty">
+          <Reveal as="div" className="cart-empty">
             <span className="cart-empty-icon">🛒</span>
             <h2>Giỏ hàng của bạn đang trống</h2>
             <p>Hãy khám phá những sản phẩm nội thất tuyệt vời của LuxWood</p>
             <Link to="/products" className="btn-primary-solid">Khám phá sản phẩm</Link>
-          </div>
+          </Reveal>
         </div>
       </div>
     );
@@ -29,8 +30,8 @@ const Cart = () => {
 
         <div className="cart-layout">
           <div className="cart-items">
-            {cart.map(item => (
-              <div className="cart-item" key={item.id}>
+            {cart.map((item, idx) => (
+              <Reveal as="div" className="cart-item" key={item.id} delay={Math.min(idx * 60, 300)}>
                 <div className="cart-item-img">
                   {item.image
                     ? <img src={item.image} alt={item.name} onError={e => e.target.style.display = "none"} />
@@ -51,11 +52,11 @@ const Cart = () => {
                 </div>
                 <div className="cart-item-total">{formatPrice(item.price * item.quantity)}</div>
                 <button className="cart-item-remove" onClick={() => removeFromCart(item.id)} title="Xoá">🗑️</button>
-              </div>
+              </Reveal>
             ))}
           </div>
 
-          <div className="cart-summary">
+          <Reveal as="div" className="cart-summary" direction="right" delay={150}>
             <h3>Tóm tắt đơn hàng</h3>
             <div className="cart-summary-row">
               <span>Tạm tính</span>
@@ -73,7 +74,7 @@ const Cart = () => {
               Tiến hành thanh toán
             </button>
             <Link to="/products" className="cart-continue">← Tiếp tục mua sắm</Link>
-          </div>
+          </Reveal>
         </div>
       </div>
     </div>

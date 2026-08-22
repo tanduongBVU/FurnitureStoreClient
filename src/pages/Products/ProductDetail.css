@@ -1,5 +1,5 @@
 .pd-page { width: 100%; padding: 40px 0 100px; }
-.section-inner { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+.pd-page .section-inner { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 
 .pd-breadcrumb { font-size: 13px; color: var(--text-muted, #7a6a58); margin-bottom: 28px; }
 .pd-breadcrumb a { color: var(--text-muted, #7a6a58); text-decoration: none; }
@@ -58,13 +58,13 @@
 .qty-control input::-webkit-inner-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
 
 .pd-actions { display: flex; gap: 14px; flex-wrap: wrap; }
-.btn-outline {
+.pd-page .btn-outline {
   display: inline-flex; align-items: center; justify-content: center;
   padding: 13px 26px; border-radius: 10px; font-size: 15px; font-weight: 500;
   color: var(--walnut, #3b2a1a); text-decoration: none; border: 1.5px solid var(--walnut, #3b2a1a);
   background: transparent; cursor: pointer; transition: background .2s, color .2s; font-family: inherit;
 }
-.btn-outline:hover { background: var(--walnut, #3b2a1a); color: var(--cream, #f5f0e8); }
+.pd-page .btn-outline:hover { background: var(--walnut, #3b2a1a); color: var(--cream, #f5f0e8); }
 .btn-primary-solid {
   display: inline-flex; align-items: center; justify-content: center;
   padding: 13px 30px; border-radius: 10px; font-size: 15px; font-weight: 600;

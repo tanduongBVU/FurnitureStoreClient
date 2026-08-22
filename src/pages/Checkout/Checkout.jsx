@@ -15,14 +15,62 @@ const Checkout = () => {
   const [success, setSuccess] = useState(false);
   const set = (f, v) => setForm(p => ({ ...p, [f]: v }));
 
+  // ── Mã giảm giá ──
+  const [couponInput, setCouponInput] = useState("");
+  const [couponChecking, setCouponChecking] = useState(false);
+  const [couponError, setCouponError] = useState("");
+  // appliedCoupon = { code, discountPercent, discountAmount } khi mã hợp lệ, null nếu chưa áp dụng
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+
   // Tự điền sẵn tên nếu khách đã đăng nhập
   useEffect(() => {
     if (isLoggedIn && user) {
       setForm(p => ({ ...p, customerName: user.name }));
+
+      // user trong AuthContext (từ login/register) không có sẵn phone/address,
+      // nên gọi thẳng /Auth/me để lấy đúng thông tin đã lưu trong tài khoản
+      // rồi tự điền sẵn — khách vẫn có thể sửa lại trước khi đặt hàng.
+      api.get("/Auth/me")
+        .then(res => {
+          setForm(p => ({
+            ...p,
+            phone: res.data.phone || p.phone,
+            address: res.data.address || p.address,
+          }));
+        })
+        .catch(() => {
+          // Không lấy được thì thôi, để khách tự nhập như bình thường
+        });
     }
   }, [isLoggedIn, user]);
 
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
+
+  // Giá cuối cùng sau khi trừ giảm giá (nếu có mã đang áp dụng) — chỉ dùng để HIỂN THỊ,
+  // số tiền thật lưu vào đơn hàng luôn do server tự tính lại (xem OrdersController.Create).
+  const finalTotal = appliedCoupon ? totalPrice - appliedCoupon.discountAmount : totalPrice;
+
+  const handleApplyCoupon = async () => {
+    const code = couponInput.trim();
+    if (!code) return;
+    setCouponChecking(true);
+    setCouponError("");
+    try {
+      const res = await api.post("/Coupons/validate", { code, orderValue: totalPrice });
+      setAppliedCoupon(res.data);
+    } catch (err) {
+      setAppliedCoupon(null);
+      setCouponError(err.response?.data?.message || "Mã giảm giá không hợp lệ.");
+    } finally {
+      setCouponChecking(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,6 +85,9 @@ const Checkout = () => {
         address: form.address,
         status: "Chờ xác nhận",
         total: totalPrice,
+        // Gửi mã kèm theo, nhưng số tiền thật giảm bao nhiêu do SERVER tự tính lại —
+        // client không được quyết định số tiền giảm cuối cùng, chỉ gợi ý mã muốn dùng.
+        couponCode: appliedCoupon ? appliedCoupon.code : null,
         orderItems: cart.map(item => ({
           productId: item.id,
           productName: item.name,
@@ -129,7 +180,7 @@ const Checkout = () => {
             </div>
 
             <button type="submit" className="btn-primary-solid btn-full" disabled={saving}>
-              {saving ? "Đang xử lý..." : `Đặt hàng — ${formatPrice(totalPrice)}`}
+              {saving ? "Đang xử lý..." : `Đặt hàng — ${formatPrice(finalTotal)}`}
             </button>
           </form>
 
@@ -153,9 +204,49 @@ const Checkout = () => {
                 </div>
               ))}
             </div>
+
+            {/* ── Mã giảm giá ── */}
+            <div className="checkout-coupon">
+              {appliedCoupon ? (
+                <div className="checkout-coupon__applied">
+                  <span>
+                    🎟️ Mã <strong>{appliedCoupon.code}</strong> (-{appliedCoupon.discountPercent}%)
+                  </span>
+                  <button type="button" onClick={handleRemoveCoupon}>Bỏ mã</button>
+                </div>
+              ) : (
+                <div className="checkout-coupon__form">
+                  <input
+                    type="text"
+                    placeholder="Nhập mã giảm giá"
+                    value={couponInput}
+                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={couponChecking || !couponInput.trim()}
+                  >
+                    {couponChecking ? "Đang kiểm tra..." : "Áp dụng"}
+                  </button>
+                </div>
+              )}
+              {couponError && <p className="checkout-coupon__error">⚠️ {couponError}</p>}
+            </div>
+
+            <div className="checkout-summary-row">
+              <span>Tạm tính</span>
+              <span>{formatPrice(totalPrice)}</span>
+            </div>
+            {appliedCoupon && (
+              <div className="checkout-summary-row checkout-summary-row--discount">
+                <span>Giảm giá ({appliedCoupon.code})</span>
+                <span>−{formatPrice(appliedCoupon.discountAmount)}</span>
+              </div>
+            )}
             <div className="checkout-summary-total">
               <span>Tổng cộng</span>
-              <span>{formatPrice(totalPrice)}</span>
+              <span>{formatPrice(finalTotal)}</span>
             </div>
           </div>
         </div>
