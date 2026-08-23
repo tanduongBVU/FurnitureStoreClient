@@ -326,7 +326,14 @@ button.navbar__link:focus-visible {
 }
 
 .navbar__mobile--open {
-  max-height: 640px;
+  /* FIX: trước đây max-height cố định 640px + overflow:hidden khiến menu bị CẮT MẤT
+     nút Đăng xuất/CTA khi mở cả 2 accordion (Sản Phẩm + Dịch Vụ) trên máy thật — vì
+     .navbar là position:fixed nên phần tràn ra ngoài không cuộn theo trang được.
+     Sửa: giới hạn theo chiều cao MÀN HÌNH THẬT còn lại (trừ navbar + banner khuyến mãi)
+     và cho phép TỰ CUỘN bên trong chính menu. */
+  max-height: calc(100svh - var(--nav-height) - var(--banner-h, 0px));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   opacity: 1;
   padding-top: 16px;
   padding-bottom: 24px;
@@ -427,6 +434,27 @@ button.navbar__link:focus-visible {
 
   .navbar__mobile {
     display: flex;
+  }
+}
+
+/* ── Màn hình rất hẹp (320–480px): nới vùng chạm hamburger + giảm padding container ── */
+@media (max-width: 480px) {
+  .navbar__container {
+    padding: 0 16px;
+  }
+
+  .navbar__logo-text {
+    font-size: 19px;
+  }
+
+  .navbar__hamburger {
+    width: 44px;
+    height: 44px;
+  }
+
+  .navbar__mobile {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 
