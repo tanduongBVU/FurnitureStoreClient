@@ -1,9 +1,7 @@
 // Component hiện sao đánh giá trung bình gọn trong card sản phẩm (Products/Sale/Home).
 // Nhận avg (số thập phân, VD 4.3) và count (số lượng review đã duyệt).
-// KHÔNG render gì cả nếu count === 0 — tránh hiện "0 sao / 0 đánh giá" gây phản cảm
-// cho sản phẩm mới chưa ai đánh giá.
 const RatingStars = ({ avg = 0, count = 0, size = 13 }) => {
-  if (!count) return null;
+  const hasRating = count > 0;
 
   // Làm tròn về mốc .0 hoặc .5 gần nhất để vẽ sao (đầy / nửa / rỗng)
   const rounded = Math.round(avg * 2) / 2;
@@ -18,8 +16,20 @@ const RatingStars = ({ avg = 0, count = 0, size = 13 }) => {
   return (
     <div
       className="rating-stars"
-      style={{ display: "flex", alignItems: "center", gap: 4, fontSize: size }}
-      title={`${avg.toFixed(1)} / 5 (${count} đánh giá)`}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 4,
+        fontSize: size,
+        // FIX: trước đây khi count === 0, component return null (không render gì cả),
+        // khiến khối này MẤT HẲN khoảng trống layout — đẩy phần giá/nút "Thêm vào giỏ"
+        // của card đó lên cao hơn hẳn so với card bên cạnh có đánh giá, gây lệch hàng
+        // trong lưới sản phẩm. Giờ luôn render đúng cấu trúc DOM (giữ nguyên khoảng
+        // trống), chỉ ẩn về mặt hình ảnh bằng visibility khi chưa có đánh giá nào —
+        // không ai nhìn thấy sao rỗng vô nghĩa, nhưng layout luôn đồng nhất.
+        visibility: hasRating ? "visible" : "hidden",
+      }}
+      title={hasRating ? `${avg.toFixed(1)} / 5 (${count} đánh giá)` : undefined}
     >
       <span style={{ display: "flex", lineHeight: 1 }}>
         {stars.map((type, i) => (

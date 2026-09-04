@@ -10,6 +10,9 @@ const WishlistButton = ({ product, top = 12, right = 12 }) => {
   return (
     <button
       type="button"
+      // className thêm để CSS responsive (index.css) can thiệp được kích thước trên mobile
+      // — style inline bên dưới set kích thước desktop, className override bằng !important.
+      className="wishlist-btn"
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();

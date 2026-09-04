@@ -18,6 +18,18 @@
   margin-bottom: 48px;
   text-align: left;
 }
+/* THIẾU HOÀN TOÀN trước đây — Contact.jsx có dùng <span className="eyebrow"> nhưng
+   file này chưa từng định nghĩa rule cho nó (chỉ có màu set qua inline style), khiến
+   chữ "Liên hệ" dính sát vào tiêu đề "Liên Hệ Với Chúng Tôi" bên dưới, không có
+   khoảng cách và cỡ chữ to bằng chữ thường thay vì caption nhỏ như thiết kế. */
+.contact-hero .eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
 .contact-hero h1 {
   color: #fff;
   margin: 0 0 8px;

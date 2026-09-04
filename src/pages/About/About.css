@@ -141,22 +141,163 @@
 
 /* ── WHY US ── */
 .whyus-section { padding: 96px 0; background: var(--cream); }
+
+/* Ảnh minh hoạ bên trái — cùng pattern với .company-img (dùng chung class .img-real.tall
+   và .img-placeholder.tall đã có sẵn nên không cần định nghĩa lại kích thước ảnh). */
+.whyus-img { position: relative; }
+
+/* Khung bọc phần chữ + danh sách 4 lợi thế bên phải, xếp dọc với khoảng cách rõ ràng
+   giữa đoạn giới thiệu và danh sách — trước đây whyus-text/whyus-list là 2 cột riêng,
+   giờ dồn chung 1 cột để nhường chỗ cho ảnh. */
+.whyus-content { display: flex; flex-direction: column; gap: 32px; }
+
 .whyus-text h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 34px; color: var(--walnut); margin: 0 0 16px; line-height: 1.25; }
-.whyus-text p { color: var(--text-muted); line-height: 1.8; }
-.whyus-list { display: flex; flex-direction: column; gap: 24px; }
+.whyus-text p { color: var(--text-muted); line-height: 1.8; margin: 0; }
+.whyus-list { display: flex; flex-direction: column; gap: 20px; }
 .whyus-item { display: flex; gap: 20px; align-items: flex-start; padding: 24px; background: #fff; border-radius: 12px; }
 .whyus-num { font-family: 'Playfair Display', Georgia, serif; font-size: 28px; color: var(--gold); flex-shrink: 0; line-height: 1; }
 .whyus-item h4 { font-size: 16px; font-weight: 600; color: var(--walnut); margin: 0 0 6px; }
 .whyus-item p { font-size: 14px; color: var(--text-muted); margin: 0; line-height: 1.6; }
 
-/* ── PROCESS ── */
+/* Ảnh minh hoạ dưới đoạn mô tả cột trái — lấp khoảng trống khi cột phải (4 lý do)
+   cao hơn cột trái, lấy từ CMS (Admin → Giao diện Client → Trang Giới thiệu →
+   "Vì sao chọn chúng tôi") */
+.whyus-img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-top: 32px;
+  display: block;
+}
+.whyus-img-placeholder {
+  width: 100%;
+  height: 280px;
+  margin-top: 32px;
+  border-radius: 16px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+/* ── PROCESS (dạng timeline/sơ đồ lịch trình) ──
+   Thay cho lưới 6 card rời rạc trước đây: đường kẻ dọc trung tâm nối các mốc lại
+   thành 1 chuỗi liền mạch, nội dung xen kẽ trái-phải (zigzag) để nhìn có nhịp điệu
+   hơn, đúng tinh thần "sơ đồ quy trình" thay vì chỉ là danh sách bước rời rạc. */
 .process-section { padding: 96px 0; background: #fff; }
-.process-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.process-card { position: relative; padding: 32px 24px; background: var(--cream); border-radius: 14px; }
-.process-step { display: inline-block; font-family: 'Playfair Display', Georgia, serif; font-size: 13px; font-weight: 700; color: var(--gold-d); background: rgba(200,169,110,.15); padding: 4px 12px; border-radius: 20px; margin-bottom: 14px; letter-spacing: 1px; }
-.process-card h3 { font-size: 17px; font-weight: 600; color: var(--walnut); margin: 0 0 10px; }
-.process-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin: 0; }
-.process-arrow { position: absolute; top: 50%; right: -16px; transform: translateY(-50%); font-size: 20px; color: var(--gold); z-index: 1; display: none; }
+
+.process-timeline {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 12px 0;
+}
+
+/* Đường kẻ trung tâm — mờ dần ở 2 đầu cho mềm mắt thay vì cắt cụt */
+.process-timeline::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, var(--gold) 8%, var(--gold) 92%, transparent);
+  transform: translateX(-50%);
+}
+
+.process-timeline-item {
+  position: relative;
+  display: flex;
+  width: 100%;
+  margin-bottom: 56px;
+}
+.process-timeline-item:last-child { margin-bottom: 0; }
+
+.process-timeline-item--left { justify-content: flex-start; }
+.process-timeline-item--right { justify-content: flex-end; }
+
+/* Mốc tròn đánh số, luôn nằm giữa đường kẻ — viền trắng dày tạo cảm giác "nổi" trên line */
+.process-timeline-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--walnut);
+  color: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 0 0 6px #fff;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.process-timeline-card {
+  position: relative;
+  width: 44%;
+  background: var(--cream);
+  border-radius: 14px;
+  padding: 26px 28px;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.process-timeline-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(59,42,26,.1);
+}
+
+/* Đoạn nối ngắn từ mốc tròn vào thẻ nội dung, giúp mắt dễ theo dõi mốc nào ứng với thẻ nào */
+.process-timeline-item--left .process-timeline-card::after,
+.process-timeline-item--right .process-timeline-card::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 26px;
+  height: 2px;
+  background: var(--gold);
+  transform: translateY(-50%);
+}
+.process-timeline-item--left .process-timeline-card::after { right: -26px; }
+.process-timeline-item--right .process-timeline-card::after { left: -26px; }
+
+.process-timeline-card h3 { font-size: 17px; font-weight: 600; color: var(--walnut); margin: 0 0 10px; }
+.process-timeline-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin: 0; }
+
+/* Mobile: đường kẻ + mốc dồn về sát mép trái, mọi thẻ nằm 1 cột bên phải đường kẻ
+   (bỏ zigzag trái-phải vì không đủ chỗ chia đôi màn hình trên máy hẹp) */
+@media (max-width: 768px) {
+  .process-timeline::before { left: 22px; }
+
+  .process-timeline-item,
+  .process-timeline-item--left,
+  .process-timeline-item--right {
+    justify-content: flex-start;
+    padding-left: 56px;
+    margin-bottom: 36px;
+  }
+
+  .process-timeline-dot {
+    left: 22px;
+    width: 40px;
+    height: 40px;
+    font-size: 13px;
+  }
+
+  .process-timeline-card { width: 100%; }
+
+  .process-timeline-item--left .process-timeline-card::after,
+  .process-timeline-item--right .process-timeline-card::after {
+    left: -34px;
+    right: auto;
+  }
+}
 
 /* ── TEAM ── */
 .team-section { padding: 96px 0; background: var(--cream); }
@@ -175,11 +316,20 @@
 .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .project-card { border-radius: 14px; overflow: hidden; border: 1.5px solid rgba(200,169,110,.2); transition: transform .2s, box-shadow .2s; }
 .project-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(59,42,26,.1); }
-.project-img-placeholder { height: 180px; background: var(--cream); display: flex; align-items: center; justify-content: center; }
+.project-img-placeholder { height: 180px; background: var(--cream); display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .project-info { padding: 20px; }
 .project-year { font-size: 11px; color: var(--gold-d); font-weight: 600; letter-spacing: 1px; }
 .project-info h3 { font-size: 15px; font-weight: 600; color: var(--walnut); margin: 6px 0 6px; }
 .project-type { font-size: 13px; color: var(--text-muted); }
+
+/* Ảnh dự án thật lấy từ CMS (Admin → Giao diện Client → Trang Giới thiệu →
+   "Dự án tiêu biểu") — object-fit: cover để lấp đầy khung, không méo ảnh */
+.project-img-real {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
 /* ── TESTIMONIALS ── */
 .testimonials-section { padding: 96px 0; background: var(--walnut); }
@@ -222,7 +372,6 @@
   .about-page .two-col { grid-template-columns: 1fr; gap: 40px; }
   .mission-grid { grid-template-columns: 1fr; }
   .values-grid { grid-template-columns: 1fr; }
-  .process-grid { grid-template-columns: 1fr; }
   .team-grid { grid-template-columns: repeat(2, 1fr); }
   .projects-grid { grid-template-columns: 1fr; }
   .partners-grid { grid-template-columns: repeat(2, 1fr); }

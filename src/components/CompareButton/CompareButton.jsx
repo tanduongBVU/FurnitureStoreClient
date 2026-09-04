@@ -21,6 +21,9 @@ const CompareButton = ({ product, top = 12, right = 54 }) => {
   return (
     <button
       type="button"
+      // className thêm để CSS responsive (index.css) can thiệp được kích thước trên mobile
+      // — style inline bên dưới set kích thước desktop, className override bằng !important.
+      className="compare-btn"
       onClick={handleClick}
       aria-label={active ? "Bỏ khỏi so sánh" : "Thêm vào so sánh"}
       title={active ? "Bỏ khỏi so sánh" : isFull ? "Đã đạt giới hạn 4 sản phẩm" : "Thêm vào so sánh"}

@@ -8,6 +8,17 @@
   padding: 48px 0;
   margin-bottom: 32px;
 }
+/* THIẾU HOÀN TOÀN trước đây — Compare.jsx có dùng <span className="eyebrow"> nhưng
+   file này chưa từng định nghĩa rule cho nó, khiến chữ "So sánh" dính sát vào tiêu đề
+   "So sánh sản phẩm" bên dưới, không có khoảng cách. */
+.compare-header .eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
 .compare-header h1 {
   color: #fff;
   margin: 0 0 8px;

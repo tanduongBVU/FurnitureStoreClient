@@ -51,6 +51,12 @@
   color: #9a8f7f;
   padding: 2px 4px;
   flex-shrink: 0;
+  /* FIX MOBILE: vùng chạm gốc quá nhỏ so với ngón tay — nới lên tối thiểu 28x28 */
+  min-width: 28px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── Dropdown gợi ý — panel riêng rộng hơn ô input, xổ xuống ngay dưới ── */
@@ -166,4 +172,20 @@
   width: 100%;
   left: 0;
   transform: none;
+}
+
+/* ── FIX MOBILE (né zoom iOS + giảm chồng cuộn) ──
+   Cùng breakpoint chuyển sang menu mobile trong Navbar.css (max-width: 1100px). */
+@media (max-width: 1100px) {
+  .navbar-search__form input {
+    /* Safari iOS tự động zoom cả trang khi focus vào input có font-size < 16px.
+       Bắt buộc >= 16px trên mọi input trong khung mobile để né lỗi này. */
+    font-size: 16px;
+  }
+
+  .navbar-search__results {
+    /* Dropdown kết quả giờ nằm bên trong menu mobile (đã tự cuộn sau khi sửa
+       .navbar__mobile--open) — giảm max-height để tránh cảm giác cuộn lồng cuộn. */
+    max-height: 50svh;
+  }
 }

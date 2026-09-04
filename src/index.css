@@ -100,3 +100,39 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* ══════════════════════════════════════════════════════
+   BỔ SUNG RESPONSIVE MOBILE — dán thêm vào CUỐI index.css
+   hiện có (KHÔNG thay thế, chỉ nối thêm vào cuối file).
+   ══════════════════════════════════════════════════════ */
+
+/* ── Né lỗi Safari iOS tự động zoom cả trang khi focus vào input có font-size < 16px ──
+   Ảnh hưởng RẤT NHIỀU trang: Checkout, Contact, Login, Register, MyAccount, form liên hệ
+   ở Home, ProductDetail (ô số lượng)... vì hầu hết đang dùng font-size 13–15px.
+   Dùng !important vì các rule hiện có đều scope theo từng trang (VD: .checkout-page
+   .form-group input) nên specificity cao hơn 1 rule global thường — cần ép override
+   khi ở khung mobile. */
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* ── Nút ♡ (WishlistButton) / ⚖️ (CompareButton) trên card sản phẩm ──
+   Kích thước gốc 32x32px set qua inline style trong WishlistButton.jsx/CompareButton.jsx
+   (Home, Products, Sale, Wishlist đều dùng chung 2 component này). Trên mobile nới to hơn
+   và giãn khoảng cách để đỡ bấm nhầm giữa 2 nút đứng sát nhau. Dùng !important để override
+   inline style. */
+@media (max-width: 640px) {
+  .wishlist-btn,
+  .compare-btn {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 17px !important;
+  }
+  .compare-btn {
+    right: 50px !important;
+  }
+}

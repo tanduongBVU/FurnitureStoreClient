@@ -1,0 +1,205 @@
+.chatw {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  font-family: inherit;
+}
+
+.chatw-bubble-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--walnut, #3b2a1a);
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(59, 42, 26, 0.35);
+  transition: transform .15s;
+}
+.chatw-bubble-btn:hover { transform: scale(1.06); }
+
+.chatw-panel {
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  height: 460px;
+  max-height: 70vh;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chatw-header {
+  background: var(--walnut, #3b2a1a);
+  color: #fff;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.chatw-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: .8;
+}
+.chatw-close:hover { opacity: 1; }
+
+.chatw-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--cream, #f5f0e8);
+}
+
+.chatw-bubble {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.chatw-bubble--bot {
+  align-self: flex-start;
+  background: #fff;
+  color: var(--text, #2c1f10);
+  border-bottom-left-radius: 4px;
+}
+.chatw-bubble--user {
+  align-self: flex-end;
+  background: var(--gold-d, #a8854a);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.chatw-quickreplies {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: flex-start;
+  width: 100%;
+}
+.chatw-quickreplies--wrap { flex-direction: row; flex-wrap: wrap; }
+.chatw-quickreplies button {
+  padding: 9px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--gold, #c8a96e);
+  background: #fff;
+  color: var(--walnut, #3b2a1a);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: background .15s, color .15s;
+}
+.chatw-quickreplies button:hover {
+  background: var(--gold, #c8a96e);
+  color: #fff;
+}
+
+.chatw-link-btn {
+  align-self: flex-start;
+  background: var(--walnut, #3b2a1a);
+  color: #fff !important;
+  text-decoration: none;
+  padding: 9px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.chatw-products {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.chatw-product-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.chatw-product-img {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--cream, #f5f0e8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.chatw-product-img img { width: 100%; height: 100%; object-fit: cover; }
+.chatw-product-info { display: flex; flex-direction: column; min-width: 0; }
+.chatw-product-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--walnut, #3b2a1a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chatw-product-price {
+  font-size: 12px;
+  color: var(--gold-d, #a8854a);
+  font-weight: 700;
+}
+
+.chatw-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid #eee2d0;
+  background: #fff;
+  flex-shrink: 0;
+}
+.chatw-input-row input {
+  flex: 1;
+  border: 1px solid #e5ddd0;
+  border-radius: 20px;
+  padding: 9px 14px;
+  font-size: 13.5px;
+  outline: none;
+  font-family: inherit;
+}
+.chatw-input-row input:focus { border-color: var(--gold, #c8a96e); }
+.chatw-input-row button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--walnut, #3b2a1a);
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.chatw-input-row button:disabled { opacity: .4; cursor: default; }
+
+@media (max-width: 480px) {
+  .chatw { right: 12px; bottom: 12px; }
+  .chatw-panel { width: calc(100vw - 24px); height: 65vh; }
+}

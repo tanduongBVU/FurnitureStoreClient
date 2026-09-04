@@ -74,3 +74,19 @@
   height: 1px;
   background: #e5ddd0;
 }
+
+/* ══════════════════════════════════════════════════════
+   BỔ SUNG RESPONSIVE MOBILE — dán thêm vào CUỐI Login.css
+   hiện có (KHÔNG thay thế, chỉ nối thêm vào cuối file).
+   Register.jsx dùng chung file này nên tự động ăn theo,
+   không cần sửa riêng.
+   ══════════════════════════════════════════════════════ */
+
+@media (max-width: 420px) {
+  .auth-card {
+    padding: 28px 20px;
+  }
+  .auth-page {
+    padding: 32px 16px;
+  }
+}
