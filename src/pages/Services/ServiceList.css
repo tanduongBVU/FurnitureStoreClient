@@ -7,8 +7,20 @@
   text-align: center;
   color: #fff;
 }
-.service-list-hero .eyebrow { color: var(--gold, #c8a96e); }
-.service-list-hero h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 42px; margin: 0 0 12px; }
+.service-list-hero .eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  color: var(--gold, #c8a96e);
+}
+/* FIX: thiếu color:#fff khiến rule global "h1, h2 { color: var(--text-h) }" trong
+   index.css (đen gần tuyền) đè lên màu trắng thừa hưởng từ .service-list-hero — vì
+   1 rule set màu trực tiếp lên chính thẻ h1 luôn thắng màu inherit từ cha, bất kể
+   specificity thấp cỡ nào. Phải khai báo color RÕ RÀNG ở đây để thắng lại. */
+.service-list-hero h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 42px; margin: 0 0 12px; color: #fff; }
 .service-list-hero p { color: rgba(255,255,255,.65); font-size: 15px; max-width: 520px; margin: 0 auto; }
 
 .service-list-body { padding: 40px 0 80px; }

@@ -8,6 +8,10 @@ import RatingStars from "../../components/RatingStars/RatingStars";
 import "./Products.css";
 
 const CATEGORIES = ["Tất cả", "Phòng khách", "Phòng ngủ", "Phòng ăn", "Phòng làm việc", "Ban công"];
+// Phải khớp CHÍNH XÁC với danh sách Admin dùng khi nhập liệu (ProductCreate.jsx/ProductEdit.jsx),
+// nếu không chip lọc sẽ không bao giờ khớp được với dữ liệu thật trong DB.
+const MATERIALS = ["Gỗ tự nhiên", "Gỗ công nghiệp", "Kim loại", "Vải nỉ", "Da/Da công nghiệp", "Mây tre đan", "Kính"];
+const COLORS = ["Nâu gỗ", "Trắng", "Đen", "Xám", "Be/Kem", "Xanh dương", "Xanh lá", "Vàng"];
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -16,15 +20,39 @@ const Products = () => {
   const [search, setSearch] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Đọc category từ URL (?category=Phòng ngủ) — dùng khi bấm từ dropdown Navbar
   const [category, setCategory] = useState(() => {
     const fromUrl = searchParams.get("category");
     return CATEGORIES.includes(fromUrl) ? fromUrl : "Tất cả";
   });
   const [sort, setSort] = useState("default");
 
-  // Đọc từ khoá tìm kiếm từ URL (?search=...) — dùng khi khách nhấn Enter ở ô search
-  // Navbar rồi được điều hướng sang đây, để ô search trên trang này tự điền sẵn từ khoá đó.
+  // ── Bộ lọc nâng cao ──
+  const [showFilters, setShowFilters] = useState(false);
+  const [priceMin, setPriceMin] = useState("");
+  const [priceMax, setPriceMax] = useState("");
+  const [materials, setMaterials] = useState([]); // chọn được nhiều
+  const [colors, setColors] = useState([]);       // chọn được nhiều
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [onSaleOnly, setOnSaleOnly] = useState(false);
+
+  const toggleInList = (list, setList, value) => {
+    setList(prev => (prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]));
+  };
+
+  const resetFilters = () => {
+    setPriceMin("");
+    setPriceMax("");
+    setMaterials([]);
+    setColors([]);
+    setInStockOnly(false);
+    setOnSaleOnly(false);
+  };
+
+  const activeFilterCount =
+    materials.length + colors.length +
+    (priceMin !== "" ? 1 : 0) + (priceMax !== "" ? 1 : 0) +
+    (inStockOnly ? 1 : 0) + (onSaleOnly ? 1 : 0);
+
   useEffect(() => {
     const fromUrl = searchParams.get("search");
     if (fromUrl) setSearch(fromUrl);
@@ -47,7 +75,6 @@ const Products = () => {
     fetchProducts();
   }, []);
 
-  // Nếu URL đổi (VD: bấm link khác từ dropdown khi đang ở trang /products) → cập nhật lại tab
   useEffect(() => {
     const fromUrl = searchParams.get("category");
     const next = CATEGORIES.includes(fromUrl) ? fromUrl : "Tất cả";
@@ -70,11 +97,19 @@ const Products = () => {
   let filtered = products.filter(p => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
     const matchCat = category === "Tất cả" || p.category === category;
-    return matchSearch && matchCat;
+    const matchMaterial = materials.length === 0 || materials.includes(p.material);
+    const matchColor = colors.length === 0 || colors.includes(p.color);
+    const matchPriceMin = priceMin === "" || p.price >= Number(priceMin);
+    const matchPriceMax = priceMax === "" || p.price <= Number(priceMax);
+    const matchStock = !inStockOnly || p.stock > 0;
+    const matchSale = !onSaleOnly || p.discountPercent > 0;
+    return matchSearch && matchCat && matchMaterial && matchColor && matchPriceMin && matchPriceMax && matchStock && matchSale;
   });
 
   if (sort === "price-asc") filtered = [...filtered].sort((a, b) => a.price - b.price);
   if (sort === "price-desc") filtered = [...filtered].sort((a, b) => b.price - a.price);
+  if (sort === "rating-desc") filtered = [...filtered].sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+  if (sort === "newest") filtered = [...filtered].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   return (
     <div className="products-page">
@@ -97,10 +132,19 @@ const Products = () => {
               onChange={e => setSearch(e.target.value)}
             />
           </div>
+          <button
+            type="button"
+            className={`btn-filter-toggle ${showFilters ? "btn-filter-toggle--active" : ""}`}
+            onClick={() => setShowFilters(s => !s)}
+          >
+            ⚙️ Bộ lọc nâng cao{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+          </button>
           <select className="sort-select" value={sort} onChange={e => setSort(e.target.value)}>
             <option value="default">Mặc định</option>
             <option value="price-asc">Giá tăng dần</option>
             <option value="price-desc">Giá giảm dần</option>
+            <option value="rating-desc">Đánh giá cao nhất</option>
+            <option value="newest">Mới nhất</option>
           </select>
         </div>
 
@@ -114,12 +158,102 @@ const Products = () => {
           ))}
         </div>
 
+        {/* Bộ lọc nâng cao — chỉ hiện khi bấm mở */}
+        {showFilters && (
+          <div className="advanced-filters">
+            <div className="filter-group">
+              <label>Khoảng giá (₫)</label>
+              <div className="price-range-inputs">
+                <input
+                  type="number"
+                  placeholder="Từ"
+                  value={priceMin}
+                  onChange={e => setPriceMin(e.target.value)}
+                  min={0}
+                />
+                <span>—</span>
+                <input
+                  type="number"
+                  placeholder="Đến"
+                  value={priceMax}
+                  onChange={e => setPriceMax(e.target.value)}
+                  min={0}
+                />
+              </div>
+            </div>
+
+            <div className="filter-group">
+              <label>Chất liệu</label>
+              <div className="filter-chips">
+                {MATERIALS.map(m => (
+                  <button
+                    key={m}
+                    type="button"
+                    className={`filter-chip ${materials.includes(m) ? "filter-chip--active" : ""}`}
+                    onClick={() => toggleInList(materials, setMaterials, m)}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="filter-group">
+              <label>Màu sắc</label>
+              <div className="filter-chips">
+                {COLORS.map(c => (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`filter-chip ${colors.includes(c) ? "filter-chip--active" : ""}`}
+                    onClick={() => toggleInList(colors, setColors, c)}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="filter-group filter-group--row">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={inStockOnly}
+                  onChange={e => setInStockOnly(e.target.checked)}
+                />
+                <span>Chỉ hiện còn hàng</span>
+              </label>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={onSaleOnly}
+                  onChange={e => setOnSaleOnly(e.target.checked)}
+                />
+                <span>Đang giảm giá</span>
+              </label>
+            </div>
+
+            {activeFilterCount > 0 && (
+              <button type="button" className="btn-clear-filters" onClick={resetFilters}>
+                ✕ Xoá bộ lọc ({activeFilterCount})
+              </button>
+            )}
+          </div>
+        )}
+
         {error && <div className="error-box">⚠️ {error}</div>}
 
         {loading ? (
           <div className="loading-box"><div className="spinner" /><p>Đang tải sản phẩm...</p></div>
         ) : filtered.length === 0 ? (
-          <div className="empty-box">Không tìm thấy sản phẩm phù hợp</div>
+          <div className="empty-box">
+            Không tìm thấy sản phẩm phù hợp
+            {activeFilterCount > 0 && (
+              <button type="button" className="btn-clear-filters" onClick={resetFilters} style={{ marginTop: 12 }}>
+                Xoá bộ lọc và thử lại
+              </button>
+            )}
+          </div>
         ) : (
           <div className="client-products-grid">
             {filtered.map((p, idx) => (

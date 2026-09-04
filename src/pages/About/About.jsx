@@ -100,6 +100,9 @@ export default function About() {
   // Ảnh banner đầu trang và ảnh xưởng sản xuất giờ là 2 key riêng biệt
   const bannerImage = get("aboutpage.banner.image", "");
   const companyImage = get("aboutpage.company.image", "");
+  // Ảnh minh hoạ cho mục "Vì sao chọn chúng tôi?" — đặt dưới đoạn mô tả bên cột trái,
+  // trước đây khoảng trống này để trắng trơn khi cột phải (danh sách 4 lý do) dài hơn nhiều
+  const whyUsImage = get("aboutpage.whyus.image", "");
 
   return (
     <div className="about-page">
@@ -233,6 +236,18 @@ export default function About() {
             <span className="eyebrow">Lợi thế của LuxWood</span>
             <h2>Vì sao chọn chúng tôi?</h2>
             <p>Chúng tôi không chỉ bán sản phẩm — chúng tôi cung cấp trải nghiệm hoàn chỉnh từ lúc bạn bước vào showroom đến khi đặt chiếc ghế cuối cùng vào nhà.</p>
+            {whyUsImage ? (
+              <img
+                src={whyUsImage}
+                alt="Vì sao chọn LuxWood"
+                className="whyus-img"
+                onError={(e) => (e.target.style.display = "none")}
+              />
+            ) : (
+              <div className="whyus-img-placeholder">
+                <span style={{ fontSize: 48 }}>🏗️</span>
+              </div>
+            )}
           </Reveal>
           <div className="whyus-list">
             {whyUs.map((w, i) => (
@@ -248,20 +263,28 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── QUY TRÌNH ── */}
+      {/* ── QUY TRÌNH (dạng timeline/sơ đồ lịch trình — đường kẻ nối các mốc, zigzag
+          trái-phải — thay cho lưới 6 card rời rạc trước đây) ── */}
       <section className="process-section">
         <div className="section-inner">
           <Reveal as="div" className="section-header">
             <span className="eyebrow">Cách chúng tôi làm việc</span>
             <h2>Quy trình làm việc</h2>
           </Reveal>
-          <div className="process-grid">
+          <div className="process-timeline">
             {steps.map((s, i) => (
-              <Reveal as="div" className="process-card" key={i} delay={Math.min(i * 70, 420)}>
-                <span className="process-step">{s.step}</span>
-                <h3>{s.title}</h3>
-                <p>{s.desc}</p>
-                {i < steps.length - 1 && <div className="process-arrow">→</div>}
+              <Reveal
+                as="div"
+                className={`process-timeline-item ${i % 2 === 0 ? "process-timeline-item--left" : "process-timeline-item--right"}`}
+                key={i}
+                delay={Math.min(i * 90, 450)}
+                direction={i % 2 === 0 ? "left" : "right"}
+              >
+                <div className="process-timeline-dot">{s.step}</div>
+                <div className="process-timeline-card">
+                  <h3>{s.title}</h3>
+                  <p>{s.desc}</p>
+                </div>
               </Reveal>
             ))}
           </div>
@@ -305,18 +328,34 @@ export default function About() {
             <h2>Dự án tiêu biểu</h2>
           </Reveal>
           <div className="projects-grid">
-            {projects.map((p, i) => (
-              <Reveal as="div" className="project-card" key={i} delay={Math.min((i % 3) * 90, 270)}>
-                <div className="project-img-placeholder">
-                  <span style={{ fontSize: 40 }}>{p.icon}</span>
-                </div>
-                <div className="project-info">
-                  <span className="project-year">{p.year}</span>
-                  <h3>{p.name}</h3>
-                  <span className="project-type">{p.type}</span>
-                </div>
-              </Reveal>
-            ))}
+            {projects.map((p, i) => {
+              // Ảnh dự án lấy từ CMS (Admin → Giao diện Client → Trang Giới thiệu →
+              // "Dự án tiêu biểu"). Key theo đúng thứ tự mảng `projects` phía trên
+              // (project1..project6). Nếu Admin chưa nhập URL, giữ nguyên emoji
+              // placeholder cũ như trước — không để trống trơn xấu xí.
+              const projectImage = get(`aboutpage.project${i + 1}.image`, "");
+              return (
+                <Reveal as="div" className="project-card" key={i} delay={Math.min((i % 3) * 90, 270)}>
+                  <div className="project-img-placeholder">
+                    {projectImage ? (
+                      <img
+                        src={projectImage}
+                        alt={p.name}
+                        className="project-img-real"
+                        onError={(e) => (e.target.style.display = "none")}
+                      />
+                    ) : (
+                      <span style={{ fontSize: 40 }}>{p.icon}</span>
+                    )}
+                  </div>
+                  <div className="project-info">
+                    <span className="project-year">{p.year}</span>
+                    <h3>{p.name}</h3>
+                    <span className="project-type">{p.type}</span>
+                  </div>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>

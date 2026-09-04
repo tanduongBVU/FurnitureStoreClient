@@ -35,12 +35,28 @@ input, textarea, select {
 .blog-card-img img {
   transition: transform .45s ease;
 }
-.product-card:hover .product-img img,
-.blog-card:hover .blog-card-img img {
-  transform: scale(1.06);
+
+/* FIX MOBILE: hiệu ứng phóng ảnh khi hover giờ CHỈ áp dụng cho thiết bị thật sự có chuột
+   (hover:hover + pointer:fine đều false trên mọi màn cảm ứng, kể cả tablet). Trước đây
+   không giới hạn khiến Safari iOS có thể giữ nguyên trạng thái :hover sau khi khách chạm
+   vào card — ảnh bị "kẹt" ở trạng thái phóng to, kể cả sau khi điều hướng sang trang khác
+   rồi bấm quay lại. */
+@media (hover: hover) and (pointer: fine) {
+  .product-card:hover .product-img img,
+  .blog-card:hover .blog-card-img img {
+    transform: scale(1.06);
+  }
 }
 
 /* Người dùng bật "giảm hiệu ứng chuyển động" → tắt hết animation/transition */
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
+}
+
+/* FIX MOBILE: tắt khung highlight xám/xanh mặc định của Android/iOS khi chạm vào
+   <a>/<button> — site đã tự làm hiệu ứng nhún riêng (:active { transform: scale(0.96) })
+   nên không cần khung highlight mặc định của trình duyệt, vốn thường vẽ vuông góc đè lên
+   cả phần tử đã bo tròn (nút tròn ♡/⚖️, hamburger, card bo góc...), trông không đồng bộ. */
+a, button {
+  -webkit-tap-highlight-color: transparent;
 }

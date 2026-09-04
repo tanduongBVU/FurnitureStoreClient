@@ -72,7 +72,7 @@
 }
 .home .btn-outline:hover { background: var(--walnut); color: var(--cream); }
 
-/* ── SLIDER (full-bleed, ảnh phủ kín, chữ căn giữa banner) ── */
+/* ── SLIDER (full-bleed, ảnh/video phủ kín, chữ căn giữa banner) ── */
 .hero-slider {
   position: relative;
   height: 88vh;
@@ -83,6 +83,16 @@
 }
 
 .hero-bg-image {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-bg-video {
   position: absolute;
   inset: 0;
   width: 100% !important;
@@ -206,8 +216,11 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
 }
+
 .home .product-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   background: #fff;
   border-radius: 14px;
   overflow: hidden;
@@ -223,6 +236,7 @@
 .home .product-img {
   position: relative;
   height: 200px;
+  flex-shrink: 0;
   background: var(--cream);
   display: flex;
   align-items: center;
@@ -245,10 +259,22 @@
   border-radius: 20px;
   letter-spacing: .5px;
 }
-.home .product-info { padding: 18px; background: #fff; }
+.home .product-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 18px;
+  background: #fff;
+}
 .home .product-cat { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 .home .product-info h3 { font-size: 15px; font-weight: 600; color: var(--walnut); margin: 6px 0 14px; }
-.home .product-footer { display: flex; align-items: center; justify-content: space-between; }
+.home .product-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 8px;
+}
 .home .product-price { font-family: 'Playfair Display', Georgia, serif; font-size: 16px; color: var(--gold-d); }
 .home .product-price--sale { color: #b91c1c; }
 .home .product-price-original {
@@ -259,9 +285,6 @@
   margin-bottom: 2px;
 }
 
-/* Bỏ style link mặc định (xanh + gạch chân) do Bootstrap áp lên thẻ <a>.
-   LƯU Ý: chính .product-card là thẻ <a> (không phải có <a> nằm bên trong),
-   nên phải nhắm thẳng vào "a.product-card", không phải ".product-card a" */
 .home a.product-card,
 .home a.product-card:visited,
 .home a.product-card:hover,
@@ -269,8 +292,6 @@
   text-decoration: none;
   color: inherit;
 }
-/* Chặn thêm ở từng phần tử con để chắc chắn không bị gạch chân
-   (text-decoration của thẻ cha <a> có thể "vẽ xuyên" qua con) */
 .home .product-info h3,
 .home .product-price,
 .home .product-cat {
@@ -288,6 +309,99 @@
   transition: background .2s;
 }
 .btn-add:hover { background: var(--gold-d); }
+
+/* ── COMBO TIẾT KIỆM ── */
+.bundles-section { padding: 96px 0; background: #fff; }
+.bundles-grid-home {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.bundle-card-home {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--cream);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1.5px solid #e5ddd0;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.bundle-card-home:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(59,42,26,.16);
+  border-color: var(--gold-d);
+}
+.bundle-card-home__img {
+  position: relative;
+  height: 200px;
+  flex-shrink: 0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.bundle-card-home__img img { width: 100%; height: 100%; object-fit: cover; }
+.bundle-card-home__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #b91c1c;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+  letter-spacing: .3px;
+}
+
+.bundle-card-home__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 20px;
+}
+.bundle-card-home__body h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 18px;
+  color: var(--walnut);
+  margin: 0 0 10px;
+}
+.bundle-card-home__items {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bundle-card-home__items li {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.bundle-card-home__price {
+  margin-top: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.bundle-card-home__price strong {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  color: #b91c1c;
+}
+.bundle-card-home__price-original {
+  font-size: 13px;
+  color: #9a9186;
+  text-decoration: line-through;
+}
+.bundle-card-home__btn {
+  width: 100%;
+  justify-content: center;
+}
 
 /* ── PHÒNG (ảnh thật + icon nổi ở góc) ── */
 .rooms-section { padding: 96px 0; background: #fff; }
@@ -356,8 +470,6 @@
 .contact-section {
   padding: 96px 0;
   background: var(--walnut);
-  /* Bù trừ chiều cao navbar (fixed, ~72px) để khi cuộn tới #contact
-     không bị navbar che mất phần đầu section */
   scroll-margin-top: 88px;
 }
 .contact-inner {
@@ -410,6 +522,7 @@
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .bundles-grid-home { grid-template-columns: repeat(2, 1fr); }
   .footer-inner { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 768px) {
@@ -419,19 +532,13 @@
   .hero-sub { font-size: 15px; }
   .about-section .section-inner { grid-template-columns: 1fr; gap: 40px; }
   .products-grid { grid-template-columns: 1fr; }
+  .bundles-grid-home { grid-template-columns: 1fr; }
   .rooms-grid { grid-template-columns: repeat(2, 1fr); }
   .contact-inner { grid-template-columns: 1fr; gap: 40px; }
   .footer-inner { grid-template-columns: 1fr; gap: 32px; }
 }
 
-/* ══════════════════════════════════════════════════════
-   BỔ SUNG RESPONSIVE MOBILE — dán thêm vào CUỐI Home.css
-   hiện có (KHÔNG thay thế, chỉ nối thêm vào cuối file).
-   ══════════════════════════════════════════════════════ */
-
 @media (max-width: 480px) {
-  /* Hàng thống kê "500+ Sản phẩm / 10.000+ Khách hàng / 15+ Năm kinh nghiệm" chưa có
-     breakpoint riêng cho máy rất hẹp — gap 32px cố định dễ bị bóp chật hoặc tràn. */
   .stats {
     gap: 16px;
     flex-wrap: wrap;

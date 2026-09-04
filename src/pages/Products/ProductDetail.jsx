@@ -3,6 +3,9 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useCart } from "../../contexts/CartContext";
 import { useWishlist } from "../../contexts/WishlistContext";
+import WishlistButton from "../../components/WishlistButton/WishlistButton";
+import CompareButton from "../../components/CompareButton/CompareButton";
+import RatingStars from "../../components/RatingStars/RatingStars";
 import Reveal from "../../components/Reveal/Reveal";
 import ProductReviews from "../../components/ProductReviews/ProductReviews";
 import "./ProductDetail.css";
@@ -18,6 +21,11 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
+  // Sản phẩm liên quan — tải riêng, KHÔNG chặn phần chi tiết chính hiển thị (loading riêng biệt),
+  // để trang chính vẫn hiện nhanh dù phần gợi ý chưa tải xong.
+  const [related, setRelated] = useState([]);
+  const [relatedLoading, setRelatedLoading] = useState(true);
+
   useEffect(() => {
     setLoading(true);
     setAdded(false);
@@ -28,13 +36,20 @@ const ProductDetail = () => {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // Effect riêng cho related — chạy lại mỗi khi đổi sản phẩm (id đổi), độc lập với effect ở trên
+  useEffect(() => {
+    setRelatedLoading(true);
+    api.get(`/Products/${id}/related`)
+      .then(res => setRelated(res.data))
+      .catch(() => setRelated([]))
+      .finally(() => setRelatedLoading(false));
+  }, [id]);
+
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
 
   const hasDiscount = product?.discountPercent > 0;
   const salePrice = product ? product.price * (1 - (product.discountPercent || 0) / 100) : 0;
 
-  // Giá THỰC TẾ khách phải trả — dùng giá này khi thêm vào giỏ, KHÔNG dùng product.price gốc,
-  // để giỏ hàng/đơn hàng phản ánh đúng giá đã giảm.
   const getCartPayload = () => ({ ...product, price: hasDiscount ? salePrice : product.price });
 
   const handleAddToCart = () => {
@@ -93,6 +108,13 @@ const ProductDetail = () => {
           <Reveal as="div" className="pd-info" direction="right" delay={120}>
             <span className="pd-cat">{product.category}</span>
             <h1>{product.name}</h1>
+
+            {(product.material || product.color) && (
+              <div className="pd-attrs">
+                {product.material && <span className="pd-attr-chip">Chất liệu: {product.material}</span>}
+                {product.color && <span className="pd-attr-chip">Màu sắc: {product.color}</span>}
+              </div>
+            )}
 
             {hasDiscount ? (
               <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
@@ -162,6 +184,54 @@ const ProductDetail = () => {
         </div>
 
         <ProductReviews productId={product.id} />
+
+        {/* Sản phẩm liên quan — ẩn hoàn toàn nếu chưa tải xong hoặc không có gợi ý nào,
+            tránh để lộ khung rỗng xấu xí trong lúc chờ hoặc khi DB không đủ sản phẩm */}
+        {!relatedLoading && related.length > 0 && (
+          <div className="pd-related">
+            <h2 className="pd-related__title">Sản phẩm liên quan</h2>
+            <div className="pd-related__grid">
+              {related.map((p, idx) => (
+                <Reveal as="div" key={p.id} delay={Math.min(idx * 70, 300)}>
+                  <Link to={`/products/${p.id}`} className="pd-related__card">
+                    <div className="pd-related__img">
+                      {p.image
+                        ? <img src={p.image} alt={p.name} onError={e => e.target.style.display = "none"} />
+                        : <span className="pd-related__img-placeholder">🪑</span>
+                      }
+                      {p.stock === 0 ? (
+                        <span className="pd-related__tag pd-related__tag--out">Hết hàng</span>
+                      ) : p.discountPercent > 0 ? (
+                        <span className="pd-related__tag" style={{ background: "#b91c1c" }}>-{p.discountPercent}%</span>
+                      ) : p.isBestSeller ? (
+                        <span className="pd-related__tag">Bán chạy</span>
+                      ) : null}
+                      <WishlistButton product={p} />
+                      <CompareButton product={p} />
+                    </div>
+                    <div className="pd-related__info">
+                      <span className="pd-related__cat">{p.category}</span>
+                      <h3>{p.name}</h3>
+                      <RatingStars avg={p.averageRating} count={p.reviewCount} />
+                      {p.discountPercent > 0 ? (
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span style={{ textDecoration: "line-through", color: "#9a9a9a", fontSize: 12 }}>
+                            {formatPrice(p.price)}
+                          </span>
+                          <span className="pd-related__price" style={{ color: "#b91c1c" }}>
+                            {formatPrice(p.price * (1 - p.discountPercent / 100))}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="pd-related__price">{formatPrice(p.price)}</span>
+                      )}
+                    </div>
+                  </Link>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

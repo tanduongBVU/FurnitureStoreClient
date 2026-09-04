@@ -52,6 +52,7 @@ export default function Home() {
       bg: get("hero.slide1.bg", "#2c1f10"),
       accent: get("hero.slide1.accent", "#c8a96e"),
       img: get("hero.slide1.image", "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1600&q=80&auto=format&fit=crop"),
+      video: get("hero.slide1.video", ""),
     },
     {
       id: 2,
@@ -60,6 +61,7 @@ export default function Home() {
       bg: get("hero.slide2.bg", "#1a2c20"),
       accent: get("hero.slide2.accent", "#7ab87a"),
       img: get("hero.slide2.image", "https://images.unsplash.com/photo-1621295693450-080546d2ec8e?w=1600&q=80&auto=format&fit=crop"),
+      video: get("hero.slide2.video", ""),
     },
     {
       id: 3,
@@ -68,11 +70,16 @@ export default function Home() {
       bg: get("hero.slide3.bg", "#1a1f2c"),
       accent: get("hero.slide3.accent", "#6e9ec8"),
       img: get("hero.slide3.image", "https://images.unsplash.com/photo-1687180498602-5a1046defaa4?w=1600&q=80&auto=format&fit=crop"),
+      video: get("hero.slide3.video", ""),
     },
   ];
 
   const [bestSellers, setBestSellers] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+
+  // ── Combo tiết kiệm ──
+  const [bundles, setBundles] = useState([]);
+  const [loadingBundles, setLoadingBundles] = useState(true);
 
   const [contactForm, setContactForm] = useState({ name: "", phone: "", email: "", message: "" });
   const [contactSending, setContactSending] = useState(false);
@@ -110,6 +117,15 @@ export default function Home() {
       .finally(() => setLoadingProducts(false));
   }, []);
 
+  // Tải danh sách combo — độc lập với việc tải sản phẩm bán chạy ở trên (2 useEffect
+  // riêng), để 1 API chậm/lỗi không làm phần còn lại của trang bị chặn theo.
+  useEffect(() => {
+    api.get("/Bundles")
+      .then(res => setBundles(res.data.slice(0, 3))) // chỉ hiện tối đa 3 combo ở trang chủ
+      .catch(() => setBundles([]))
+      .finally(() => setLoadingBundles(false));
+  }, []);
+
   const goTo = (idx) => {
     setCurrent((idx + slides.length) % slides.length);
   };
@@ -123,16 +139,43 @@ export default function Home() {
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
   const salePriceOf = (p) => p.price * (1 - (p.discountPercent || 0) / 100);
 
+  // Thêm CẢ combo vào giỏ chỉ với 1 lần bấm — áp % giảm của combo lên TỪNG sản phẩm
+  // trước khi thêm, để tổng tiền hiện trong giỏ hàng khớp CHÍNH XÁC với FinalPrice đã
+  // quảng cáo ở thẻ combo (không lệch do làm tròn cộng dồn nhiều lần).
+  const addBundleToCart = (bundle) => {
+    bundle.items.forEach((item) => {
+      const discountedUnitPrice = item.productPrice * (1 - bundle.discountPercent / 100);
+      addToCart(
+        { id: item.productId, name: item.productName, image: item.productImage, price: discountedUnitPrice },
+        item.quantity
+      );
+    });
+  };
+
   return (
     <div className="home">
 
       {/* ── SLIDER ── */}
       <section className="hero-slider" style={{ background: slide.bg }}>
-        <img
-          src={slide.img}
-          alt={slide.title.replace("\n", " ")}
-          className="hero-bg-image"
-        />
+        {slide.video ? (
+          <video
+            key={`video-${slide.id}`}
+            className="hero-bg-video"
+            src={slide.video}
+            poster={slide.img || undefined}
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+        ) : (
+          <img
+            key={`img-${slide.id}`}
+            src={slide.img}
+            alt={slide.title.replace("\n", " ")}
+            className="hero-bg-image"
+          />
+        )}
         <div className="hero-overlay" />
 
         <div className="hero-content">
@@ -253,7 +296,6 @@ export default function Home() {
                           className="btn-add"
                           onClick={(e) => {
                             e.preventDefault();
-                            // Thêm vào giỏ đúng giá đã giảm (nếu có), không dùng giá gốc
                             addToCart({ ...p, price: hasDiscount ? salePriceOf(p) : p.price }, 1);
                           }}
                         >+ Thêm</button>
@@ -271,6 +313,59 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── COMBO TIẾT KIỆM ── */}
+      {/* Ẩn hoàn toàn cả section nếu chưa có combo nào — tránh lộ khung rỗng xấu xí
+          trên trang chủ trong lúc Admin chưa tạo combo nào. */}
+      {!loadingBundles && bundles.length > 0 && (
+        <section className="bundles-section">
+          <div className="section-inner">
+            <Reveal as="div" className="section-header">
+              <span className="eyebrow">Mua trọn bộ, tiết kiệm hơn</span>
+              <h2>Combo tiết kiệm</h2>
+            </Reveal>
+
+            <div className="bundles-grid-home">
+              {bundles.map((b, idx) => {
+                const coverImage = b.image || b.items[0]?.productImage;
+                return (
+                  <Reveal as="div" key={b.id} delay={Math.min(idx * 90, 320)}>
+                    <div className="bundle-card-home">
+                      <div className="bundle-card-home__img">
+                        {coverImage
+                          ? <img src={coverImage} alt={b.name} onError={e => e.target.style.display = "none"} />
+                          : <span style={{ fontSize: 40 }}>🎁</span>
+                        }
+                        {b.discountPercent > 0 && (
+                          <span className="bundle-card-home__badge">Giảm thêm {b.discountPercent}%</span>
+                        )}
+                      </div>
+                      <div className="bundle-card-home__body">
+                        <h3>{b.name}</h3>
+                        <ul className="bundle-card-home__items">
+                          {b.items.slice(0, 3).map(item => (
+                            <li key={item.productId}>{item.productName} x{item.quantity}</li>
+                          ))}
+                          {b.items.length > 3 && <li>...và {b.items.length - 3} sản phẩm khác</li>}
+                        </ul>
+                        <div className="bundle-card-home__price">
+                          {b.discountPercent > 0 && (
+                            <span className="bundle-card-home__price-original">{formatPrice(b.subtotal)}</span>
+                          )}
+                          <strong>{formatPrice(b.finalPrice)}</strong>
+                        </div>
+                        <button className="btn-primary bundle-card-home__btn" style={{ background: "var(--walnut)", color: "#fff" }} onClick={() => addBundleToCart(b)}>
+                          Thêm cả combo vào giỏ
+                        </button>
+                      </div>
+                    </div>
+                  </Reveal>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── PHÒNG ── */}
       <section className="rooms-section">

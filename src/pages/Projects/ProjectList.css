@@ -7,8 +7,20 @@
   text-align: center;
   color: #fff;
 }
-.project-list-hero .eyebrow { color: var(--gold, #c8a96e); }
-.project-list-hero h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 42px; margin: 0 0 12px; }
+.project-list-hero .eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  color: var(--gold, #c8a96e);
+}
+/* FIX: thiếu color:#fff khiến rule global "h1, h2 { color: var(--text-h) }" trong
+   index.css (đen gần tuyền) đè lên màu trắng thừa hưởng từ .project-list-hero — vì
+   1 rule set màu trực tiếp lên chính thẻ h1 luôn thắng màu inherit từ cha, bất kể
+   specificity thấp cỡ nào. Phải khai báo color RÕ RÀNG ở đây để thắng lại. */
+.project-list-hero h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 42px; margin: 0 0 12px; color: #fff; }
 .project-list-hero p { color: rgba(255,255,255,.65); font-size: 15px; max-width: 520px; margin: 0 auto; }
 
 .project-list-body { padding: 40px 0 80px; }
@@ -66,6 +78,17 @@
 }
 .project-detail-back { color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; display: inline-block; margin-bottom: 16px; }
 .project-detail-back:hover { text-decoration: underline; }
+/* THIẾU HOÀN TOÀN trước đây — ProjectDetail.jsx có dùng <span className="eyebrow">
+   nhưng file này chưa từng định nghĩa rule cho nó, khiến chữ hạng mục (VD: "Nội thất
+   toàn bộ") dính sát vào tiêu đề dự án bên dưới, không có khoảng cách. */
+.project-detail-hero .eyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
 .project-detail-hero h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 32px; margin: 6px 0 12px; color: #fff; }
 .project-detail-meta { display: flex; gap: 20px; font-size: 13px; color: rgba(255,255,255,0.7); }
 
