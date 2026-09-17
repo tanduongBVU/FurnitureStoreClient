@@ -20,24 +20,69 @@
 
 .products-page .section-inner { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 
-/* Toolbar */
-.products-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 40px 0 20px; }
+/* Toolbar — giờ chỉ còn tìm kiếm + sort. Nút "Bộ lọc nâng cao" vẫn nằm trong DOM
+   nhưng bị ẩn (display:none) trên desktop, chỉ hiện lại ở mobile (xem media query
+   cuối file) để mở/đóng sidebar dạng panel trượt. */
+.products-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 40px 0 28px; }
 .search-box { display: flex; align-items: center; gap: 8px; background: #fff; border: 1.5px solid #e5ddd0; border-radius: 10px; padding: 0 14px; max-width: 360px; width: 100%; }
 .search-box input { border: none; outline: none; padding: 12px 0; font-size: 14px; color: var(--text, #2c1f10); background: transparent; width: 100%; font-family: inherit; }
 .sort-select { padding: 11px 14px; border: 1.5px solid #e5ddd0; border-radius: 10px; font-size: 14px; color: var(--text, #2c1f10); font-family: inherit; outline: none; background: #fff; cursor: pointer; }
 
-/* Category tabs */
-.category-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px; }
-.cat-tab { padding: 9px 20px; border-radius: 24px; border: 1.5px solid #e5ddd0; background: #fff; font-size: 14px; color: var(--text-muted, #7a6a58); cursor: pointer; transition: all .15s; font-family: inherit; }
-.cat-tab:hover { border-color: var(--gold, #c8a96e); color: var(--gold-d, #a8854a); }
-.cat-tab--active { background: var(--walnut, #3b2a1a); color: #fff; border-color: var(--walnut, #3b2a1a); font-weight: 600; }
+/* ── Layout 2 cột: sidebar trái (bộ lọc) + nội dung phải (lưới sản phẩm) ── */
+.products-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 36px;
+  padding-bottom: 80px;
+}
 
-/* Grid */
+.products-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  position: sticky;
+  top: 24px;
+}
+
+.sidebar-section { padding-bottom: 24px; border-bottom: 1px solid #eee2d0; }
+.sidebar-section:last-of-type { border-bottom: none; padding-bottom: 0; }
+.sidebar-section h4 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--walnut, #3b2a1a);
+  margin: 0 0 14px;
+}
+
+/* Danh mục dạng cột dọc thay cho pill ngang trước đây */
+.sidebar-categories { display: flex; flex-direction: column; gap: 2px; }
+.sidebar-cat-btn {
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text-muted, #7a6a58);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  font-family: inherit;
+}
+.sidebar-cat-btn:hover { background: #faf7f2; color: var(--gold-d, #a8854a); }
+.sidebar-cat-btn--active { background: var(--walnut, #3b2a1a); color: #fff; font-weight: 600; }
+
+.sidebar-checkboxes { display: flex; flex-direction: column; gap: 12px; }
+
+.products-main { flex: 1; min-width: 0; }
+
+/* Grid — 3 cột thay vì 4 vì phần nội dung chính giờ hẹp hơn (đã nhường chỗ cho sidebar) */
 .client-products-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-  padding-bottom: 80px;
 }
 
 /* FIX: card dùng flex-column + product-info flex:1 + product-footer margin-top:auto —
@@ -104,16 +149,8 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 .error-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 14px 18px; color: #b91c1c; font-size: 14px; margin-bottom: 24px; }
 
-@media (max-width: 1024px) {
-  .client-products-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 640px) {
-  .client-products-grid { grid-template-columns: 1fr; }
-  .products-hero h1 { font-size: 30px; }
-}
-
-
 .btn-filter-toggle {
+  display: none; /* chỉ hiện lại ở mobile — xem media query bên dưới */
   padding: 10px 16px;
   border: 1px solid #d8cfc0;
   border-radius: 8px;
@@ -128,30 +165,16 @@
   border-color: #3b2a1a;
 }
 
-.advanced-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  padding: 20px;
-  margin-bottom: 16px;
-  background: #faf7f2;
-  border-radius: 10px;
-  border: 1px solid #eee2d0;
-}
-
-.filter-group { display: flex; flex-direction: column; gap: 8px; }
-.filter-group label { font-size: 13px; font-weight: 600; color: #5c4a34; }
-.filter-group--row { flex-direction: row; gap: 20px; align-items: center; }
-
 .price-range-inputs { display: flex; align-items: center; gap: 8px; }
 .price-range-inputs input {
-  width: 110px;
+  flex: 1;
+  min-width: 0;
   padding: 8px 10px;
   border: 1px solid #d8cfc0;
   border-radius: 6px;
 }
 
-.filter-chips { display: flex; flex-wrap: wrap; gap: 8px; max-width: 320px; }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .filter-chip {
   padding: 6px 14px;
   border: 1px solid #d8cfc0;
@@ -179,8 +202,28 @@
   align-self: flex-start;
 }
 
-/* Mobile — dồn về 1 cột, giống pattern responsive đã áp dụng cho toàn site */
-@media (max-width: 768px) {
-  .advanced-filters { flex-direction: column; gap: 16px; }
-  .filter-chips { max-width: 100%; }
+@media (max-width: 1024px) {
+  .client-products-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Mobile / tablet hẹp — sidebar chuyển thành panel ẩn/hiện qua nút "Bộ lọc nâng cao"
+   thay vì nằm cố định bên trái (không đủ chỗ ngang để chia 2 cột). */
+@media (max-width: 900px) {
+  .products-layout { flex-direction: column; }
+  .products-sidebar {
+    width: 100%;
+    position: static;
+    display: none;
+    background: #faf7f2;
+    border: 1px solid #eee2d0;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .products-sidebar--open { display: flex; }
+  .btn-filter-toggle { display: inline-block; }
+}
+
+@media (max-width: 640px) {
+  .client-products-grid { grid-template-columns: 1fr; }
+  .products-hero h1 { font-size: 30px; }
 }

@@ -8,6 +8,7 @@ import CompareButton from "../../components/CompareButton/CompareButton";
 import RatingStars from "../../components/RatingStars/RatingStars";
 import Reveal from "../../components/Reveal/Reveal";
 import ProductReviews from "../../components/ProductReviews/ProductReviews";
+import SEO from "../../components/SEO/SEO";
 import "./ProductDetail.css";
 
 const ProductDetail = () => {
@@ -21,8 +22,8 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
-  // Sản phẩm liên quan — tải riêng, KHÔNG chặn phần chi tiết chính hiển thị (loading riêng biệt),
-  // để trang chính vẫn hiện nhanh dù phần gợi ý chưa tải xong.
+  const [selectedVariant, setSelectedVariant] = useState(null);
+
   const [related, setRelated] = useState([]);
   const [relatedLoading, setRelatedLoading] = useState(true);
 
@@ -31,12 +32,20 @@ const ProductDetail = () => {
     setAdded(false);
     setQuantity(1);
     api.get(`/Products/${id}`)
-      .then(res => setProduct(res.data))
+      .then(res => {
+        setProduct(res.data);
+        const variants = res.data.variants || [];
+        if (variants.length > 0) {
+          const firstInStock = variants.find(v => v.stock > 0);
+          setSelectedVariant(firstInStock || variants[0]);
+        } else {
+          setSelectedVariant(null);
+        }
+      })
       .catch(() => setError("Không tìm thấy sản phẩm này."))
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Effect riêng cho related — chạy lại mỗi khi đổi sản phẩm (id đổi), độc lập với effect ở trên
   useEffect(() => {
     setRelatedLoading(true);
     api.get(`/Products/${id}/related`)
@@ -47,19 +56,32 @@ const ProductDetail = () => {
 
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
 
-  const hasDiscount = product?.discountPercent > 0;
-  const salePrice = product ? product.price * (1 - (product.discountPercent || 0) / 100) : 0;
+  const hasVariants = (product?.variants?.length ?? 0) > 0;
 
-  const getCartPayload = () => ({ ...product, price: hasDiscount ? salePrice : product.price });
+  const activePrice = hasVariants && selectedVariant ? selectedVariant.price : (product?.price ?? 0);
+  const activeStock = hasVariants && selectedVariant ? selectedVariant.stock : (product?.stock ?? 0);
+
+  const hasDiscount = product?.discountPercent > 0;
+  const salePrice = activePrice * (1 - (product?.discountPercent || 0) / 100);
+
+  useEffect(() => {
+    if (activeStock > 0 && quantity > activeStock) setQuantity(activeStock);
+  }, [selectedVariant]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const getCartPayload = () => ({ ...product, price: hasDiscount ? salePrice : activePrice });
+  const getVariantPayload = () =>
+    hasVariants && selectedVariant
+      ? { ...selectedVariant, price: hasDiscount ? salePrice : selectedVariant.price }
+      : null;
 
   const handleAddToCart = () => {
-    addToCart(getCartPayload(), quantity);
+    addToCart(getCartPayload(), quantity, getVariantPayload());
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
   const handleBuyNow = () => {
-    addToCart(getCartPayload(), quantity);
+    addToCart(getCartPayload(), quantity, getVariantPayload());
     navigate("/cart");
   };
 
@@ -80,6 +102,13 @@ const ProductDetail = () => {
 
   return (
     <div className="pd-page">
+      <SEO
+        title={product.name}
+        description={product.description}
+        image={product.image}
+        type="product"
+      />
+
       <div className="section-inner">
         <div className="pd-breadcrumb">
           <Link to="/products">Sản phẩm</Link> <span>/</span> <span>{product.name}</span>
@@ -120,11 +149,31 @@ const ProductDetail = () => {
               <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
                 <p className="pd-price" style={{ margin: 0, color: "#b3492f" }}>{formatPrice(salePrice)}</p>
                 <span style={{ fontSize: 16, color: "#9a9186", textDecoration: "line-through" }}>
-                  {formatPrice(product.price)}
+                  {formatPrice(activePrice)}
                 </span>
               </div>
             ) : (
-              <p className="pd-price">{formatPrice(product.price)}</p>
+              <p className="pd-price">{formatPrice(activePrice)}</p>
+            )}
+
+            {hasVariants && (
+              <div className="pd-variants">
+                <span className="pd-variants__label">Chọn loại:</span>
+                <div className="pd-variants__options">
+                  {product.variants.map(v => (
+                    <button
+                      key={v.id}
+                      type="button"
+                      className={`pd-variant-btn ${selectedVariant?.id === v.id ? "pd-variant-btn--active" : ""} ${v.stock === 0 ? "pd-variant-btn--out" : ""}`}
+                      onClick={() => setSelectedVariant(v)}
+                      disabled={v.stock === 0}
+                    >
+                      {v.name}
+                      {v.stock === 0 && " (Hết hàng)"}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
 
             <button
@@ -144,15 +193,15 @@ const ProductDetail = () => {
             <p className="pd-desc">{product.description || "Chưa có mô tả cho sản phẩm này."}</p>
 
             <div className="pd-stock">
-              {product.stock === 0
+              {activeStock === 0
                 ? <span className="pd-stock--out">Hết hàng</span>
-                : product.stock <= 3
-                  ? <span className="pd-stock--low">Chỉ còn {product.stock} sản phẩm</span>
-                  : <span className="pd-stock--ok">Còn hàng ({product.stock} sản phẩm)</span>
+                : activeStock <= 3
+                  ? <span className="pd-stock--low">Chỉ còn {activeStock} sản phẩm</span>
+                  : <span className="pd-stock--ok">Còn hàng ({activeStock} sản phẩm)</span>
               }
             </div>
 
-            {product.stock > 0 && (
+            {activeStock > 0 && (
               <>
                 <div className="pd-qty">
                   <span>Số lượng</span>
@@ -162,13 +211,13 @@ const ProductDetail = () => {
                       type="number"
                       value={quantity}
                       min={1}
-                      max={product.stock}
+                      max={activeStock}
                       onChange={e => {
                         const v = Number(e.target.value);
-                        if (v >= 1 && v <= product.stock) setQuantity(v);
+                        if (v >= 1 && v <= activeStock) setQuantity(v);
                       }}
                     />
-                    <button onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}>+</button>
+                    <button onClick={() => setQuantity(q => Math.min(activeStock, q + 1))}>+</button>
                   </div>
                 </div>
 
@@ -185,8 +234,6 @@ const ProductDetail = () => {
 
         <ProductReviews productId={product.id} />
 
-        {/* Sản phẩm liên quan — ẩn hoàn toàn nếu chưa tải xong hoặc không có gợi ý nào,
-            tránh để lộ khung rỗng xấu xí trong lúc chờ hoặc khi DB không đủ sản phẩm */}
         {!relatedLoading && related.length > 0 && (
           <div className="pd-related">
             <h2 className="pd-related__title">Sản phẩm liên quan</h2>

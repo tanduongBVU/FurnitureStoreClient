@@ -7,9 +7,7 @@ import CompareButton from "../../components/CompareButton/CompareButton";
 import RatingStars from "../../components/RatingStars/RatingStars";
 import "./Products.css";
 
-const CATEGORIES = ["Tất cả", "Phòng khách", "Phòng ngủ", "Phòng ăn", "Phòng làm việc", "Ban công"];
-// Phải khớp CHÍNH XÁC với danh sách Admin dùng khi nhập liệu (ProductCreate.jsx/ProductEdit.jsx),
-// nếu không chip lọc sẽ không bao giờ khớp được với dữ liệu thật trong DB.
+const CATEGORIES = ["Tất cả", "Phòng khách", "Phòng ngủ", "Phòng ăn", "Phòng làm việc", "Phòng tắm", "Ban công"];
 const MATERIALS = ["Gỗ tự nhiên", "Gỗ công nghiệp", "Kim loại", "Vải nỉ", "Da/Da công nghiệp", "Mây tre đan", "Kính"];
 const COLORS = ["Nâu gỗ", "Trắng", "Đen", "Xám", "Be/Kem", "Xanh dương", "Xanh lá", "Vàng"];
 
@@ -26,12 +24,11 @@ const Products = () => {
   });
   const [sort, setSort] = useState("default");
 
-  // ── Bộ lọc nâng cao ──
   const [showFilters, setShowFilters] = useState(false);
   const [priceMin, setPriceMin] = useState("");
   const [priceMax, setPriceMax] = useState("");
-  const [materials, setMaterials] = useState([]); // chọn được nhiều
-  const [colors, setColors] = useState([]);       // chọn được nhiều
+  const [materials, setMaterials] = useState([]);
+  const [colors, setColors] = useState([]);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [onSaleOnly, setOnSaleOnly] = useState(false);
 
@@ -94,20 +91,34 @@ const Products = () => {
 
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
 
+  const productMatchesMaterial = (p) => {
+    if (materials.length === 0) return true;
+    if (materials.includes(p.material)) return true;
+    return (p.variants || []).some(v => materials.includes(v.material));
+  };
+  const productMatchesColor = (p) => {
+    if (colors.length === 0) return true;
+    if (colors.includes(p.color)) return true;
+    return (p.variants || []).some(v => colors.includes(v.color));
+  };
+
+  const priceOf = (p) => (p.hasVariants ? p.displayPrice : p.price);
+
   let filtered = products.filter(p => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
     const matchCat = category === "Tất cả" || p.category === category;
-    const matchMaterial = materials.length === 0 || materials.includes(p.material);
-    const matchColor = colors.length === 0 || colors.includes(p.color);
-    const matchPriceMin = priceMin === "" || p.price >= Number(priceMin);
-    const matchPriceMax = priceMax === "" || p.price <= Number(priceMax);
+    const matchMaterial = productMatchesMaterial(p);
+    const matchColor = productMatchesColor(p);
+    const priceForFilter = priceOf(p);
+    const matchPriceMin = priceMin === "" || priceForFilter >= Number(priceMin);
+    const matchPriceMax = priceMax === "" || priceForFilter <= Number(priceMax);
     const matchStock = !inStockOnly || p.stock > 0;
     const matchSale = !onSaleOnly || p.discountPercent > 0;
     return matchSearch && matchCat && matchMaterial && matchColor && matchPriceMin && matchPriceMax && matchStock && matchSale;
   });
 
-  if (sort === "price-asc") filtered = [...filtered].sort((a, b) => a.price - b.price);
-  if (sort === "price-desc") filtered = [...filtered].sort((a, b) => b.price - a.price);
+  if (sort === "price-asc") filtered = [...filtered].sort((a, b) => priceOf(a) - priceOf(b));
+  if (sort === "price-desc") filtered = [...filtered].sort((a, b) => priceOf(b) - priceOf(a));
   if (sort === "rating-desc") filtered = [...filtered].sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
   if (sort === "newest") filtered = [...filtered].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -122,7 +133,6 @@ const Products = () => {
       </div>
 
       <div className="section-inner">
-        {/* Toolbar */}
         <div className="products-toolbar">
           <div className="search-box">
             <span>🔍</span>
@@ -137,7 +147,7 @@ const Products = () => {
             className={`btn-filter-toggle ${showFilters ? "btn-filter-toggle--active" : ""}`}
             onClick={() => setShowFilters(s => !s)}
           >
-            ⚙️ Bộ lọc nâng cao{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+            ⚙️ Bộ lọc{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
           </button>
           <select className="sort-select" value={sort} onChange={e => setSort(e.target.value)}>
             <option value="default">Mặc định</option>
@@ -148,21 +158,25 @@ const Products = () => {
           </select>
         </div>
 
-        <div className="category-tabs">
-          {CATEGORIES.map(c => (
-            <button
-              key={c}
-              className={`cat-tab ${category === c ? "cat-tab--active" : ""}`}
-              onClick={() => handleCategoryClick(c)}
-            >{c}</button>
-          ))}
-        </div>
+        <div className="products-layout">
+          {/* ── SIDEBAR — danh mục + bộ lọc nâng cao, luôn hiện trên desktop,
+              chỉ bật/tắt qua nút "Bộ lọc" ở màn hình hẹp (xem CSS) ── */}
+          <aside className={`products-sidebar ${showFilters ? "products-sidebar--open" : ""}`}>
+            <div className="sidebar-section">
+              <h4>Danh mục</h4>
+              <div className="sidebar-categories">
+                {CATEGORIES.map(c => (
+                  <button
+                    key={c}
+                    className={`sidebar-cat-btn ${category === c ? "sidebar-cat-btn--active" : ""}`}
+                    onClick={() => handleCategoryClick(c)}
+                  >{c}</button>
+                ))}
+              </div>
+            </div>
 
-        {/* Bộ lọc nâng cao — chỉ hiện khi bấm mở */}
-        {showFilters && (
-          <div className="advanced-filters">
-            <div className="filter-group">
-              <label>Khoảng giá (₫)</label>
+            <div className="sidebar-section">
+              <h4>Khoảng giá (₫)</h4>
               <div className="price-range-inputs">
                 <input
                   type="number"
@@ -182,8 +196,8 @@ const Products = () => {
               </div>
             </div>
 
-            <div className="filter-group">
-              <label>Chất liệu</label>
+            <div className="sidebar-section">
+              <h4>Chất liệu</h4>
               <div className="filter-chips">
                 {MATERIALS.map(m => (
                   <button
@@ -198,8 +212,8 @@ const Products = () => {
               </div>
             </div>
 
-            <div className="filter-group">
-              <label>Màu sắc</label>
+            <div className="sidebar-section">
+              <h4>Màu sắc</h4>
               <div className="filter-chips">
                 {COLORS.map(c => (
                   <button
@@ -214,23 +228,25 @@ const Products = () => {
               </div>
             </div>
 
-            <div className="filter-group filter-group--row">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={inStockOnly}
-                  onChange={e => setInStockOnly(e.target.checked)}
-                />
-                <span>Chỉ hiện còn hàng</span>
-              </label>
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={onSaleOnly}
-                  onChange={e => setOnSaleOnly(e.target.checked)}
-                />
-                <span>Đang giảm giá</span>
-              </label>
+            <div className="sidebar-section">
+              <div className="sidebar-checkboxes">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={inStockOnly}
+                    onChange={e => setInStockOnly(e.target.checked)}
+                  />
+                  <span>Chỉ hiện còn hàng</span>
+                </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={onSaleOnly}
+                    onChange={e => setOnSaleOnly(e.target.checked)}
+                  />
+                  <span>Đang giảm giá</span>
+                </label>
+              </div>
             </div>
 
             {activeFilterCount > 0 && (
@@ -238,66 +254,71 @@ const Products = () => {
                 ✕ Xoá bộ lọc ({activeFilterCount})
               </button>
             )}
-          </div>
-        )}
+          </aside>
 
-        {error && <div className="error-box">⚠️ {error}</div>}
+          {/* ── NỘI DUNG CHÍNH — lưới sản phẩm ── */}
+          <div className="products-main">
+            {error && <div className="error-box">⚠️ {error}</div>}
 
-        {loading ? (
-          <div className="loading-box"><div className="spinner" /><p>Đang tải sản phẩm...</p></div>
-        ) : filtered.length === 0 ? (
-          <div className="empty-box">
-            Không tìm thấy sản phẩm phù hợp
-            {activeFilterCount > 0 && (
-              <button type="button" className="btn-clear-filters" onClick={resetFilters} style={{ marginTop: 12 }}>
-                Xoá bộ lọc và thử lại
-              </button>
+            {loading ? (
+              <div className="loading-box"><div className="spinner" /><p>Đang tải sản phẩm...</p></div>
+            ) : filtered.length === 0 ? (
+              <div className="empty-box">
+                Không tìm thấy sản phẩm phù hợp
+                {activeFilterCount > 0 && (
+                  <button type="button" className="btn-clear-filters" onClick={resetFilters} style={{ marginTop: 12 }}>
+                    Xoá bộ lọc và thử lại
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="client-products-grid">
+                {filtered.map((p, idx) => (
+                  <Reveal as="div" key={p.id} delay={Math.min((idx % 8) * 60, 400)}>
+                  <Link to={`/products/${p.id}`} className="product-card">
+                    <div className="product-img">
+                      {p.image
+                        ? <img src={p.image} alt={p.name} onError={e => e.target.style.display = "none"} />
+                        : <span className="product-img-placeholder">🪑</span>
+                      }
+                      {p.stock === 0 ? (
+                        <span className="product-tag product-tag--out">Hết hàng</span>
+                      ) : p.discountPercent > 0 ? (
+                        <span className="product-tag" style={{ background: "#b91c1c" }}>-{p.discountPercent}%</span>
+                      ) : p.isBestSeller ? (
+                        <span className="product-tag">Bán chạy</span>
+                      ) : null}
+                      <WishlistButton product={p} />
+                      <CompareButton product={p} />
+                    </div>
+                    <div className="product-info">
+                      <span className="product-cat">{p.category}</span>
+                      <h3>{p.name}</h3>
+                      <RatingStars avg={p.averageRating} count={p.reviewCount} />
+                      <div className="product-footer">
+                        {p.discountPercent > 0 ? (
+                          <div style={{ display: "flex", flexDirection: "column" }}>
+                            <span style={{ textDecoration: "line-through", color: "#9a9a9a", fontSize: 12 }}>
+                              {formatPrice(priceOf(p))}
+                            </span>
+                            <span className="product-price" style={{ color: "#b91c1c" }}>
+                              {formatPrice(priceOf(p) * (1 - p.discountPercent / 100))}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="product-price">
+                            {p.hasVariants && "Từ "}{formatPrice(priceOf(p))}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                  </Reveal>
+                ))}
+              </div>
             )}
           </div>
-        ) : (
-          <div className="client-products-grid">
-            {filtered.map((p, idx) => (
-              <Reveal as="div" key={p.id} delay={Math.min((idx % 8) * 60, 400)}>
-              <Link to={`/products/${p.id}`} className="product-card">
-                <div className="product-img">
-                  {p.image
-                    ? <img src={p.image} alt={p.name} onError={e => e.target.style.display = "none"} />
-                    : <span className="product-img-placeholder">🪑</span>
-                  }
-                  {p.stock === 0 ? (
-                    <span className="product-tag product-tag--out">Hết hàng</span>
-                  ) : p.discountPercent > 0 ? (
-                    <span className="product-tag" style={{ background: "#b91c1c" }}>-{p.discountPercent}%</span>
-                  ) : p.isBestSeller ? (
-                    <span className="product-tag">Bán chạy</span>
-                  ) : null}
-                  <WishlistButton product={p} />
-                  <CompareButton product={p} />
-                </div>
-                <div className="product-info">
-                  <span className="product-cat">{p.category}</span>
-                  <h3>{p.name}</h3>
-                  <RatingStars avg={p.averageRating} count={p.reviewCount} />
-                  <div className="product-footer">
-                    {p.discountPercent > 0 ? (
-                      <div style={{ display: "flex", flexDirection: "column" }}>
-                        <span style={{ textDecoration: "line-through", color: "#9a9a9a", fontSize: 12 }}>
-                          {formatPrice(p.price)}
-                        </span>
-                        <span className="product-price" style={{ color: "#b91c1c" }}>
-                          {formatPrice(p.price * (1 - p.discountPercent / 100))}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="product-price">{formatPrice(p.price)}</span>
-                    )}
-                  </div>
-                </div>
-              </Link>
-              </Reveal>
-            ))}
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

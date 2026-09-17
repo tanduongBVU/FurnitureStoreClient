@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://furniture-store-api-domain.example.com/sitemap.xml

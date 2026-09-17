@@ -403,7 +403,8 @@
   justify-content: center;
 }
 
-/* ── PHÒNG (ảnh thật + icon nổi ở góc) ── */
+/* ── PHÒNG (kiểu overlay tạp chí nội thất — ảnh full-bleed, chữ đè lên ảnh
+   qua lớp gradient tối dần từ chân lên, không còn khung nền kem/icon tròn nổi) ── */
 .rooms-section { padding: 96px 0; background: #fff; }
 .rooms-grid {
   display: grid;
@@ -411,22 +412,20 @@
   gap: 24px;
 }
 .room-card {
-  display: flex;
-  flex-direction: column;
-  background: var(--cream);
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
   border-radius: 14px;
   overflow: hidden;
   text-decoration: none;
-  border: 1.5px solid transparent;
-  transition: border-color .2s, transform .2s, box-shadow .2s;
+  isolation: isolate; /* giữ box-shadow hover không bị chồng lệch bởi lớp ::after */
+  transition: transform .3s ease, box-shadow .3s ease;
 }
-.room-card:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(59,42,26,.1); }
+.room-card:hover { transform: translateY(-4px); box-shadow: 0 20px 44px rgba(43,31,16,.28); }
 
 .room-img {
-  position: relative;
-  height: 180px;
-  width: 100%;
-  overflow: hidden;
+  position: absolute;
+  inset: 0;
   background: var(--cream);
 }
 .room-img img {
@@ -434,23 +433,23 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform .35s ease;
+  transition: transform .5s ease;
 }
-.room-card:hover .room-img img { transform: scale(1.06); }
+.room-card:hover .room-img img { transform: scale(1.08); }
 
-.room-img .room-icon {
+/* Gradient tối dần từ chân ảnh lên — đủ tối để chữ trắng đọc rõ, nhưng vẫn
+   thấy được phần lớn ảnh phía trên (đặc trưng bố cục tạp chí nội thất). */
+.room-img::after {
+  content: "";
   position: absolute;
-  bottom: 12px;
-  left: 12px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.92);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 19px;
-  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(26, 18, 8, .92) 0%,
+    rgba(26, 18, 8, .55) 30%,
+    rgba(26, 18, 8, .08) 58%,
+    rgba(26, 18, 8, 0) 75%
+  );
 }
 
 .room-img-placeholder {
@@ -462,9 +461,52 @@
   background: var(--cream);
 }
 
-.room-card-body { padding: 22px 24px 26px; }
-.room-card-body h3 { font-size: 17px; font-weight: 600; color: var(--walnut); margin: 0 0 8px; }
-.room-card-body p { font-size: 14px; color: var(--text-muted); margin: 0; line-height: 1.6; }
+.room-card-body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  padding: 26px 24px;
+}
+.room-card-body h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 21px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 6px;
+}
+.room-card-body p {
+  font-size: 13.5px;
+  color: rgba(255,255,255,.72);
+  margin: 0;
+  line-height: 1.5;
+  max-width: 90%;
+}
+
+/* ── BANNER ẢNH KHUYẾN MÃI (chèn giữa trang chủ, vị trí do Admin chọn) ──
+   CHỈ hiện ảnh, co gọn trong khung nội dung (giống About/Products...) thay vì
+   tràn full màn hình — phù hợp với các ảnh banner dạng đồ hoạ quảng cáo vốn đã
+   có sẵn chữ/nút thiết kế ngay trong ảnh, không cần web chèn thêm chữ đè lên. */
+.promo-image-banner {
+  padding: 56px 0;
+}
+.promo-image-banner__link {
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(59,42,26,.14);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+a.promo-image-banner__link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 44px rgba(59,42,26,.2);
+}
+.promo-image-banner__img {
+  display: block;
+  width: 100%;
+  height: auto; /* giữ nguyên tỉ lệ ảnh gốc — không crop, không ép chiều cao cố định */
+}
 
 /* ── LIÊN HỆ ── */
 .contact-section {
@@ -534,11 +576,13 @@
   .products-grid { grid-template-columns: 1fr; }
   .bundles-grid-home { grid-template-columns: 1fr; }
   .rooms-grid { grid-template-columns: repeat(2, 1fr); }
+  .room-card { aspect-ratio: 3 / 4; }
   .contact-inner { grid-template-columns: 1fr; gap: 40px; }
   .footer-inner { grid-template-columns: 1fr; gap: 32px; }
 }
 
 @media (max-width: 480px) {
+  .rooms-grid { grid-template-columns: 1fr; }
   .stats {
     gap: 16px;
     flex-wrap: wrap;

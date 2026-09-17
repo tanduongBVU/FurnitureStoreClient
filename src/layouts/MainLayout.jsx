@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar/Navbar";
 import PromoBanner from "../components/PromoBanner/PromoBanner";
 import NewsletterPopup from "../components/NewsletterPopup/NewsletterPopup";
 import CompareBar from "../components/CompareBar/CompareBar";
+import FloatingContact from "../components/FloatingContact/FloatingContact";
 import { Outlet } from "react-router-dom";
 
 const MainLayout = () => (
@@ -21,6 +22,10 @@ const MainLayout = () => (
         (xem CompareBar.jsx), hiện ở mọi trang để khách so sánh xong ở Products vẫn
         thấy thanh này khi lỡ chuyển sang trang khác trước khi bấm "So sánh ngay". */}
     <CompareBar />
+    {/* Bong bóng Zalo/Facebook — đặt ở đây (không phải main.jsx) vì cần đọc
+        social.zaloPhone/social.facebookUrl từ SettingsContext, mà SettingsProvider
+        chỉ bao quanh cây route bên trong App.jsx, không bao quanh main.jsx. */}
+    <FloatingContact />
   </>
 );
 

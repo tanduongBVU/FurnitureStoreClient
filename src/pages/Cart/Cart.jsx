@@ -30,8 +30,11 @@ const Cart = () => {
 
         <div className="cart-layout">
           <div className="cart-items">
+            {/* key/remove/update dùng item.cartKey (không phải item.id) — vì 2 biến thể
+                khác nhau của CÙNG 1 sản phẩm có id giống nhau nhưng cartKey khác nhau,
+                dùng id sẽ khiến bấm xoá/sửa 1 dòng bị ảnh hưởng nhầm sang dòng kia. */}
             {cart.map((item, idx) => (
-              <Reveal as="div" className="cart-item" key={item.id} delay={Math.min(idx * 60, 300)}>
+              <Reveal as="div" className="cart-item" key={item.cartKey} delay={Math.min(idx * 60, 300)}>
                 <div className="cart-item-img">
                   {item.image
                     ? <img src={item.image} alt={item.name} onError={e => e.target.style.display = "none"} />
@@ -43,15 +46,15 @@ const Cart = () => {
                   <p className="cart-item-price">{formatPrice(item.price)}</p>
                 </div>
                 <div className="cart-item-qty">
-                  <button onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>−</button>
+                  <button onClick={() => updateQuantity(item.cartKey, item.quantity - 1)} disabled={item.quantity <= 1}>−</button>
                   <span>{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    onClick={() => updateQuantity(item.cartKey, item.quantity + 1)}
                     disabled={item.stock ? item.quantity >= item.stock : false}
                   >+</button>
                 </div>
                 <div className="cart-item-total">{formatPrice(item.price * item.quantity)}</div>
-                <button className="cart-item-remove" onClick={() => removeFromCart(item.id)} title="Xoá">🗑️</button>
+                <button className="cart-item-remove" onClick={() => removeFromCart(item.cartKey)} title="Xoá">🗑️</button>
               </Reveal>
             ))}
           </div>

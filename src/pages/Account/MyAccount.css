@@ -9,7 +9,10 @@
 
 .myaccount-page { width: 100%; min-height: 60vh; background: #fff; }
 
-.myaccount-page .section-inner { max-width: 640px; margin: 0 auto; padding: 0 24px; }
+/* Nới rộng khung chứa — trước đây 640px làm trang bị dồn vào giữa, 2 bên
+   trống rất nhiều trên màn hình lớn. 1100px khớp với các trang khác trong
+   site (VD Products, Home) để nhất quán bố cục toàn hệ thống. */
+.myaccount-page .section-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
 .myaccount-page .eyebrow { display: block; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-d); margin-bottom: 10px; }
 
@@ -20,11 +23,16 @@
 .myaccount-header h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 38px; color: #fff; margin: 0 0 10px; }
 .myaccount-header p { color: rgba(255,255,255,.65); font-size: 15px; margin: 0; }
 
+/* Đổi từ flex-column (2 card xếp chồng dọc, dồn giữa) sang grid 2 cột song
+   song — tận dụng chiều ngang, giống bố cục "Hồ sơ | Bảo mật" chuẩn của các
+   trang tài khoản. align-items: start để 2 card không bị kéo giãn bằng
+   chiều cao nhau khi nội dung 2 bên chênh lệch (form đổi mật khẩu ngắn hơn). */
 .myaccount-body {
   padding: 48px 24px 96px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 28px;
+  align-items: start;
 }
 
 .account-card {
@@ -86,6 +94,11 @@
 }
 .myaccount-page .btn-dark:hover:not(:disabled) { background: var(--gold-d); border-color: var(--gold-d); }
 .myaccount-page .btn-dark:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Màn hình hẹp — không đủ chỗ chia 2 cột, quay lại xếp dọc như cũ */
+@media (max-width: 900px) {
+  .myaccount-body { grid-template-columns: 1fr; }
+}
 
 @media (max-width: 600px) {
   .myaccount-header { padding: 120px 0 36px; }

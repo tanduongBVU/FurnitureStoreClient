@@ -8,15 +8,18 @@ import WishlistButton from "../../components/WishlistButton/WishlistButton";
 import CompareButton from "../../components/CompareButton/CompareButton";
 import RatingStars from "../../components/RatingStars/RatingStars";
 import NewsletterForm from "../../components/NewsletterForm/NewsletterForm";
+import SEO from "../../components/SEO/SEO";
 import "./Home.css";
 
+// "category" PHẢI khớp CHÍNH XÁC (kể cả hoa/thường) với mảng CATEGORIES trong
+// Products.jsx, vì trang Products lọc bằng so sánh chuỗi tuyệt đối (p.category === category).
 const rooms = [
-  { id: 1, label: "Phòng Khách", icon: "🛋️", desc: "Sofa, kệ TV, bàn trà, tủ trang trí" },
-  { id: 2, label: "Phòng Ngủ", icon: "🛏️", desc: "Giường, tủ quần áo, bàn đầu giường" },
-  { id: 3, label: "Phòng Ăn", icon: "🍽️", desc: "Bàn ăn, ghế ăn, tủ bếp, kệ rượu" },
-  { id: 4, label: "Phòng Làm Việc", icon: "💼", desc: "Bàn làm việc, ghế công thái học, kệ sách" },
-  { id: 5, label: "Phòng Tắm", icon: "🚿", desc: "Tủ gương, kệ đựng đồ, ghế tắm" },
-  { id: 6, label: "Ban Công", icon: "🌿", desc: "Bàn ghế ngoài trời, xích đu, đèn sân vườn" },
+  { id: 1, label: "Phòng Khách", icon: "🛋️", desc: "Sofa, kệ TV, bàn trà, tủ trang trí", category: "Phòng khách" },
+  { id: 2, label: "Phòng Ngủ", icon: "🛏️", desc: "Giường, tủ quần áo, bàn đầu giường", category: "Phòng ngủ" },
+  { id: 3, label: "Phòng Ăn", icon: "🍽️", desc: "Bàn ăn, ghế ăn, tủ bếp, kệ rượu", category: "Phòng ăn" },
+  { id: 4, label: "Phòng Làm Việc", icon: "💼", desc: "Bàn làm việc, ghế công thái học, kệ sách", category: "Phòng làm việc" },
+  { id: 5, label: "Phòng Tắm", icon: "🚿", desc: "Tủ gương, kệ đựng đồ, ghế tắm", category: "Phòng tắm" },
+  { id: 6, label: "Ban Công", icon: "🌿", desc: "Bàn ghế ngoài trời, xích đu, đèn sân vườn", category: "Ban công" },
 ];
 
 // Nếu sản phẩm đang giảm giá, trả về bản sao với price = giá đã giảm
@@ -25,6 +28,27 @@ const withSalePrice = (p) =>
   p.discountPercent > 0
     ? { ...p, price: Math.round(p.price * (1 - p.discountPercent / 100)) }
     : p;
+
+// Tách ID video YouTube từ nhiều dạng link khác nhau người dùng có thể dán vào:
+// - https://www.youtube.com/watch?v=XXXXXXXXXXX
+// - https://youtu.be/XXXXXXXXXXX
+// - https://www.youtube.com/embed/XXXXXXXXXXX
+// - https://www.youtube.com/shorts/XXXXXXXXXXX
+// Trả về null nếu không nhận diện được (để component biết mà không render iframe hỏng).
+const getYouTubeId = (url) => {
+  if (!url) return null;
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([^&\s]+)/,
+    /(?:youtu\.be\/)([^?&\s]+)/,
+    /(?:youtube\.com\/embed\/)([^?&\s]+)/,
+    /(?:youtube\.com\/shorts\/)([^?&\s]+)/,
+  ];
+  for (const re of patterns) {
+    const m = url.match(re);
+    if (m) return m[1];
+  }
+  return null;
+};
 
 // ── Component ─────────────────────────────────────────
 export default function Home() {
@@ -44,6 +68,10 @@ export default function Home() {
     }
   }, [location]);
 
+  // "slides" (mặc định) = xoay vòng 3 ảnh như cũ. "video" = 1 video nền DUY NHẤT,
+  // thay thế hoàn toàn slider (không dots/arrows/xoay vòng).
+  const heroMode = get("hero.mode", "slides");
+
   const slides = [
     {
       id: 1,
@@ -52,7 +80,6 @@ export default function Home() {
       bg: get("hero.slide1.bg", "#2c1f10"),
       accent: get("hero.slide1.accent", "#c8a96e"),
       img: get("hero.slide1.image", "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1600&q=80&auto=format&fit=crop"),
-      video: get("hero.slide1.video", ""),
     },
     {
       id: 2,
@@ -61,7 +88,6 @@ export default function Home() {
       bg: get("hero.slide2.bg", "#1a2c20"),
       accent: get("hero.slide2.accent", "#7ab87a"),
       img: get("hero.slide2.image", "https://images.unsplash.com/photo-1621295693450-080546d2ec8e?w=1600&q=80&auto=format&fit=crop"),
-      video: get("hero.slide2.video", ""),
     },
     {
       id: 3,
@@ -70,9 +96,33 @@ export default function Home() {
       bg: get("hero.slide3.bg", "#1a1f2c"),
       accent: get("hero.slide3.accent", "#6e9ec8"),
       img: get("hero.slide3.image", "https://images.unsplash.com/photo-1687180498602-5a1046defaa4?w=1600&q=80&auto=format&fit=crop"),
-      video: get("hero.slide3.video", ""),
     },
   ];
+
+  // Dữ liệu riêng cho chế độ video — key hoàn toàn tách biệt với slide1/2/3
+  const heroVideo = {
+    title: get("hero.video.title", "Không gian sống\nđẳng cấp"),
+    sub: get("hero.video.subtitle", "Nội thất cao cấp — tinh tế từng đường nét"),
+    bg: get("hero.video.bg", "#2c1f10"),
+    accent: get("hero.video.accent", "#c8a96e"),
+    url: get("hero.video.url", ""),
+    poster: get("hero.video.poster", ""),
+  };
+  const youtubeId = getYouTubeId(heroVideo.url);
+  // Link không phải YouTube (VD file .mp4 thật) → coi là link video trực tiếp cho thẻ <video>
+  const isDirectVideoFile = heroVideo.url && !youtubeId;
+
+  // ── Banner ảnh khuyến mãi chèn giữa trang chủ — TÁCH BIỆT hoàn toàn với banner chữ
+  // mỏng ở đầu mọi trang (promo.banner.*, nằm ở layout chung không phải trong Home.jsx
+  // này). Admin bật/tắt và chọn vị trí chèn qua dropdown ở SiteSettings.
+  // CHỈ hiện ẢNH — không chữ/nút đè lên, vì ảnh banner (dạng đồ hoạ quảng cáo) thường đã
+  // có sẵn chữ + nút thiết kế NGAY TRONG ảnh rồi, chèn thêm chữ web sẽ bị chồng/rối.
+  const homeBannerEnabled = get("homeBanner.enabled", "false") === "true";
+  const homeBannerPosition = get("homeBanner.position", "after-hero");
+  const homeBanner = {
+    image: get("homeBanner.image", ""),
+    linkUrl: get("homeBanner.linkUrl", ""),
+  };
 
   const [bestSellers, setBestSellers] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -130,10 +180,12 @@ export default function Home() {
     setCurrent((idx + slides.length) % slides.length);
   };
 
+  // Chỉ tự xoay vòng khi đang ở chế độ "slides" — chế độ video không cần timer này.
   useEffect(() => {
+    if (heroMode !== "slides") return;
     timerRef.current = setInterval(() => goTo(current + 1), 4500);
     return () => clearInterval(timerRef.current);
-  }, [current]);
+  }, [current, heroMode]);
 
   const slide = slides[current];
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
@@ -152,63 +204,142 @@ export default function Home() {
     });
   };
 
+  // Không nhận ảnh thì không render gì cả — tránh chèn 1 khối trống/xấu vào
+  // giữa trang chủ nếu Admin bật banner nhưng quên điền ảnh. CHỈ hiện ảnh, co
+  // gọn trong khung nội dung (giống các mục khác) thay vì tràn full màn hình —
+  // nếu Admin có điền link thì cả tấm ảnh bấm được, không hiện nút riêng.
+  const renderHomeBanner = () => {
+    if (!homeBannerEnabled || !homeBanner.image) return null;
+    const image = <img src={homeBanner.image} alt="Banner khuyến mãi" className="promo-image-banner__img" />;
+    return (
+      <section className="promo-image-banner">
+        <div className="section-inner">
+          {homeBanner.linkUrl ? (
+            <Link to={homeBanner.linkUrl} className="promo-image-banner__link">{image}</Link>
+          ) : (
+            <div className="promo-image-banner__link">{image}</div>
+          )}
+        </div>
+      </section>
+    );
+  };
+
   return (
     <div className="home">
+      <SEO
+        title="Trang chủ"
+        description="LuxWood - Nội thất cao cấp, thiết kế tinh tế cho không gian sống của bạn. Sofa, giường, bàn ghế gỗ tự nhiên chất lượng cao."
+      />
 
-      {/* ── SLIDER ── */}
-      <section className="hero-slider" style={{ background: slide.bg }}>
-        {slide.video ? (
-          <video
-            key={`video-${slide.id}`}
-            className="hero-bg-video"
-            src={slide.video}
-            poster={slide.img || undefined}
-            autoPlay
-            muted
-            loop
-            playsInline
-          />
-        ) : (
+      {/* ── HERO — chế độ VIDEO (1 video nền duy nhất, không slider) ── */}
+      {heroMode === "video" ? (
+        <section className="hero-slider" style={{ background: heroVideo.bg }}>
+          {youtubeId ? (
+            // Video YouTube: nhúng qua iframe, tự phát/tắt tiếng/lặp lại/ẩn control.
+            // Iframe được phóng to hơn khung chứa rồi canh giữa để LUÔN phủ kín toàn bộ
+            // khung hình (kiểu "cover"), vì iframe không hỗ trợ object-fit như <video>.
+            <div
+              style={{
+                position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none",
+              }}
+            >
+              <iframe
+                key={`yt-${youtubeId}`}
+                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&loop=1&playlist=${youtubeId}&controls=0&modestbranding=1&showinfo=0&rel=0&playsinline=1`}
+                title="Video nền trang chủ"
+                allow="autoplay; encrypted-media"
+                style={{
+                  position: "absolute", top: "50%", left: "50%",
+                  width: "177.78vh", height: "56.25vw",
+                  minWidth: "100%", minHeight: "100%",
+                  transform: "translate(-50%, -50%)",
+                  border: "none",
+                }}
+              />
+            </div>
+          ) : isDirectVideoFile ? (
+            <video
+              key={`video-${heroVideo.url}`}
+              className="hero-bg-video"
+              src={heroVideo.url}
+              poster={heroVideo.poster || undefined}
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          ) : (
+            <img
+              key="hero-video-fallback-img"
+              src={heroVideo.poster || "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1600&q=80&auto=format&fit=crop"}
+              alt={heroVideo.title.replace("\n", " ")}
+              className="hero-bg-image"
+            />
+          )}
+          <div className="hero-overlay" />
+
+          <div className="hero-content">
+            <span className="hero-eyebrow" style={{ color: heroVideo.accent }}>LuxWood Collection 2025</span>
+            <h1 className="hero-title" style={{ "--accent": heroVideo.accent }}>
+              {heroVideo.title.split("\n").map((line, i) => (
+                <span key={i}>{line}<br /></span>
+              ))}
+            </h1>
+            <p className="hero-sub">{heroVideo.sub}</p>
+            <div className="hero-actions">
+              <Link to="/products" className="btn-primary" style={{ background: heroVideo.accent, color: "#1a1208" }}>
+                Khám phá ngay
+              </Link>
+              <Link to="/about" className="btn-ghost">Về chúng tôi</Link>
+            </div>
+          </div>
+          {/* Không dots, không arrows — chỉ 1 video duy nhất, không có gì để chuyển */}
+        </section>
+      ) : (
+        /* ── HERO — chế độ SLIDES (xoay vòng 3 ảnh, hành vi gốc) ── */
+        <section className="hero-slider" style={{ background: slide.bg }}>
           <img
             key={`img-${slide.id}`}
             src={slide.img}
             alt={slide.title.replace("\n", " ")}
             className="hero-bg-image"
           />
-        )}
-        <div className="hero-overlay" />
+          <div className="hero-overlay" />
 
-        <div className="hero-content">
-          <span className="hero-eyebrow" style={{ color: slide.accent }}>LuxWood Collection 2025</span>
-          <h1 className="hero-title" style={{ "--accent": slide.accent }}>
-            {slide.title.split("\n").map((line, i) => (
-              <span key={i}>{line}<br /></span>
-            ))}
-          </h1>
-          <p className="hero-sub">{slide.sub}</p>
-          <div className="hero-actions">
-            <Link to="/products" className="btn-primary" style={{ background: slide.accent, color: "#1a1208" }}>
-              Khám phá ngay
-            </Link>
-            <Link to="/about" className="btn-ghost">Về chúng tôi</Link>
+          <div className="hero-content">
+            <span className="hero-eyebrow" style={{ color: slide.accent }}>LuxWood Collection 2025</span>
+            <h1 className="hero-title" style={{ "--accent": slide.accent }}>
+              {slide.title.split("\n").map((line, i) => (
+                <span key={i}>{line}<br /></span>
+              ))}
+            </h1>
+            <p className="hero-sub">{slide.sub}</p>
+            <div className="hero-actions">
+              <Link to="/products" className="btn-primary" style={{ background: slide.accent, color: "#1a1208" }}>
+                Khám phá ngay
+              </Link>
+              <Link to="/about" className="btn-ghost">Về chúng tôi</Link>
+            </div>
           </div>
-        </div>
 
-        {/* Dots */}
-        <div className="slider-dots">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              className={`dot ${i === current ? "dot--active" : ""}`}
-              style={{ background: i === current ? slide.accent : "rgba(255,255,255,0.4)" }}
-              onClick={() => goTo(i)}
-            />
-          ))}
-        </div>
-        {/* Arrows */}
-        <button className="arrow arrow--left" onClick={() => goTo(current - 1)}>‹</button>
-        <button className="arrow arrow--right" onClick={() => goTo(current + 1)}>›</button>
-      </section>
+          {/* Dots */}
+          <div className="slider-dots">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                className={`dot ${i === current ? "dot--active" : ""}`}
+                style={{ background: i === current ? slide.accent : "rgba(255,255,255,0.4)" }}
+                onClick={() => goTo(i)}
+              />
+            ))}
+          </div>
+          {/* Arrows */}
+          <button className="arrow arrow--left" onClick={() => goTo(current - 1)}>‹</button>
+          <button className="arrow arrow--right" onClick={() => goTo(current + 1)}>›</button>
+        </section>
+      )}
+
+      {homeBannerPosition === "after-hero" && renderHomeBanner()}
 
       {/* ── GIỚI THIỆU ── */}
       <section className="about-section">
@@ -237,6 +368,8 @@ export default function Home() {
           </Reveal>
         </div>
       </section>
+
+      {homeBannerPosition === "after-about" && renderHomeBanner()}
 
       {/* ── SẢN PHẨM BÁN CHẠY ── */}
       <section className="products-section">
@@ -314,6 +447,8 @@ export default function Home() {
         </div>
       </section>
 
+      {homeBannerPosition === "after-products" && renderHomeBanner()}
+
       {/* ── COMBO TIẾT KIỆM ── */}
       {/* Ẩn hoàn toàn cả section nếu chưa có combo nào — tránh lộ khung rỗng xấu xí
           trên trang chủ trong lúc Admin chưa tạo combo nào. */}
@@ -379,13 +514,10 @@ export default function Home() {
               const roomImage = get(`rooms.room${r.id}.image`, "");
               return (
                 <Reveal as="div" key={r.id} delay={Math.min(idx * 70, 350)}>
-                <Link to="/products" className="room-card">
+                <Link to={`/products?category=${encodeURIComponent(r.category)}`} className="room-card">
                   <div className="room-img">
                     {roomImage ? (
-                      <>
-                        <img src={roomImage} alt={r.label} />
-                        <span className="room-icon">{r.icon}</span>
-                      </>
+                      <img src={roomImage} alt={r.label} />
                     ) : (
                       <div className="room-img-placeholder">
                         <span style={{ fontSize: 40 }}>{r.icon}</span>
@@ -403,6 +535,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {homeBannerPosition === "after-rooms" && renderHomeBanner()}
 
       {/* ── LIÊN HỆ ── */}
       <section className="contact-section" id="contact">
@@ -468,6 +602,8 @@ export default function Home() {
           </Reveal>
         </div>
       </section>
+
+      {homeBannerPosition === "before-footer" && renderHomeBanner()}
 
       {/* ── FOOTER ── */}
       <footer className="footer">

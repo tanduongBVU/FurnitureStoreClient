@@ -15,21 +15,15 @@ const Checkout = () => {
   const [success, setSuccess] = useState(false);
   const set = (f, v) => setForm(p => ({ ...p, [f]: v }));
 
-  // ── Mã giảm giá ──
   const [couponInput, setCouponInput] = useState("");
   const [couponChecking, setCouponChecking] = useState(false);
   const [couponError, setCouponError] = useState("");
-  // appliedCoupon = { code, discountPercent, discountAmount } khi mã hợp lệ, null nếu chưa áp dụng
   const [appliedCoupon, setAppliedCoupon] = useState(null);
 
-  // Tự điền sẵn tên nếu khách đã đăng nhập
   useEffect(() => {
     if (isLoggedIn && user) {
       setForm(p => ({ ...p, customerName: user.name }));
 
-      // user trong AuthContext (từ login/register) không có sẵn phone/address,
-      // nên gọi thẳng /Auth/me để lấy đúng thông tin đã lưu trong tài khoản
-      // rồi tự điền sẵn — khách vẫn có thể sửa lại trước khi đặt hàng.
       api.get("/Auth/me")
         .then(res => {
           setForm(p => ({
@@ -38,16 +32,12 @@ const Checkout = () => {
             address: res.data.address || p.address,
           }));
         })
-        .catch(() => {
-          // Không lấy được thì thôi, để khách tự nhập như bình thường
-        });
+        .catch(() => {});
     }
   }, [isLoggedIn, user]);
 
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
 
-  // Giá cuối cùng sau khi trừ giảm giá (nếu có mã đang áp dụng) — chỉ dùng để HIỂN THỊ,
-  // số tiền thật lưu vào đơn hàng luôn do server tự tính lại (xem OrdersController.Create).
   const finalTotal = appliedCoupon ? totalPrice - appliedCoupon.discountAmount : totalPrice;
 
   const handleApplyCoupon = async () => {
@@ -85,14 +75,14 @@ const Checkout = () => {
         address: form.address,
         status: "Chờ xác nhận",
         total: totalPrice,
-        // Gửi mã kèm theo, nhưng số tiền thật giảm bao nhiêu do SERVER tự tính lại —
-        // client không được quyết định số tiền giảm cuối cùng, chỉ gợi ý mã muốn dùng.
         couponCode: appliedCoupon ? appliedCoupon.code : null,
         orderItems: cart.map(item => ({
           productId: item.id,
           productName: item.name,
           quantity: item.quantity,
           price: item.price,
+          variantId: item.variantId ?? null,
+          variantName: item.variantName ?? null,
         })),
       });
       clearCart();
@@ -188,7 +178,7 @@ const Checkout = () => {
             <h3>Đơn hàng của bạn</h3>
             <div className="checkout-items">
               {cart.map(item => (
-                <div className="checkout-item" key={item.id}>
+                <div className="checkout-item" key={item.cartKey}>
                   <div className="checkout-item-img">
                     {item.image
                       ? <img src={item.image} alt={item.name} onError={e => e.target.style.display = "none"} />
@@ -205,7 +195,6 @@ const Checkout = () => {
               ))}
             </div>
 
-            {/* ── Mã giảm giá ── */}
             <div className="checkout-coupon">
               {appliedCoupon ? (
                 <div className="checkout-coupon__applied">
