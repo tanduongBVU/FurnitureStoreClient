@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSettings } from "../../contexts/SettingsContext";
 import Reveal from "../../components/Reveal/Reveal";
@@ -62,6 +62,56 @@ function getInitials(name = "") {
     .join("")
     .toUpperCase()
     .slice(0, 3);
+}
+
+// Tách phần SỐ ra khỏi chuỗi Admin nhập (VD: "10.000+" → số 10000 + hậu tố "+"). Bỏ dấu
+// chấm/phẩy ngăn cách hàng nghìn trước khi parse, giữ lại nguyên phần chữ phía sau (hậu tố)
+// để ráp lại y hệt sau khi đếm xong. Trả về null nếu chuỗi không bắt đầu bằng số (VD Admin
+// lỡ xoá hết chỉ còn chữ) — lúc đó component sẽ hiện nguyên văn, không cố animate.
+function parseStatValue(value) {
+  const match = String(value).match(/^([\d.,]+)(.*)$/);
+  if (!match) return null;
+  const target = parseInt(match[1].replace(/[.,]/g, ""), 10);
+  if (Number.isNaN(target)) return null;
+  return { target, suffix: match[2] };
+}
+
+// Đếm số tăng dần từ 0 lên đúng giá trị thật, chạy 1 LẦN ngay khi component mount (banner
+// đầu trang luôn hiện sẵn khi vào trang, không cần đợi cuộn tới mới kích hoạt). Dùng
+// requestAnimationFrame + easeOutCubic (chạy nhanh lúc đầu, chậm dần về đích) cho mượt.
+// "delay" cho phép so le thời điểm bắt đầu giữa 4 số liệu, tạo hiệu ứng chạy nối tiếp nhau
+// thay vì cả 4 số cùng nhảy số một lúc trông rối mắt.
+function AnimatedStat({ value, duration = 1600, delay = 0 }) {
+  const parsed = parseStatValue(value);
+  const [display, setDisplay] = useState(parsed ? `0${parsed.suffix}` : value);
+
+  useEffect(() => {
+    if (!parsed) return;
+    let rafId;
+    let timeoutId;
+    let startTime = null;
+
+    const step = (timestamp) => {
+      if (startTime === null) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(eased * parsed.target);
+      setDisplay(current.toLocaleString("vi-VN") + parsed.suffix);
+      if (progress < 1) rafId = requestAnimationFrame(step);
+    };
+
+    timeoutId = setTimeout(() => {
+      rafId = requestAnimationFrame(step);
+    }, delay);
+
+    return () => {
+      clearTimeout(timeoutId);
+      cancelAnimationFrame(rafId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, duration, delay]);
+
+  return <>{display}</>;
 }
 
 // ── Component ─────────────────────────────────────────
@@ -137,22 +187,22 @@ export default function About() {
           <p>{get("aboutpage.banner.description", "Hơn 15 năm đồng hành cùng hàng nghìn gia đình Việt Nam trong hành trình tạo nên tổ ấm hoàn hảo.")}</p>
           <div className="about-banner__stats">
             <div className="banner-stat">
-              <strong>{get("aboutpage.banner.stat1Number", "15+")}</strong>
+              <strong><AnimatedStat value={get("aboutpage.banner.stat1Number", "15+")} delay={0} /></strong>
               <span>{get("aboutpage.banner.stat1Label", "Năm kinh nghiệm")}</span>
             </div>
             <div className="banner-stat-divider" />
             <div className="banner-stat">
-              <strong>{get("aboutpage.banner.stat2Number", "500+")}</strong>
+              <strong><AnimatedStat value={get("aboutpage.banner.stat2Number", "500+")} delay={120} /></strong>
               <span>{get("aboutpage.banner.stat2Label", "Sản phẩm")}</span>
             </div>
             <div className="banner-stat-divider" />
             <div className="banner-stat">
-              <strong>{get("aboutpage.banner.stat3Number", "10.000+")}</strong>
+              <strong><AnimatedStat value={get("aboutpage.banner.stat3Number", "10.000+")} delay={240} /></strong>
               <span>{get("aboutpage.banner.stat3Label", "Khách hàng")}</span>
             </div>
             <div className="banner-stat-divider" />
             <div className="banner-stat">
-              <strong>{get("aboutpage.banner.stat4Number", "200+")}</strong>
+              <strong><AnimatedStat value={get("aboutpage.banner.stat4Number", "200+")} delay={360} /></strong>
               <span>{get("aboutpage.banner.stat4Label", "Dự án lớn")}</span>
             </div>
           </div>

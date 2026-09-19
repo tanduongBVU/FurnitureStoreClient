@@ -16,13 +16,40 @@ const FAQ = {
 
 // Các từ đệm/hư từ tiếng Việt phổ biến khi khách gõ nguyên câu thay vì từ khoá — loại bỏ
 // trước khi thử tìm lại theo từng từ, để "tui muốn xem sofa" vẫn tìm ra "sofa".
+// Mở rộng thêm nhóm từ đệm hay xuất hiện trong CÂU HỎI CHUNG (không phải tên sản phẩm) —
+// trước đây thiếu nhóm này nên "hiện tại bên mình có bao nhiêu sản phẩm" còn sót lại từ
+// "hiện" sau khi lọc, và "hiện" tình cờ khớp vào tên "Sofa da hiện đại ZP147" (sai bét).
 const STOPWORDS = new Set([
   "tui", "tôi", "mình", "em", "shop", "cửa", "hàng",
   "muốn", "mún", "cần", "kiếm", "tìm", "xem", "hỏi", "coi",
   "các", "những", "loại", "mẫu", "sản", "phẩm",
   "cho", "về", "là", "có", "bán", "giúp", "với", "nhé", "ạ", "dùm", "giùm",
   "ơi", "hi", "hello", "chào",
+  // Nhóm mở rộng — từ đệm/liên từ hay gặp trong câu hỏi chung, KHÔNG mang nghĩa sản phẩm
+  "hiện", "tại", "bên", "đang", "bao", "nhiêu", "mấy", "vậy", "giờ", "rồi",
+  "đó", "này", "đây", "sao", "thế", "nào", "được", "ra", "lại", "đã", "sẽ",
+  "thật", "quá", "khá", "hơi", "rất", "luôn", "thôi", "à", "nha", "nhỉ",
 ]);
+
+// Các mẫu câu hỏi rõ ràng là hỏi CHUNG (số lượng, khái niệm, chính sách...) chứ không phải
+// đang tìm 1 sản phẩm cụ thể — gặp các mẫu này thì bỏ qua tìm kiếm sản phẩm luôn, chuyển
+// thẳng sang hỏi AI (AI đã có dữ liệu thật để trả lời chính xác), tránh vòng dò từ khoá dễ
+// trúng nhầm như đã gặp phải.
+const GENERAL_QUESTION_PATTERNS = [
+  /bao nhiêu/i,
+  /có (bao nhiêu|mấy)/i,
+  /là gì/i,
+  /(như thế nào|thế nào)/i,
+  /ở đâu/i,
+  /khi nào/i,
+  /tại sao|vì sao/i,
+  /bao lâu/i,
+];
+
+// Câu càng dài (nhiều từ) càng có khả năng là câu hỏi/tư vấn thay vì tên sản phẩm đang gõ —
+// khách tìm sản phẩm thường gõ ngắn gọn (VD: "sofa nỉ xám", "bàn ăn 6 ghế"). Vượt ngưỡng
+// này thì bỏ qua bước dò-từng-từ-khoá (rủi ro trúng nhầm từ đệm cao hơn hẳn so với lợi ích).
+const MAX_WORDS_FOR_KEYWORD_FALLBACK = 5;
 
 const extractKeywords = (text) =>
   text
@@ -79,8 +106,9 @@ const ChatWidget = () => {
     pushMessage({ type: "bot-text", text: FAQ[question] });
   };
 
-  // Gọi AI (Gemini qua Backend) — chỉ dùng khi tìm sản phẩm thật không ra kết quả gì,
-  // để xử lý các câu hỏi chung chung (FAQ tự do, tư vấn...) mà bộ FAQ tĩnh không khớp sẵn.
+  // Gọi AI (Gemini qua Backend) — dùng khi tìm sản phẩm thật không ra kết quả, hoặc khi câu
+  // hỏi rõ ràng là câu hỏi chung (xem GENERAL_QUESTION_PATTERNS) — để xử lý FAQ tự do, tư
+  // vấn, số liệu chung... mà bộ FAQ tĩnh/tìm kiếm sản phẩm không phù hợp để trả lời.
   const askAI = async (query) => {
     try {
       const res = await api.post("/Chat", { message: query });
@@ -94,15 +122,23 @@ const ChatWidget = () => {
     }
   };
 
-  // Thử tìm sản phẩm thật trước (nhanh, chính xác, miễn phí) — chỉ khi KHÔNG ra kết quả
-  // nào (kể cả sau khi tách từ khoá) mới chuyển sang hỏi AI.
+  // Thử tìm sản phẩm thật trước (nhanh, chính xác, miễn phí) — CHỈ khi câu hỏi không phải
+  // dạng câu hỏi chung rõ ràng, và không quá dài (xem 2 hằng số ở trên). Nếu không ra kết
+  // quả nào (kể cả sau khi tách từ khoá, khi đủ điều kiện thử) mới chuyển sang hỏi AI.
   const runProductSearch = async (query) => {
     setBusy(true);
     try {
-      let results = await searchOnce(query);
+      const looksLikeGeneralQuestion = GENERAL_QUESTION_PATTERNS.some((re) => re.test(query));
+      const wordCount = query.trim().split(/\s+/).length;
+
+      let results = looksLikeGeneralQuestion ? [] : await searchOnce(query);
       let matchedTerm = query;
 
-      if (results.length === 0) {
+      if (
+        results.length === 0 &&
+        !looksLikeGeneralQuestion &&
+        wordCount <= MAX_WORDS_FOR_KEYWORD_FALLBACK
+      ) {
         const keywords = extractKeywords(query);
         for (const kw of keywords) {
           results = await searchOnce(kw);
@@ -124,8 +160,8 @@ const ChatWidget = () => {
         return;
       }
 
-      // Không tìm ra sản phẩm nào khớp — có thể đây là câu hỏi chung (FAQ, tư vấn...),
-      // chuyển sang hỏi AI thay vì báo "không tìm thấy" cụt lủn như trước.
+      // Không tìm ra sản phẩm nào khớp (hoặc là câu hỏi chung/quá dài ngay từ đầu) —
+      // chuyển sang hỏi AI thay vì báo "không tìm thấy" cụt lủn hoặc trúng nhầm từ đệm.
       await askAI(query);
     } catch {
       pushMessage({ type: "bot-text", text: "Có lỗi xảy ra, vui lòng thử lại sau." });

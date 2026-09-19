@@ -122,6 +122,7 @@ export default function Home() {
   const homeBanner = {
     image: get("homeBanner.image", ""),
     linkUrl: get("homeBanner.linkUrl", ""),
+    align: get("homeBanner.align", "center"),
   };
 
   const [bestSellers, setBestSellers] = useState([]);
@@ -214,11 +215,13 @@ export default function Home() {
     return (
       <section className="promo-image-banner">
         <div className="section-inner">
-          {homeBanner.linkUrl ? (
-            <Link to={homeBanner.linkUrl} className="promo-image-banner__link">{image}</Link>
-          ) : (
-            <div className="promo-image-banner__link">{image}</div>
-          )}
+          <div className={`promo-image-banner__wrap promo-image-banner__wrap--${homeBanner.align}`}>
+            {homeBanner.linkUrl ? (
+              <Link to={homeBanner.linkUrl} className="promo-image-banner__link">{image}</Link>
+            ) : (
+              <div className="promo-image-banner__link">{image}</div>
+            )}
+          </div>
         </div>
       </section>
     );

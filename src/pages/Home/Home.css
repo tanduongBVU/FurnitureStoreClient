@@ -491,8 +491,17 @@
 .promo-image-banner {
   padding: 56px 0;
 }
+/* Wrapper canh lề — chỉ thấy khác biệt rõ khi ảnh hẹp hơn khung nội dung, vì ảnh giờ
+   giữ kích thước TỰ NHIÊN (không còn ép width:100% như trước) nên có thể không lấp
+   đầy hết chiều ngang khung. */
+.promo-image-banner__wrap { display: flex; }
+.promo-image-banner__wrap--left { justify-content: flex-start; }
+.promo-image-banner__wrap--center { justify-content: center; }
+.promo-image-banner__wrap--right { justify-content: flex-end; }
+
 .promo-image-banner__link {
-  display: block;
+  display: inline-block; /* co theo kích thước ảnh thật, không tự giãn full ngang */
+  max-width: 100%;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 12px 32px rgba(59,42,26,.14);
@@ -504,7 +513,7 @@ a.promo-image-banner__link:hover {
 }
 .promo-image-banner__img {
   display: block;
-  width: 100%;
+  max-width: 100%; /* không bao giờ tràn khỏi khung, nhưng KHÔNG ép giãn nếu ảnh nhỏ hơn */
   height: auto; /* giữ nguyên tỉ lệ ảnh gốc — không crop, không ép chiều cao cố định */
 }
 
