@@ -93,11 +93,19 @@ const Navbar = () => {
           <div
             className="navbar__dropdown"
             onMouseEnter={() => setProductsMenuOpen(true)}
-            onMouseLeave={() => setProductsMenuOpen(false)}
+            onMouseLeave={(event) => {
+              if (!event.currentTarget.contains(document.activeElement)) setProductsMenuOpen(false);
+            }}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) setProductsMenuOpen(false);
+            }}
           >
             <Link
               to="/products"
               className={`navbar__link navbar__link--dropdown ${location.pathname === "/products" ? "navbar__link--active" : ""}`}
+              aria-haspopup="true"
+              aria-expanded={productsMenuOpen}
+              onFocus={() => setProductsMenuOpen(true)}
             >
               Sản Phẩm
               <span className={`navbar__dropdown-arrow ${productsMenuOpen ? "navbar__dropdown-arrow--open" : ""}`}>▾</span>
@@ -129,11 +137,20 @@ const Navbar = () => {
           <div
             className="navbar__dropdown"
             onMouseEnter={() => setServicesMenuOpen(true)}
-            onMouseLeave={() => setServicesMenuOpen(false)}
+            onMouseLeave={(event) => {
+              if (!event.currentTarget.contains(document.activeElement)) setServicesMenuOpen(false);
+            }}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) setServicesMenuOpen(false);
+            }}
           >
             <button
               type="button"
               className={`navbar__link navbar__link--dropdown ${isServicesActive ? "navbar__link--active" : ""}`}
+              aria-haspopup="true"
+              aria-expanded={servicesMenuOpen}
+              onFocus={() => setServicesMenuOpen(true)}
+              onClick={() => setServicesMenuOpen(true)}
             >
               Dịch Vụ
               <span className={`navbar__dropdown-arrow ${servicesMenuOpen ? "navbar__dropdown-arrow--open" : ""}`}>▾</span>
