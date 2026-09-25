@@ -10,9 +10,9 @@ const MainLayout = () => (
   <>
     <PromoBanner />
     <Navbar />
-    {/* 72px = chiều cao Navbar cố định (--nav-height trong Navbar.css).
+    {/* --nav-height = chiều cao Navbar cố định (được đặt trong Navbar.css).
         var(--banner-h) = chiều cao banner khuyến mãi, do PromoBanner tự set — 0px nếu banner tắt. */}
-    <main style={{ paddingTop: "calc(72px + var(--banner-h, 0px))", width: "100%" }}>
+    <main style={{ paddingTop: "calc(var(--nav-height) + var(--banner-h, 0px))", width: "100%" }}>
       <Outlet />
     </main>
     {/* Footer — TÁCH RA từ Home.jsx (trước đây nằm trong đó nên CHỈ hiện ở trang chủ).

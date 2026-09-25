@@ -6,7 +6,7 @@
   --gold: #c8a96e;
   --gold-dark: #a8854a;
   --text-nav: #2c1f10;
-  --nav-height: 72px;
+  --nav-height: 80px;
   --banner-h: 0px;
 }
 
@@ -33,13 +33,13 @@
 
 /* ── Container ── */
 .navbar__container {
-  max-width: 1320px;
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 32px;
   height: 100%;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: clamp(14px, 1.5vw, 24px);
 }
 
 /* ── Logo ── */
@@ -52,7 +52,7 @@
 }
 
 .navbar__logo-icon {
-  font-size: 22px;
+  font-size: 24px;
   color: var(--gold);
   line-height: 1;
 }
@@ -73,20 +73,21 @@
 .navbar__links {
   display: flex;
   align-items: center;
-  gap: 2px;
-  margin-left: auto;
-  flex-shrink: 0;
+  justify-content: space-evenly;
+  flex: 1;
+  min-width: 0;
+  gap: 0;
 }
 
 .navbar__link {
   position: relative;
   text-decoration: none;
   color: var(--text-nav);
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 500;
-  letter-spacing: 0.3px;
-  padding: 6px 10px;
-  border-radius: 6px;
+  letter-spacing: 0.25px;
+  padding: 9px 0;
+  border-radius: 8px;
   white-space: nowrap;
   flex-shrink: 0;
   transition: color 0.2s ease;
@@ -96,8 +97,8 @@
   content: "";
   position: absolute;
   bottom: 0px;
-  left: 14px;
-  right: 14px;
+  left: 0;
+  right: 0;
   height: 2px;
   background: var(--gold);
   border-radius: 2px;
@@ -125,6 +126,16 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+}
+
+/* Keep the pointer inside the dropdown group while crossing its visual gap. */
+.navbar__dropdown::after {
+  content: "";
+  position: absolute;
+  top: calc(100% - 1px);
+  left: -12px;
+  right: -12px;
+  height: 12px;
 }
 
 .navbar__link--dropdown {
@@ -165,7 +176,7 @@ button.navbar__link:focus-visible {
 
 .navbar__dropdown-menu {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%) translateY(-6px);
   background: #fff;
@@ -173,7 +184,7 @@ button.navbar__link:focus-visible {
   border-radius: 12px;
   box-shadow: 0 12px 32px rgba(59, 42, 26, 0.14);
   padding: 10px;
-  min-width: 220px;
+  min-width: 240px;
   z-index: 50;
 
   opacity: 0;
@@ -193,7 +204,7 @@ button.navbar__link:focus-visible {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: 8px;
   color: var(--text-nav);
   font-size: 14px;
@@ -245,7 +256,7 @@ button.navbar__link:focus-visible {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 
 .navbar__cta {
@@ -262,7 +273,7 @@ button.navbar__link:focus-visible {
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   white-space: nowrap;
   flex-shrink: 0;
-  margin-left: 8px;
+  margin-left: 0;
 }
 
 .navbar__cta:hover {
@@ -466,7 +477,7 @@ button.navbar__link:focus-visible {
   justify-content: center;
   font-size: 20px;
   text-decoration: none;
-  margin-right: 8px;
+  margin-right: 0;
   line-height: 1;
   flex-shrink: 0;
 }
@@ -493,7 +504,7 @@ button.navbar__link:focus-visible {
   color: #3b2a1a;
   text-decoration: none;
   font-weight: 500;
-  margin-right: 8px;
+  margin-right: 0;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -501,7 +512,7 @@ button.navbar__link:focus-visible {
 
 .navbar__account {
   position: relative;
-  margin-right: 8px;
+  margin-right: 0;
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -569,4 +580,42 @@ button.navbar__link:focus-visible {
   color: #b91c1c;
   font-family: inherit;
   cursor: pointer;
+}
+
+/* Keep the desktop row balanced on smaller laptop screens. */
+@media (min-width: 1101px) and (max-width: 1360px) {
+  .navbar__container {
+    padding-right: 16px;
+    padding-left: 16px;
+    gap: 10px;
+  }
+
+  .navbar__logo-text {
+    font-size: 21px;
+  }
+
+  .navbar__links {
+    gap: 0;
+    justify-content: space-evenly;
+  }
+
+  .navbar__link {
+    font-size: 13px;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .navbar__actions {
+    gap: 5px;
+  }
+
+  .navbar__actions .navbar-search__form {
+    width: 132px;
+  }
+
+  .navbar__cta {
+    font-size: 13px;
+    padding: 9px 12px;
+    margin-left: 0;
+  }
 }
