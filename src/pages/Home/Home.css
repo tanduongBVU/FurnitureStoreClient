@@ -9,7 +9,13 @@
   --radius: 10px;
 }
 
-.home { width: 100%; overflow-x: hidden; }
+/* Bỏ overflow-x:hidden ở đây (trước dùng để chặn thanh cuộn ngang lỡ phát sinh từ hiệu
+   ứng Reveal/slide-in) — vì overflow khác "visible" trên BẤT KỲ phần tử cha nào cũng làm
+   hỏng hẳn position:sticky của phần tử con (banner 2 bên trái/phải mới thêm bị "đứng yên"
+   sai thay vì dính-rồi-nhả đúng lúc cuộn). Nếu sau này phát sinh thanh cuộn ngang ở đâu đó,
+   xử lý overflow:hidden CỤC BỘ ngay tại section gây ra (VD thêm vào .hero-slider,
+   .rooms-grid...) thay vì đặt ở .home — tránh lặp lại đúng lỗi này. */
+.home { width: 100%; }
 
 /* ── Shared ── */
 .home .section-inner {
@@ -489,6 +495,7 @@
    tràn full màn hình — phù hợp với các ảnh banner dạng đồ hoạ quảng cáo vốn đã
    có sẵn chữ/nút thiết kế ngay trong ảnh, không cần web chèn thêm chữ đè lên. */
 .promo-image-banner {
+  position: relative;
   padding: 56px 0;
 }
 /* Wrapper canh lề — chỉ thấy khác biệt rõ khi ảnh hẹp hơn khung nội dung, vì ảnh giờ
@@ -515,6 +522,49 @@ a.promo-image-banner__link:hover {
   display: block;
   max-width: 100%; /* không bao giờ tràn khỏi khung, nhưng KHÔNG ép giãn nếu ảnh nhỏ hơn */
   height: auto; /* giữ nguyên tỉ lệ ảnh gốc — không crop, không ép chiều cao cố định */
+}
+
+/* ── BANNER DỌC 2 BÊN (TÁCH RIÊNG HOÀN TOÀN khỏi banner ngang ở trên) ──
+   Có vị trí chèn riêng, bật/tắt riêng, ảnh/link riêng (homeBanner.sideLeft và
+   sideRight ở Admin). Không phụ thuộc banner ngang có ảnh hay không.
+   Cấu trúc: .side-banners là mốc neo cao 0px (không chiếm chỗ trong luồng trang, không
+   thêm khoảng trắng nào), bên trong 2 lớp outer ghim theo cạnh trái/phải màn hình và
+   cao 180vh (khoảng 2 màn hình cuộn) để tạo quãng đường sticky. Lớp inner mới thật sự
+   sticky theo chiều dọc bên trong quãng đường đó. Lề 2 bên các section phía dưới cũng
+   đang trống nên ảnh không đè lên nội dung chính.
+   Mặc định ẨN HẲN — chỉ hiện từ 1600px trở lên vì dưới ngưỡng đó lề trống quá hẹp. */
+.side-banners {
+  position: relative;
+  height: 0;
+}
+.side-banner__outer {
+  display: none;
+  position: absolute;
+  top: 0;
+  height: 180vh;
+  /* rộng = lề trống mỗi bên trừ chừa chỗ hở, tối thiểu 180px, tối đa 340px */
+  width: clamp(180px, calc((100vw - 1160px) / 2 - 48px), 340px);
+}
+.side-banner__outer--left { left: 32px; }
+.side-banner__outer--right { right: 32px; }
+
+.side-banner__inner {
+  position: sticky;
+  /* Dính ngay dưới Navbar (72px cố định) + banner khuyến mãi mỏng đầu trang (nếu đang
+     bật, var(--banner-h) do PromoBanner tự set) + chừa thêm 24px cho thoáng — đúng
+     công thức padding-top đã dùng ở MainLayout.jsx cho main, để không bị Navbar che. */
+  top: calc(72px + var(--banner-h, 0px) + 24px);
+}
+.side-banner__inner img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(59,42,26,.14);
+}
+
+@media (min-width: 1600px) {
+  .side-banner__outer { display: block; }
 }
 
 /* ── LIÊN HỆ ── */
@@ -553,28 +603,10 @@ a.promo-image-banner__link:hover {
 .contact-form input:focus,
 .contact-form textarea:focus { border-color: var(--gold); }
 
-/* ── FOOTER ── */
-.footer { background: #1a0f05; padding: 64px 0 0; }
-.footer-inner {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 48px;
-  padding-bottom: 48px;
-}
-.footer-brand .footer-logo { font-size: 20px; color: var(--cream); display: block; margin-bottom: 12px; }
-.footer-brand p { font-size: 14px; color: rgba(255,255,255,.45); margin: 0; }
-.footer-links { display: flex; flex-direction: column; gap: 10px; }
-.footer-links h4 { color: var(--cream); font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 4px; }
-.footer-links a { color: rgba(255,255,255,.5); font-size: 14px; text-decoration: none; transition: color .2s; }
-.footer-links a:hover { color: var(--gold); }
-.footer-bottom { border-top: 1px solid rgba(255,255,255,.08); padding: 20px 24px; text-align: center; }
-.footer-bottom p { color: rgba(255,255,255,.3); font-size: 13px; margin: 0; }
-
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .products-grid { grid-template-columns: repeat(2, 1fr); }
   .bundles-grid-home { grid-template-columns: repeat(2, 1fr); }
-  .footer-inner { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 768px) {
   .hero-slider { height: 70vh; min-height: 480px; }
@@ -587,7 +619,6 @@ a.promo-image-banner__link:hover {
   .rooms-grid { grid-template-columns: repeat(2, 1fr); }
   .room-card { aspect-ratio: 3 / 4; }
   .contact-inner { grid-template-columns: 1fr; gap: 40px; }
-  .footer-inner { grid-template-columns: 1fr; gap: 32px; }
 }
 
 @media (max-width: 480px) {

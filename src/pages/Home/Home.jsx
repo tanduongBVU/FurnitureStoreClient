@@ -7,7 +7,6 @@ import Reveal from "../../components/Reveal/Reveal";
 import WishlistButton from "../../components/WishlistButton/WishlistButton";
 import CompareButton from "../../components/CompareButton/CompareButton";
 import RatingStars from "../../components/RatingStars/RatingStars";
-import NewsletterForm from "../../components/NewsletterForm/NewsletterForm";
 import SEO from "../../components/SEO/SEO";
 import "./Home.css";
 
@@ -112,9 +111,9 @@ export default function Home() {
   // Link không phải YouTube (VD file .mp4 thật) → coi là link video trực tiếp cho thẻ <video>
   const isDirectVideoFile = heroVideo.url && !youtubeId;
 
-  // ── Banner ảnh khuyến mãi chèn giữa trang chủ — TÁCH BIỆT hoàn toàn với banner chữ
-  // mỏng ở đầu mọi trang (promo.banner.*, nằm ở layout chung không phải trong Home.jsx
-  // này). Admin bật/tắt và chọn vị trí chèn qua dropdown ở SiteSettings.
+  // ── BANNER NGANG (ở giữa trang) — TÁCH BIỆT hoàn toàn với banner chữ mỏng ở đầu mọi
+  // trang (promo.banner.*, nằm ở layout chung) VÀ với banner dọc 2 bên (bên dưới).
+  // Admin bật/tắt và chọn vị trí chèn qua SiteSettings.
   // CHỈ hiện ẢNH — không chữ/nút đè lên, vì ảnh banner (dạng đồ hoạ quảng cáo) thường đã
   // có sẵn chữ + nút thiết kế NGAY TRONG ảnh rồi, chèn thêm chữ web sẽ bị chồng/rối.
   const homeBannerEnabled = get("homeBanner.enabled", "false") === "true";
@@ -123,6 +122,19 @@ export default function Home() {
     image: get("homeBanner.image", ""),
     linkUrl: get("homeBanner.linkUrl", ""),
     align: get("homeBanner.align", "center"),
+  };
+
+  // ── BANNER DỌC 2 BÊN — ĐỘC LẬP hoàn toàn với banner ngang: bật/tắt riêng (showSides),
+  // vị trí riêng (sidePosition), ảnh + link riêng mỗi bên. KHÔNG phụ thuộc banner ngang
+  // có bật hay có ảnh hay không.
+  // Vị trí mặc định (khi Admin chưa chọn) là ngay sau Hero — khớp với dropdown ở Admin.
+  const sideBanners = {
+    enabled: get("homeBanner.showSides", "false") === "true",
+    position: get("homeBanner.sidePosition", "after-hero"),
+    leftImage: get("homeBanner.sideLeft.image", ""),
+    leftLink: get("homeBanner.sideLeft.linkUrl", ""),
+    rightImage: get("homeBanner.sideRight.image", ""),
+    rightLink: get("homeBanner.sideRight.linkUrl", ""),
   };
 
   const [bestSellers, setBestSellers] = useState([]);
@@ -205,27 +217,71 @@ export default function Home() {
     });
   };
 
-  // Không nhận ảnh thì không render gì cả — tránh chèn 1 khối trống/xấu vào
-  // giữa trang chủ nếu Admin bật banner nhưng quên điền ảnh. CHỈ hiện ảnh, co
-  // gọn trong khung nội dung (giống các mục khác) thay vì tràn full màn hình —
-  // nếu Admin có điền link thì cả tấm ảnh bấm được, không hiện nút riêng.
+  // ── BANNER NGANG — chỉ lo phần ảnh ở giữa, không dính gì tới banner dọc. Không có ảnh
+  // thì không render gì cả, tránh chèn 1 khối trống/xấu vào giữa trang chủ.
+  // Nếu Admin có điền link thì cả tấm ảnh bấm được, không hiện nút riêng.
   const renderHomeBanner = () => {
     if (!homeBannerEnabled || !homeBanner.image) return null;
-    const image = <img src={homeBanner.image} alt="Banner khuyến mãi" className="promo-image-banner__img" />;
+
+    const centerImg = <img src={homeBanner.image} alt="Banner khuyến mãi" className="promo-image-banner__img" />;
+
     return (
       <section className="promo-image-banner">
         <div className="section-inner">
           <div className={`promo-image-banner__wrap promo-image-banner__wrap--${homeBanner.align}`}>
             {homeBanner.linkUrl ? (
-              <Link to={homeBanner.linkUrl} className="promo-image-banner__link">{image}</Link>
+              <Link to={homeBanner.linkUrl} className="promo-image-banner__link">{centerImg}</Link>
             ) : (
-              <div className="promo-image-banner__link">{image}</div>
+              <div className="promo-image-banner__link">{centerImg}</div>
             )}
           </div>
         </div>
       </section>
     );
   };
+
+  // ── BANNER DỌC 2 BÊN — khối riêng, không nằm trong section của banner ngang. Bên nào
+  // chưa điền ảnh thì bên đó tự ẩn, không ảnh hưởng bên còn lại. Ẩn/hiện theo bề rộng
+  // màn hình bằng CSS (xem Home.css) — lề trống 2 bên chỉ thật sự tồn tại trên màn hình
+  // rất rộng. Khối này cao 0px nên không tạo thêm khoảng trắng nào trong trang.
+  const renderSideBanners = () => {
+    if (!sideBanners.enabled) return null;
+
+    const showLeft = Boolean(sideBanners.leftImage);
+    const showRight = Boolean(sideBanners.rightImage);
+    if (!showLeft && !showRight) return null;
+
+    const leftImg = <img src={sideBanners.leftImage} alt="" />;
+    const rightImg = <img src={sideBanners.rightImage} alt="" />;
+
+    return (
+      <div className="side-banners">
+        {showLeft && (
+          <div className="side-banner__outer side-banner__outer--left">
+            <div className="side-banner__inner">
+              {sideBanners.leftLink ? <Link to={sideBanners.leftLink}>{leftImg}</Link> : leftImg}
+            </div>
+          </div>
+        )}
+        {showRight && (
+          <div className="side-banner__outer side-banner__outer--right">
+            <div className="side-banner__inner">
+              {sideBanners.rightLink ? <Link to={sideBanners.rightLink}>{rightImg}</Link> : rightImg}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Chèn cả 2 loại banner tại 1 vị trí — mỗi loại tự kiểm tra vị trí RIÊNG của nó.
+  // Banner dọc đặt TRƯỚC banner ngang để cả 2 bắt đầu từ cùng độ cao.
+  const renderBannersAt = (pos) => (
+    <>
+      {sideBanners.position === pos && renderSideBanners()}
+      {homeBannerPosition === pos && renderHomeBanner()}
+    </>
+  );
 
   return (
     <div className="home">
@@ -342,7 +398,7 @@ export default function Home() {
         </section>
       )}
 
-      {homeBannerPosition === "after-hero" && renderHomeBanner()}
+      {renderBannersAt("after-hero")}
 
       {/* ── GIỚI THIỆU ── */}
       <section className="about-section">
@@ -372,7 +428,7 @@ export default function Home() {
         </div>
       </section>
 
-      {homeBannerPosition === "after-about" && renderHomeBanner()}
+      {renderBannersAt("after-about")}
 
       {/* ── SẢN PHẨM BÁN CHẠY ── */}
       <section className="products-section">
@@ -450,7 +506,7 @@ export default function Home() {
         </div>
       </section>
 
-      {homeBannerPosition === "after-products" && renderHomeBanner()}
+      {renderBannersAt("after-products")}
 
       {/* ── COMBO TIẾT KIỆM ── */}
       {/* Ẩn hoàn toàn cả section nếu chưa có combo nào — tránh lộ khung rỗng xấu xí
@@ -539,7 +595,7 @@ export default function Home() {
         </div>
       </section>
 
-      {homeBannerPosition === "after-rooms" && renderHomeBanner()}
+      {renderBannersAt("after-rooms")}
 
       {/* ── LIÊN HỆ ── */}
       <section className="contact-section" id="contact">
@@ -606,45 +662,7 @@ export default function Home() {
         </div>
       </section>
 
-      {homeBannerPosition === "before-footer" && renderHomeBanner()}
-
-      {/* ── FOOTER ── */}
-      <footer className="footer">
-        <div className="section-inner footer-inner">
-          <div className="footer-brand">
-            <span className="footer-logo">⬡ <strong>LuxWood</strong></span>
-            <p>Không gian sống — tinh tế từng đường nét.</p>
-            <div style={{ marginTop: 20 }}>
-              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginBottom: 10 }}>
-                Đăng ký nhận tin khuyến mãi mới nhất
-              </p>
-              <NewsletterForm variant="inline" />
-            </div>
-          </div>
-          <div className="footer-links">
-            <h4>Trang</h4>
-            <Link to="/">Trang chủ</Link>
-            <Link to="/about">Giới thiệu</Link>
-            <Link to="/products">Sản phẩm</Link>
-            <Link to="/sale">Khuyến mãi</Link>
-          </div>
-          <div className="footer-links">
-            <h4>Danh mục</h4>
-            <Link to="/products">Phòng khách</Link>
-            <Link to="/products">Phòng ngủ</Link>
-            <Link to="/products">Phòng ăn</Link>
-          </div>
-          <div className="footer-links">
-            <h4>Hỗ trợ</h4>
-            <a href="#">Chính sách bảo hành</a>
-            <a href="#">Hướng dẫn đặt hàng</a>
-            <a href="#">Câu hỏi thường gặp</a>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <p>© 2025 LuxWood. Bảo lưu mọi quyền.</p>
-        </div>
-      </footer>
+      {renderBannersAt("before-footer")}
 
     </div>
   );

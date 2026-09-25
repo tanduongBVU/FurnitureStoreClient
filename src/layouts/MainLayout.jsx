@@ -1,4 +1,5 @@
 import Navbar from "../components/Navbar/Navbar";
+import Footer from "../components/Footer/Footer";
 import PromoBanner from "../components/PromoBanner/PromoBanner";
 import NewsletterPopup from "../components/NewsletterPopup/NewsletterPopup";
 import CompareBar from "../components/CompareBar/CompareBar";
@@ -14,6 +15,10 @@ const MainLayout = () => (
     <main style={{ paddingTop: "calc(72px + var(--banner-h, 0px))", width: "100%" }}>
       <Outlet />
     </main>
+    {/* Footer — TÁCH RA từ Home.jsx (trước đây nằm trong đó nên CHỈ hiện ở trang chủ).
+        Đặt ở đây, NGOÀI <Outlet/>, để hiện thống nhất ở MỌI trang Client (Sản phẩm,
+        Giới thiệu, Thanh toán...), không riêng gì Trang chủ. */}
+    <Footer />
     {/* Popup đăng ký nhận tin — đặt ở MainLayout (không phải Home) để hiện được ở MỌI trang
         Client, không chỉ riêng Trang chủ. Tự ẩn vĩnh viễn sau khi khách đóng/đăng ký
         (xem STORAGE_KEY trong NewsletterPopup.jsx). */}

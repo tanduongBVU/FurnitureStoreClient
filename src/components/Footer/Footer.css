@@ -1,0 +1,40 @@
+:root {
+  --walnut: #3b2a1a;
+  --cream: #f5f0e8;
+  --gold: #c8a96e;
+  --gold-d: #a8854a;
+}
+
+/* Bản riêng của .section-inner cho Footer — trước đây dùng chung rule ".home
+   .section-inner" trong Home.css, chỉ có hiệu lực khi Footer còn nằm TRONG
+   Home.jsx. Giờ Footer hiện độc lập ở mọi trang (đặt tại MainLayout, ngoài
+   .home), nên cần tự định nghĩa lại max-width/padding, không phụ thuộc vào
+   Home.css nữa. */
+.footer .section-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.footer { background: #1a0f05; padding: 64px 0 0; }
+.footer-inner {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 48px;
+}
+.footer-brand .footer-logo { font-size: 20px; color: var(--cream); display: block; margin-bottom: 12px; }
+.footer-brand p { font-size: 14px; color: rgba(255,255,255,.45); margin: 0; }
+.footer-links { display: flex; flex-direction: column; gap: 10px; }
+.footer-links h4 { color: var(--cream); font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 4px; }
+.footer-links a { color: rgba(255,255,255,.5); font-size: 14px; text-decoration: none; transition: color .2s; }
+.footer-links a:hover { color: var(--gold); }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,.08); padding: 20px 24px; text-align: center; }
+.footer-bottom p { color: rgba(255,255,255,.3); font-size: 13px; margin: 0; }
+
+@media (max-width: 1024px) {
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+}
