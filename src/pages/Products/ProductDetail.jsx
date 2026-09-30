@@ -23,6 +23,9 @@ const ProductDetail = () => {
   const [added, setAdded] = useState(false);
 
   const [selectedVariant, setSelectedVariant] = useState(null);
+  // Ảnh đang hiện to ở khung chính — mặc định là ảnh chính (product.image), khách bấm
+  // vào 1 thumbnail (ảnh phụ) ở cột bên trái để đổi ảnh hiện ở đây, KHÔNG đổi product.image.
+  const [activeImage, setActiveImage] = useState(null);
 
   const [related, setRelated] = useState([]);
   const [relatedLoading, setRelatedLoading] = useState(true);
@@ -34,6 +37,7 @@ const ProductDetail = () => {
     api.get(`/Products/${id}`)
       .then(res => {
         setProduct(res.data);
+        setActiveImage(res.data.image);
         const variants = res.data.variants || [];
         if (variants.length > 0) {
           const firstInStock = variants.find(v => v.stock > 0);
@@ -63,6 +67,16 @@ const ProductDetail = () => {
 
   const hasDiscount = product?.discountPercent > 0;
   const salePrice = activePrice * (1 - (product?.discountPercent || 0) / 100);
+
+  // Ảnh chính + tối đa 4 ảnh phụ (product.images là chuỗi "url1,url2,..." từ Backend) —
+  // hiện thành cột thumbnail bên trái, CHỈ khi có ít nhất 1 ảnh phụ (sản phẩm cũ chưa có
+  // ảnh phụ thì không hiện cột này, layout giữ nguyên như trước).
+  const extraImages = (product?.images || "")
+    .split(",")
+    .map(u => u.trim())
+    .filter(Boolean);
+  const galleryImages = product?.image ? [product.image, ...extraImages] : extraImages;
+  const hasGallery = galleryImages.length > 1;
 
   useEffect(() => {
     if (activeStock > 0 && quantity > activeStock) setQuantity(activeStock);
@@ -115,23 +129,65 @@ const ProductDetail = () => {
         </div>
 
         <div className="pd-layout">
-          <Reveal as="div" className="pd-image" direction="left" style={{ position: "relative" }}>
-            {product.image
-              ? <img src={product.image} alt={product.name} onError={e => e.target.style.display = "none"} />
-              : <span className="pd-image-placeholder">🪑</span>
-            }
-            {product.isBestSeller && <span className="pd-tag">Bán chạy</span>}
-            {hasDiscount && (
-              <span
+          <Reveal
+            as="div"
+            className="pd-gallery"
+            direction="left"
+            style={hasGallery ? { display: "flex", gap: 12, alignItems: "flex-start" } : undefined}
+          >
+            {/* Cột thumbnail — chỉ hiện khi có ảnh phụ. Bấm 1 ảnh để phóng to lên khung chính.
+                Đặt NGOÀI class "pd-image" để không đụng vào chiều cao/tỉ lệ cố định mà CSS gốc
+                đang đặt riêng cho khung ảnh đơn — tránh để lại khoảng trắng thừa bên dưới. */}
+            {hasGallery && (
+              <div
                 style={{
-                  position: "absolute", top: 16, right: 16,
-                  background: "#c0392b", color: "#fff", fontSize: 12, fontWeight: 700,
-                  padding: "5px 12px", borderRadius: 20, letterSpacing: .5,
+                  display: "flex", flexDirection: "column", gap: 10,
+                  flexShrink: 0, width: 72,
                 }}
               >
-                -{product.discountPercent}%
-              </span>
+                {galleryImages.map((img, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setActiveImage(img)}
+                    style={{
+                      width: 72, height: 72, padding: 0, cursor: "pointer",
+                      borderRadius: 10, overflow: "hidden", flexShrink: 0,
+                      border: activeImage === img ? "2px solid #c8a96e" : "1.5px solid #e5ddd0",
+                      background: "#fff",
+                    }}
+                  >
+                    <img
+                      src={img}
+                      alt=""
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                      onError={e => (e.target.style.display = "none")}
+                    />
+                  </button>
+                ))}
+              </div>
             )}
+
+            {/* Ảnh chính — giữ nguyên class "pd-image" như code gốc, chỉ thêm minWidth:0 để
+                co lại đúng phần còn lại khi có cột thumbnail bên cạnh (flex:1). */}
+            <div className="pd-image" style={{ position: "relative", ...(hasGallery ? { flex: 1, minWidth: 0 } : {}) }}>
+              {activeImage
+                ? <img src={activeImage} alt={product.name} onError={e => e.target.style.display = "none"} />
+                : <span className="pd-image-placeholder">🪑</span>
+              }
+              {product.isBestSeller && <span className="pd-tag">Bán chạy</span>}
+              {hasDiscount && (
+                <span
+                  style={{
+                    position: "absolute", top: 16, right: 16,
+                    background: "#c0392b", color: "#fff", fontSize: 12, fontWeight: 700,
+                    padding: "5px 12px", borderRadius: 20, letterSpacing: .5,
+                  }}
+                >
+                  -{product.discountPercent}%
+                </span>
+              )}
+            </div>
           </Reveal>
 
           <Reveal as="div" className="pd-info" direction="right" delay={120}>

@@ -44,6 +44,8 @@ const testimonials = [
   { name: "Chị Bảo Châu", role: "Kiến trúc sư", text: "Tôi đã giới thiệu LuxWood cho rất nhiều khách hàng của mình. Chất lượng và dịch vụ luôn nhất quán, xứng đáng là đối tác tin cậy.", rating: 5 },
 ];
 
+// Tên + icon dự phòng khi Admin CHƯA điền logo — giữ đúng thứ tự để khớp với
+// key "aboutpage.partnerN.image" (N = 1..6) đọc từ CMS bên dưới.
 const partners = [
   { name: "Hafele", icon: "⚙️" },
   { name: "Blum", icon: "🔩" },
@@ -76,11 +78,6 @@ function parseStatValue(value) {
   return { target, suffix: match[2] };
 }
 
-// Đếm số tăng dần từ 0 lên đúng giá trị thật, chạy 1 LẦN ngay khi component mount (banner
-// đầu trang luôn hiện sẵn khi vào trang, không cần đợi cuộn tới mới kích hoạt). Dùng
-// requestAnimationFrame + easeOutCubic (chạy nhanh lúc đầu, chậm dần về đích) cho mượt.
-// "delay" cho phép so le thời điểm bắt đầu giữa 4 số liệu, tạo hiệu ứng chạy nối tiếp nhau
-// thay vì cả 4 số cùng nhảy số một lúc trông rối mắt.
 function AnimatedStat({ value, duration = 1600, delay = 0 }) {
   const parsed = parseStatValue(value);
   const [display, setDisplay] = useState(parsed ? `0${parsed.suffix}` : value);
@@ -119,7 +116,6 @@ export default function About() {
   const { get } = useSettings();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
-  // Đội ngũ lãnh đạo — nội dung lấy từ Admin → Giao diện, có fallback giữ nguyên giá trị cũ
   const team = [
     {
       image: get("aboutpage.team.member1.image", ""),
@@ -147,19 +143,13 @@ export default function About() {
     },
   ];
 
-  // Ảnh banner đầu trang và ảnh xưởng sản xuất giờ là 2 key riêng biệt
   const bannerImage = get("aboutpage.banner.image", "");
   const companyImage = get("aboutpage.company.image", "");
-  // Ảnh minh hoạ cho mục "Vì sao chọn chúng tôi?" — đặt dưới đoạn mô tả bên cột trái,
-  // trước đây khoảng trống này để trắng trơn khi cột phải (danh sách 4 lý do) dài hơn nhiều
   const whyUsImage = get("aboutpage.whyus.image", "");
 
   return (
     <div className="about-page">
 
-      {/* ── BANNER (full-bleed, nội dung canh giữa) ── */}
-      {/* Không bọc Reveal — đây là phần đầu trang, luôn hiện ngay khi vào trang,
-          không cần chờ cuộn tới mới hiện. */}
       <section className="about-banner">
         <div className="about-banner-bg">
           {bannerImage ? (
@@ -209,7 +199,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── GIỚI THIỆU CÔNG TY ── */}
       <section className="company-section">
         <div className="section-inner two-col">
           <Reveal as="div" className="company-img" direction="left">
@@ -237,7 +226,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── SỨ MỆNH - TẦM NHÌN ── */}
       <section className="mission-section">
         <div className="section-inner">
           <div className="mission-grid">
@@ -260,7 +248,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── GIÁ TRỊ CỐT LÕI ── */}
       <section className="values-section">
         <div className="section-inner">
           <Reveal as="div" className="section-header">
@@ -279,7 +266,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── VÌ SAO CHỌN CHÚNG TÔI ── */}
       <section className="whyus-section">
         <div className="section-inner two-col">
           <Reveal as="div" className="whyus-text" direction="left">
@@ -313,8 +299,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── QUY TRÌNH (dạng timeline/sơ đồ lịch trình — đường kẻ nối các mốc, zigzag
-          trái-phải — thay cho lưới 6 card rời rạc trước đây) ── */}
       <section className="process-section">
         <div className="section-inner">
           <Reveal as="div" className="section-header">
@@ -341,7 +325,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── ĐỘI NGŨ ── */}
       <section className="team-section">
         <div className="section-inner">
           <Reveal as="div" className="section-header">
@@ -370,7 +353,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── DỰ ÁN TIÊU BIỂU ── */}
       <section className="projects-section">
         <div className="section-inner">
           <Reveal as="div" className="section-header">
@@ -379,10 +361,6 @@ export default function About() {
           </Reveal>
           <div className="projects-grid">
             {projects.map((p, i) => {
-              // Ảnh dự án lấy từ CMS (Admin → Giao diện Client → Trang Giới thiệu →
-              // "Dự án tiêu biểu"). Key theo đúng thứ tự mảng `projects` phía trên
-              // (project1..project6). Nếu Admin chưa nhập URL, giữ nguyên emoji
-              // placeholder cũ như trước — không để trống trơn xấu xí.
               const projectImage = get(`aboutpage.project${i + 1}.image`, "");
               return (
                 <Reveal as="div" className="project-card" key={i} delay={Math.min((i % 3) * 90, 270)}>
@@ -410,7 +388,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
       <section className="testimonials-section">
         <div className="section-inner">
           <Reveal as="div" className="section-header">
@@ -452,17 +429,39 @@ export default function About() {
             <h2>Đối tác & Chứng nhận</h2>
           </Reveal>
           <div className="partners-grid">
-            {partners.map((p, i) => (
-              <Reveal as="div" className="partner-card" key={i} delay={Math.min(i * 60, 300)}>
-                <span className="partner-icon">{p.icon}</span>
-                <span className="partner-name">{p.name}</span>
-              </Reveal>
-            ))}
+            {partners.map((p, i) => {
+              // Logo lấy từ CMS (Admin → Giao diện Client → Trang Giới thiệu →
+              // "Đối tác & Chứng nhận"). Key partner1..partner6 đúng thứ tự mảng
+              // `partners` phía trên. Chưa có logo thì vẫn hiện icon cũ, không để
+              // trống trơn.
+              const partnerLogo = get(`aboutpage.partner${i + 1}.image`, "");
+              return (
+                <Reveal
+                  as="div"
+                  className={`partner-card ${partnerLogo ? "partner-card--logo" : ""}`}
+                  key={i}
+                  delay={Math.min(i * 60, 300)}
+                >
+                  {partnerLogo ? (
+                    <img
+                      src={partnerLogo}
+                      alt={p.name}
+                      className="partner-logo"
+                      onError={(e) => (e.target.style.display = "none")}
+                    />
+                  ) : (
+                    <>
+                      <span className="partner-icon">{p.icon}</span>
+                      <span className="partner-name">{p.name}</span>
+                    </>
+                  )}
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ── CTA ── */}
       <section className="about-cta">
         <Reveal as="div" className="section-inner" style={{ textAlign: "center" }}>
           <h2>Sẵn sàng tạo nên không gian sống trong mơ?</h2>

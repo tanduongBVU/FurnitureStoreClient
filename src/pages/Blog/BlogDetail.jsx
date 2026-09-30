@@ -4,6 +4,17 @@ import api from "../../services/api";
 import Reveal from "../../components/Reveal/Reveal";
 import "./Blog.css";
 
+// Nội dung dán từ nguồn khác (Gemini, Google Docs, web...) vào trình soạn thảo thường bị
+// Quill đổi khoảng trắng thành "&nbsp;" (khoảng trắng KHÔNG ngắt dòng) — trình duyệt không
+// tìm được chỗ xuống dòng nên chữ chạy dài tràn ra khỏi khung, gây thanh cuộn ngang cho cả
+// trang. Đổi lại thành khoảng trắng thường TRƯỚC khi hiển thị. Riêng đoạn trống kiểu
+// <p>&nbsp;</p> (Admin cố ý để tạo dòng trắng) đổi thành <p><br></p> để vẫn giữ nguyên
+// khoảng cách, không bị xẹp mất.
+const cleanContentHtml = (html) =>
+  (html || "")
+    .replace(/<p>(\s|&nbsp;|\u00a0)*<\/p>/g, "<p><br></p>")
+    .replace(/&nbsp;|\u00a0/g, " ");
+
 const BlogDetail = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
@@ -62,8 +73,12 @@ const BlogDetail = () => {
         )}
 
         {/* Nội dung soạn từ rich text editor bên Admin (đã qua Authorize, chỉ Admin/Nhân viên
-            mới tạo/sửa được) — không nhận nội dung này trực tiếp từ khách nên an toàn để render HTML */}
-        <div className="blog-detail-content" dangerouslySetInnerHTML={{ __html: post.content }} />
+            mới tạo/sửa được) — không nhận nội dung này trực tiếp từ khách nên an toàn để render HTML.
+            Vẫn dọn "&nbsp;" trước khi hiển thị để chữ xuống dòng đúng, không tràn khung. */}
+        <div
+          className="blog-detail-content"
+          dangerouslySetInnerHTML={{ __html: cleanContentHtml(post.content) }}
+        />
 
         <div className="blog-detail-back">
           <Link to="/blog" className="btn-outline">← Quay lại Cẩm nang</Link>

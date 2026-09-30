@@ -141,14 +141,7 @@
 
 /* ── WHY US ── */
 .whyus-section { padding: 96px 0; background: var(--cream); }
-
-/* Ảnh minh hoạ bên trái — cùng pattern với .company-img (dùng chung class .img-real.tall
-   và .img-placeholder.tall đã có sẵn nên không cần định nghĩa lại kích thước ảnh). */
 .whyus-img { position: relative; }
-
-/* Khung bọc phần chữ + danh sách 4 lợi thế bên phải, xếp dọc với khoảng cách rõ ràng
-   giữa đoạn giới thiệu và danh sách — trước đây whyus-text/whyus-list là 2 cột riêng,
-   giờ dồn chung 1 cột để nhường chỗ cho ảnh. */
 .whyus-content { display: flex; flex-direction: column; gap: 32px; }
 
 .whyus-text h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 34px; color: var(--walnut); margin: 0 0 16px; line-height: 1.25; }
@@ -159,9 +152,6 @@
 .whyus-item h4 { font-size: 16px; font-weight: 600; color: var(--walnut); margin: 0 0 6px; }
 .whyus-item p { font-size: 14px; color: var(--text-muted); margin: 0; line-height: 1.6; }
 
-/* Ảnh minh hoạ dưới đoạn mô tả cột trái — lấp khoảng trống khi cột phải (4 lý do)
-   cao hơn cột trái, lấy từ CMS (Admin → Giao diện Client → Trang Giới thiệu →
-   "Vì sao chọn chúng tôi") */
 .whyus-img {
   width: 100%;
   height: 280px;
@@ -182,10 +172,7 @@
   color: var(--text-muted);
 }
 
-/* ── PROCESS (dạng timeline/sơ đồ lịch trình) ──
-   Thay cho lưới 6 card rời rạc trước đây: đường kẻ dọc trung tâm nối các mốc lại
-   thành 1 chuỗi liền mạch, nội dung xen kẽ trái-phải (zigzag) để nhìn có nhịp điệu
-   hơn, đúng tinh thần "sơ đồ quy trình" thay vì chỉ là danh sách bước rời rạc. */
+/* ── PROCESS ── */
 .process-section { padding: 96px 0; background: #fff; }
 
 .process-timeline {
@@ -195,7 +182,6 @@
   padding: 12px 0;
 }
 
-/* Đường kẻ trung tâm — mờ dần ở 2 đầu cho mềm mắt thay vì cắt cụt */
 .process-timeline::before {
   content: "";
   position: absolute;
@@ -218,7 +204,6 @@
 .process-timeline-item--left { justify-content: flex-start; }
 .process-timeline-item--right { justify-content: flex-end; }
 
-/* Mốc tròn đánh số, luôn nằm giữa đường kẻ — viền trắng dày tạo cảm giác "nổi" trên line */
 .process-timeline-dot {
   position: absolute;
   top: 50%;
@@ -253,7 +238,6 @@
   box-shadow: 0 12px 28px rgba(59,42,26,.1);
 }
 
-/* Đoạn nối ngắn từ mốc tròn vào thẻ nội dung, giúp mắt dễ theo dõi mốc nào ứng với thẻ nào */
 .process-timeline-item--left .process-timeline-card::after,
 .process-timeline-item--right .process-timeline-card::after {
   content: "";
@@ -270,8 +254,6 @@
 .process-timeline-card h3 { font-size: 17px; font-weight: 600; color: var(--walnut); margin: 0 0 10px; }
 .process-timeline-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin: 0; }
 
-/* Mobile: đường kẻ + mốc dồn về sát mép trái, mọi thẻ nằm 1 cột bên phải đường kẻ
-   (bỏ zigzag trái-phải vì không đủ chỗ chia đôi màn hình trên máy hẹp) */
 @media (max-width: 768px) {
   .process-timeline::before { left: 22px; }
 
@@ -322,8 +304,6 @@
 .project-info h3 { font-size: 15px; font-weight: 600; color: var(--walnut); margin: 6px 0 6px; }
 .project-type { font-size: 13px; color: var(--text-muted); }
 
-/* Ảnh dự án thật lấy từ CMS (Admin → Giao diện Client → Trang Giới thiệu →
-   "Dự án tiêu biểu") — object-fit: cover để lấp đầy khung, không méo ảnh */
 .project-img-real {
   width: 100%;
   height: 100%;
@@ -348,9 +328,38 @@
 /* ── PARTNERS ── */
 .partners-section { padding: 80px 0; background: #fff; }
 .partners-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; }
-.partner-card { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 28px 16px; background: var(--cream); border-radius: 12px; border: 1.5px solid transparent; transition: border-color .2s; }
+.partner-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 20px;
+  min-height: 140px;
+  background: var(--cream);
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  overflow: hidden;
+  transition: border-color .2s;
+}
 .partner-card:hover { border-color: var(--gold); }
 .partner-icon { font-size: 28px; }
+/* Thẻ CÓ logo thật: bỏ hết padding để logo lấp đầy TOÀN BỘ khung thẻ, không chừa viền —
+   khác với thẻ dùng icon dự phòng (giữ padding rộng + chữ tên như cũ). */
+.partner-card--logo { padding: 0; }
+/* Logo thật lấy từ CMS (Admin → Giao diện Client → Trang Giới thiệu → "Đối tác &
+   Chứng nhận") — LẤP ĐẦY khung thẻ (width/height 100%). Vẫn dùng object-fit: contain
+   (không phải cover) để không cắt mất góc logo hay kéo méo tỉ lệ khi logo không vuông —
+   phần nền trống 2 bên (nếu có) do chính khoảng trống tự nhiên của contain tạo ra, không
+   phải do padding thẻ nữa. */
+.partner-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 140px;
+  object-fit: contain;
+}
+/* Chữ tên chỉ còn dùng khi Admin CHƯA có logo (hiện kèm icon dự phòng) */
 .partner-name { font-size: 13px; font-weight: 600; color: var(--walnut); text-align: center; }
 
 /* ── CTA ── */

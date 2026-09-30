@@ -4,6 +4,16 @@ import api from "../../services/api";
 import Reveal from "../../components/Reveal/Reveal";
 import "./ServiceList.css";
 
+// Nội dung dán từ nguồn khác (Gemini, Google Docs, web...) vào trình soạn thảo thường bị
+// Quill đổi khoảng trắng thành "&nbsp;" (khoảng trắng KHÔNG ngắt dòng) — trình duyệt không
+// tìm được chỗ xuống dòng nên chữ chạy dài tràn ra khỏi khung. Đổi lại thành khoảng trắng
+// thường TRƯỚC khi hiển thị. Riêng đoạn trống kiểu <p>&nbsp;</p> (Admin cố ý để tạo dòng
+// trắng) đổi thành <p><br></p> để vẫn giữ nguyên khoảng cách, không bị xẹp mất.
+const cleanContentHtml = (html) =>
+  (html || "")
+    .replace(/<p>(\s|&nbsp;|\u00a0)*<\/p>/g, "<p><br></p>")
+    .replace(/&nbsp;|\u00a0/g, " ");
+
 const ServiceDetail = () => {
   const { type, id } = useParams();
   const [service, setService] = useState(null);
@@ -60,7 +70,10 @@ const ServiceDetail = () => {
         <Reveal as="div" className="service-detail-content">
           <p className="service-detail-summary">{service.shortDescription}</p>
           {service.content ? (
-            <div className="service-detail-html" dangerouslySetInnerHTML={{ __html: service.content }} />
+            <div
+              className="service-detail-html"
+              dangerouslySetInnerHTML={{ __html: cleanContentHtml(service.content) }}
+            />
           ) : (
             <p>Chưa có nội dung chi tiết cho dịch vụ này.</p>
           )}
