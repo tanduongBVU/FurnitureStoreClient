@@ -90,7 +90,7 @@
   border-radius: 8px;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .navbar__link::after {
@@ -103,11 +103,12 @@
   background: var(--gold);
   border-radius: 2px;
   transform: scaleX(0);
-  transition: transform 0.25s ease;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .navbar__link:hover {
   color: var(--walnut);
+  transform: translateY(-2px);
 }
 
 .navbar__link:hover::after,
@@ -475,11 +476,25 @@ button.navbar__link:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 36px;
+  height: 40px;
   font-size: 20px;
   text-decoration: none;
   margin-right: 0;
   line-height: 1;
   flex-shrink: 0;
+  border-radius: 8px;
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.navbar__cart:hover {
+  transform: translateY(-2px) scale(1.08);
+}
+.navbar__cart:active {
+  transform: scale(0.96);
+}
+.navbar__cart:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 .navbar__cart-badge {
   position: absolute;
