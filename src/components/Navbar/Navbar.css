@@ -39,7 +39,7 @@
   height: 100%;
   display: flex;
   align-items: center;
-  gap: clamp(14px, 1.5vw, 24px);
+  gap: clamp(16px, 2vw, 32px);
 }
 
 /* ── Logo ── */
@@ -69,14 +69,16 @@
   color: var(--gold-dark);
 }
 
-/* ── Desktop Links ── */
+/* ── Desktop Links ──
+   Căn GIỮA cả cụm menu với khoảng cách đều (thay cho space-evenly trước đây làm các mục
+   giãn lệch khi bỏ nút CTA bên phải). */
 .navbar__links {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: center;
   flex: 1;
   min-width: 0;
-  gap: 0;
+  gap: clamp(16px, 2.2vw, 36px);
 }
 
 .navbar__link {
@@ -182,8 +184,8 @@ button.navbar__link:focus-visible {
   transform: translateX(-50%) translateY(-6px);
   background: #fff;
   border: 1px solid #e5ddd0;
-  border-radius: 12px;
-  box-shadow: 0 12px 32px rgba(59, 42, 26, 0.14);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(59, 42, 26, 0.16);
   padding: 10px;
   min-width: 240px;
   z-index: 50;
@@ -252,35 +254,12 @@ button.navbar__link:focus-visible {
   color: #b91c1c;
 }
 
-/* ── CTA Button + khu vực hành động (giỏ hàng / tài khoản / nút CTA) ── */
+/* ── Khu vực hành động (tìm kiếm / yêu thích / giỏ hàng / tài khoản) ── */
 .navbar__actions {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.navbar__cta {
-  display: inline-block;
-  text-decoration: none;
-  background: var(--walnut);
-  color: var(--cream);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  padding: 10px 20px;
-  border-radius: 6px;
-  border: 2px solid var(--walnut);
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-  white-space: nowrap;
-  flex-shrink: 0;
-  margin-left: 0;
-}
-
-.navbar__cta:hover {
-  background: var(--gold-dark);
-  border-color: var(--gold-dark);
-  color: #fff;
+  gap: 6px;
 }
 
 /* ── Hamburger ── */
@@ -339,7 +318,7 @@ button.navbar__link:focus-visible {
 
 .navbar__mobile--open {
   /* FIX: trước đây max-height cố định 640px + overflow:hidden khiến menu bị CẮT MẤT
-     nút Đăng xuất/CTA khi mở cả 2 accordion (Sản Phẩm + Dịch Vụ) trên máy thật — vì
+     nút Đăng xuất khi mở cả 2 accordion (Sản Phẩm + Dịch Vụ) trên máy thật — vì
      .navbar là position:fixed nên phần tràn ra ngoài không cuộn theo trang được.
      Sửa: giới hạn theo chiều cao MÀN HÌNH THẬT còn lại (trừ navbar + banner khuyến mãi)
      và cho phép TỰ CUỘN bên trong chính menu. */
@@ -426,13 +405,6 @@ button.navbar__link:focus-visible {
   opacity: 1;
 }
 
-.navbar__cta--mobile {
-  margin-top: 12px;
-  text-align: center;
-  padding: 12px 20px;
-  margin-left: 0;
-}
-
 /* ── Responsive ── */
 @media (max-width: 1100px) {
   .navbar__links,
@@ -470,27 +442,28 @@ button.navbar__link:focus-visible {
   }
 }
 
-/* ── Giỏ hàng ── */
+/* ── Nút icon tròn: Yêu thích / Giỏ hàng ── */
 .navbar__cart {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
+  width: 40px;
   height: 40px;
-  font-size: 20px;
+  color: var(--walnut);
   text-decoration: none;
-  margin-right: 0;
   line-height: 1;
   flex-shrink: 0;
-  border-radius: 8px;
-  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  border-radius: 50%;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .navbar__cart:hover {
-  transform: translateY(-2px) scale(1.08);
+  background: rgba(59, 42, 26, 0.07);
+  color: var(--gold-dark);
+  transform: translateY(-1px);
 }
 .navbar__cart:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 .navbar__cart:focus-visible {
   outline: 2px solid var(--gold);
@@ -498,96 +471,230 @@ button.navbar__link:focus-visible {
 }
 .navbar__cart-badge {
   position: absolute;
-  top: -8px;
-  right: -10px;
-  background: #c8a96e;
-  color: #fff;
+  top: 1px;
+  right: -1px;
+  background: var(--walnut);
+  color: var(--cream);
   font-size: 10px;
   font-weight: 700;
   min-width: 17px;
   height: 17px;
   padding: 0 4px;
-  border-radius: 50%;
+  border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 0 2px rgba(245, 240, 232, 0.95);
 }
 
-/* ── Đăng nhập / Tài khoản ── */
+/* ── Đăng nhập (khách chưa đăng nhập): nút viên thuốc nổi bật, thay chỗ nút "Khám Phá Ngay" cũ ── */
 .navbar__login-link {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: var(--walnut);
+  color: var(--cream);
   font-size: 14px;
-  color: #3b2a1a;
+  font-weight: 600;
   text-decoration: none;
-  font-weight: 500;
-  margin-right: 0;
   white-space: nowrap;
   flex-shrink: 0;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
-.navbar__login-link:hover { color: #a8854a; }
+.navbar__login-link:hover {
+  background: var(--gold-dark);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(59, 42, 26, 0.18);
+}
+.navbar__login-link:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
 
+/* ── Avatar tròn (dùng ở nút tài khoản, menu thả xuống và menu mobile) ── */
+.navbar__avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--gold);
+  color: var(--walnut);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+.navbar__avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.navbar__avatar--lg {
+  width: 42px;
+  height: 42px;
+  font-size: 18px;
+}
+
+/* ── Nút tài khoản (viên thuốc: avatar + tên + mũi tên) ── */
 .navbar__account {
   position: relative;
-  margin-right: 0;
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  margin-left: 4px;
 }
 .navbar__account-btn {
-  background: none;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 4px;
+  border: 1px solid rgba(200, 169, 110, 0.55);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  color: var(--walnut);
+  font-family: inherit;
   font-size: 14px;
-  font-weight: 500;
-  color: #3b2a1a;
-  cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 8px;
+  font-weight: 600;
   white-space: nowrap;
-  transition: background .15s;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
-.navbar__account-btn:hover { background: rgba(59,42,26,.06); }
+.navbar__account-btn:hover,
+.navbar__account-btn--open {
+  border-color: var(--gold);
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(59, 42, 26, 0.1);
+}
+.navbar__account-btn:focus { outline: none; }
+.navbar__account-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.navbar__account-name {
+  max-width: 96px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.navbar__account-chevron {
+  color: var(--gold-dark);
+  transition: transform 0.2s ease;
+}
+.navbar__account-btn--open .navbar__account-chevron {
+  transform: rotate(180deg);
+}
 
+/* ── Menu thả xuống của tài khoản ── */
 .navbar__account-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 12px);
   right: 0;
   background: #fff;
   border: 1px solid #e5ddd0;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(59,42,26,.12);
-  padding: 12px;
-  min-width: 200px;
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(59, 42, 26, 0.16);
+  padding: 10px;
+  min-width: 250px;
   z-index: 50;
 }
-.navbar__account-email { font-size: 12px; color: #7a6a58; margin: 0 0 10px; padding: 0 4px; word-break: break-all; }
+.navbar__account-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 6px 14px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(200, 169, 110, 0.28);
+}
+.navbar__account-head-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.navbar__account-head-text strong {
+  font-size: 14px;
+  color: var(--walnut);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.navbar__account-head-text span {
+  font-size: 12px;
+  color: #7a6a58;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .navbar__account-link {
   display: block;
   width: 100%;
-  padding: 9px 12px;
+  box-sizing: border-box;
+  padding: 10px 12px;
   border-radius: 8px;
-  color: #3b2a1a;
-  font-size: 13px;
+  color: var(--text-nav);
+  font-size: 13.5px;
   font-weight: 500;
   text-decoration: none;
-  transition: background .15s;
-  margin-bottom: 4px;
+  transition: background 0.15s ease, color 0.15s ease;
+  margin-bottom: 2px;
 }
-.navbar__account-link:hover { background: rgba(59,42,26,.06); }
-.navbar__account-dropdown button {
+.navbar__account-link:hover {
+  background: rgba(200, 169, 110, 0.14);
+  color: var(--walnut);
+}
+.navbar__account-logout {
   width: 100%;
-  padding: 9px 12px;
+  margin-top: 6px;
+  padding: 10px 12px;
   border: none;
   border-radius: 8px;
-  background: rgba(239,68,68,.08);
+  background: rgba(239, 68, 68, 0.08);
   color: #b91c1c;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
-  cursor: pointer;
   font-family: inherit;
-  transition: background .15s;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
 }
-.navbar__account-dropdown button:hover { background: #ef4444; color: #fff; }
+.navbar__account-logout:hover {
+  background: #ef4444;
+  color: #fff;
+}
 
-.navbar__mobile-user { padding: 8px 24px; font-size: 13px; color: #7a6a58; margin: 0; }
+/* ── Khối người dùng + Đăng nhập (mobile) ── */
+.navbar__mobile-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(200, 169, 110, 0.2);
+}
+.navbar__mobile-user-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.navbar__mobile-user-text strong {
+  font-size: 15px;
+  color: var(--walnut);
+}
+.navbar__mobile-user-text span {
+  font-size: 12px;
+  color: #7a6a58;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .navbar__mobile-logout {
   background: none;
   border: none;
@@ -596,13 +703,26 @@ button.navbar__link:focus-visible {
   font-family: inherit;
   cursor: pointer;
 }
+.navbar__mobile-login {
+  margin-top: 8px;
+  text-align: center;
+  background: var(--walnut);
+  color: var(--cream);
+  border-radius: 10px;
+  border-bottom: none;
+  font-weight: 600;
+}
+.navbar__mobile-login:hover {
+  color: #fff;
+  padding-left: 0;
+}
 
 /* Keep the desktop row balanced on smaller laptop screens. */
 @media (min-width: 1101px) and (max-width: 1360px) {
   .navbar__container {
     padding-right: 16px;
     padding-left: 16px;
-    gap: 10px;
+    gap: 12px;
   }
 
   .navbar__logo-text {
@@ -610,27 +730,22 @@ button.navbar__link:focus-visible {
   }
 
   .navbar__links {
-    gap: 0;
-    justify-content: space-evenly;
+    gap: clamp(12px, 1.6vw, 22px);
   }
 
   .navbar__link {
-    font-size: 13px;
-    padding-right: 0;
-    padding-left: 0;
+    font-size: 13.5px;
   }
 
   .navbar__actions {
-    gap: 5px;
+    gap: 4px;
   }
 
   .navbar__actions .navbar-search__form {
-    width: 132px;
+    width: 140px;
   }
 
-  .navbar__cta {
-    font-size: 13px;
-    padding: 9px 12px;
-    margin-left: 0;
+  .navbar__account-name {
+    max-width: 70px;
   }
 }

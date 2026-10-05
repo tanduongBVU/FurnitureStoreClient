@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../../contexts/CartContext";
 import { useWishlist } from "../../contexts/WishlistContext";
@@ -24,6 +24,39 @@ const SERVICE_LINKS = [
   { path: "/projects", label: "Dự án kiến trúc", icon: "🏛️" },
 ];
 
+// Chữ cái đầu của TÊN (từ cuối trong họ tên) — dùng làm avatar khi chưa có ảnh
+const getInitial = (name) => {
+  const parts = (name || "").trim().split(/\s+/).filter(Boolean);
+  const last = parts[parts.length - 1] || "?";
+  return last.charAt(0).toUpperCase();
+};
+
+// Avatar tròn: chữ cái đầu làm nền, ảnh thật (nếu có) phủ lên trên; ảnh lỗi thì tự ẩn để lộ chữ cái
+const Avatar = ({ user, large = false }) => (
+  <span className={`navbar__avatar ${large ? "navbar__avatar--lg" : ""}`} aria-hidden="true">
+    {getInitial(user?.name)}
+    {user?.avatarUrl && (
+      <img src={user.avatarUrl} alt="" onError={(e) => (e.currentTarget.style.display = "none")} />
+    )}
+  </span>
+);
+
+// Icon SVG nét mảnh (thay ký tự ♡ và emoji 🛒)
+const HeartIcon = () => (
+  <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor"
+    strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z" />
+  </svg>
+);
+const CartIcon = () => (
+  <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor"
+    strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="9" cy="21" r="1" />
+    <circle cx="20" cy="21" r="1" />
+    <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6" />
+  </svg>
+);
+
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -32,6 +65,7 @@ const Navbar = () => {
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const accountRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { totalItems } = useCart();
@@ -52,6 +86,16 @@ const Navbar = () => {
     setMobileProductsOpen(false);
     setMobileServicesOpen(false);
   }, [location]);
+
+  // Bấm ra ngoài khung tài khoản thì tự đóng menu thả xuống
+  useEffect(() => {
+    if (!accountOpen) return;
+    const onDown = (e) => {
+      if (accountRef.current && !accountRef.current.contains(e.target)) setAccountOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [accountOpen]);
 
   const navLinks = [
     { path: "/", label: "Trang Chủ" },
@@ -193,45 +237,60 @@ const Navbar = () => {
           </Link>
         </nav>
 
-        {/* CTA */}
+        {/* Khu vực hành động: tìm kiếm / yêu thích / giỏ hàng / tài khoản */}
         <div className="navbar__actions">
           <NavbarSearch />
 
-          <Link to="/wishlist" className="navbar__cart" aria-label="Yêu thích">
-            ♡
+          <Link to="/wishlist" className="navbar__cart" aria-label="Yêu thích" title="Yêu thích">
+            <HeartIcon />
             {wishlistCount > 0 && <span className="navbar__cart-badge">{wishlistCount}</span>}
           </Link>
 
-          <Link to="/cart" className="navbar__cart" aria-label="Giỏ hàng">
-            🛒
+          <Link to="/cart" className="navbar__cart" aria-label="Giỏ hàng" title="Giỏ hàng">
+            <CartIcon />
             {totalItems > 0 && <span className="navbar__cart-badge">{totalItems}</span>}
           </Link>
 
           {isLoggedIn ? (
-            <div className="navbar__account">
-              <button className="navbar__account-btn" onClick={() => setAccountOpen(o => !o)}>
-                👤 {user.name.split(" ").slice(-1)[0]}
+            <div className="navbar__account" ref={accountRef}>
+              <button
+                type="button"
+                className={`navbar__account-btn ${accountOpen ? "navbar__account-btn--open" : ""}`}
+                onClick={() => setAccountOpen((o) => !o)}
+                aria-haspopup="true"
+                aria-expanded={accountOpen}
+              >
+                <Avatar user={user} />
+                <span className="navbar__account-name">{user.name.split(" ").slice(-1)[0]}</span>
+                <svg className="navbar__account-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none"
+                  stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
               </button>
               {accountOpen && (
                 <div className="navbar__account-dropdown">
-                  <p className="navbar__account-email">{user.email}</p>
+                  <div className="navbar__account-head">
+                    <Avatar user={user} large />
+                    <div className="navbar__account-head-text">
+                      <strong>{user.name}</strong>
+                      <span>{user.email}</span>
+                    </div>
+                  </div>
                   <Link to="/orders" className="navbar__account-link" onClick={() => setAccountOpen(false)}>
                     Đơn hàng của tôi
                   </Link>
                   <Link to="/account" className="navbar__account-link" onClick={() => setAccountOpen(false)}>
                     Tài khoản của tôi
                   </Link>
-                  <button onClick={handleLogout}>Đăng xuất</button>
+                  <button type="button" className="navbar__account-logout" onClick={handleLogout}>
+                    Đăng xuất
+                  </button>
                 </div>
               )}
             </div>
           ) : (
             <Link to="/login" className="navbar__login-link">Đăng nhập</Link>
           )}
-
-          <Link to="/products" className="navbar__cta">
-            Khám Phá Ngay
-          </Link>
         </div>
 
         {/* Hamburger */}
@@ -268,7 +327,7 @@ const Navbar = () => {
           <button
             type="button"
             className="navbar__mobile-link navbar__mobile-link--toggle"
-            onClick={() => setMobileProductsOpen(o => !o)}
+            onClick={() => setMobileProductsOpen((o) => !o)}
           >
             Sản Phẩm
             <span className={`navbar__mobile-caret ${mobileProductsOpen ? "navbar__mobile-caret--open" : ""}`}>▾</span>
@@ -292,7 +351,7 @@ const Navbar = () => {
           <button
             type="button"
             className="navbar__mobile-link navbar__mobile-link--toggle"
-            onClick={() => setMobileServicesOpen(o => !o)}
+            onClick={() => setMobileServicesOpen((o) => !o)}
           >
             Dịch Vụ
             <span className={`navbar__mobile-caret ${mobileServicesOpen ? "navbar__mobile-caret--open" : ""}`}>▾</span>
@@ -337,7 +396,13 @@ const Navbar = () => {
         </Link>
         {isLoggedIn ? (
           <>
-            <p className="navbar__mobile-user">Xin chào, {user.name}</p>
+            <div className="navbar__mobile-user">
+              <Avatar user={user} large />
+              <div className="navbar__mobile-user-text">
+                <strong>{user.name}</strong>
+                <span>{user.email}</span>
+              </div>
+            </div>
             <Link to="/orders" className="navbar__mobile-link">Đơn hàng của tôi</Link>
             <Link to="/account" className="navbar__mobile-link">Tài khoản của tôi</Link>
             <button className="navbar__mobile-link navbar__mobile-logout" onClick={handleLogout}>
@@ -345,11 +410,8 @@ const Navbar = () => {
             </button>
           </>
         ) : (
-          <Link to="/login" className="navbar__mobile-link">Đăng nhập</Link>
+          <Link to="/login" className="navbar__mobile-link navbar__mobile-login">Đăng nhập</Link>
         )}
-        <Link to="/products" className="navbar__cta navbar__cta--mobile">
-          Khám Phá Ngay
-        </Link>
       </div>
     </header>
   );

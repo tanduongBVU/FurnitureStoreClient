@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import api from "../services/api";
 
 const AuthContext = createContext(null);
@@ -12,6 +12,31 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
+
+  // Đồng bộ ảnh đại diện từ Backend mỗi khi có người dùng đăng nhập (kể cả khi tải lại trang).
+  // Các API login/register/google chỉ trả { token, id, name, email, role } nên chưa có avatarUrl —
+  // lấy bổ sung từ /Auth/me để Navbar và trang Tài khoản luôn hiện đúng ảnh. Lỗi thì bỏ qua êm
+  // (chỉ mất ảnh, không ảnh hưởng đăng nhập).
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    api
+      .get("/Auth/me")
+      .then((res) => {
+        if (cancelled) return;
+        const avatarUrl = res.data.avatarUrl || "";
+        setUser((prev) => {
+          if (!prev || (prev.avatarUrl || "") === avatarUrl) return prev;
+          const updated = { ...prev, avatarUrl };
+          localStorage.setItem("clientUser", JSON.stringify(updated));
+          return updated;
+        });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   const login = async (email, password) => {
     const res = await api.post("/Auth/login", { email, password });
@@ -61,6 +86,15 @@ export const AuthProvider = ({ children }) => {
     return updated;
   };
 
+  // Đặt ảnh đại diện (truyền URL do /Upload trả về) hoặc xoá ảnh (truyền chuỗi rỗng "")
+  const updateAvatar = async (avatarUrl) => {
+    const res = await api.put("/Auth/me/avatar", { avatarUrl });
+    const updated = { ...user, avatarUrl: res.data.avatarUrl || "" };
+    localStorage.setItem("clientUser", JSON.stringify(updated));
+    setUser(updated);
+    return updated;
+  };
+
   // Đổi mật khẩu — yêu cầu nhập đúng mật khẩu hiện tại (backend tự kiểm tra)
   const changePassword = async (currentPassword, newPassword) => {
     await api.put("/Auth/change-password", { currentPassword, newPassword });
@@ -74,7 +108,11 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, loginWithGoogle, logout, updateProfile, changePassword, isLoggedIn: !!user }}
+      value={{
+        user, login, register, loginWithGoogle, logout,
+        updateProfile, updateAvatar, changePassword,
+        isLoggedIn: !!user,
+      }}
     >
       {children}
     </AuthContext.Provider>

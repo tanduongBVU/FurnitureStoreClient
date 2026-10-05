@@ -1,80 +1,157 @@
 :root {
   --walnut: #3b2a1a;
   --cream: #f5f0e8;
+  --paper: #faf7f2;
   --gold: #c8a96e;
   --gold-d: #a8854a;
   --text: #2c1f10;
   --text-muted: #7a6a58;
+  --line: rgba(200,169,110,.28);
 }
 
-.myaccount-page { width: 100%; min-height: 60vh; background: #fff; }
+/* Nền trang kem nhạt để các card trắng nổi lên, thay vì trắng + card kem phẳng */
+.myaccount-page { width: 100%; min-height: 60vh; background: var(--paper); }
 
-/* Nới rộng khung chứa — trước đây 640px làm trang bị dồn vào giữa, 2 bên
-   trống rất nhiều trên màn hình lớn. 1100px khớp với các trang khác trong
-   site (VD Products, Home) để nhất quán bố cục toàn hệ thống. */
 .myaccount-page .section-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 
 .myaccount-page .eyebrow { display: block; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-d); margin-bottom: 10px; }
 
+/* ── Header: chừa thêm đáy để card phía dưới "gác" lên mép nâu ── */
 .myaccount-header {
   background: var(--walnut);
-  padding: 140px 0 48px;
+  padding: 140px 0 96px;
 }
-.myaccount-header h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 38px; color: #fff; margin: 0 0 10px; }
+.myaccount-header h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 38px; color: #fff; margin: 0 0 8px; }
 .myaccount-header p { color: rgba(255,255,255,.65); font-size: 15px; margin: 0; }
 
-/* Đổi từ flex-column (2 card xếp chồng dọc, dồn giữa) sang grid 2 cột song
-   song — tận dụng chiều ngang, giống bố cục "Hồ sơ | Bảo mật" chuẩn của các
-   trang tài khoản. align-items: start để 2 card không bị kéo giãn bằng
-   chiều cao nhau khi nội dung 2 bên chênh lệch (form đổi mật khẩu ngắn hơn). */
-.myaccount-body {
-  padding: 48px 24px 96px;
+.myaccount-hero { display: flex; align-items: center; gap: 24px; }
+.myaccount-hero__text { min-width: 0; }
+.myaccount-hero__text h1 { overflow-wrap: anywhere; }
+.account-avatar {
+  width: 84px; height: 84px; flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--walnut);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 38px; font-weight: 700;
+  box-shadow: 0 0 0 4px rgba(200,169,110,.25);
+}
+
+/* ── Bố cục: menu trái + nội dung phải, kéo lên đè mép header.
+   Dùng cùng độ đặc hiệu với ".myaccount-page .section-inner" (đặt SAU nó) để KHÔNG bị ghi đè
+   padding — đây là lỗi khiến card dính sát header ở bản cũ. ── */
+.myaccount-page .myaccount-body {
+  margin: -48px auto 0;
+  padding: 0 24px 96px;
+  position: relative;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
+  grid-template-columns: 250px 1fr;
+  gap: 24px;
   align-items: start;
 }
 
-.account-card {
-  background: var(--cream);
-  border-radius: 16px;
-  padding: 32px;
+/* Menu */
+.account-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 10px;
+  box-shadow: 0 8px 28px rgba(59,42,26,.08);
+  position: sticky;
+  top: 96px;
 }
-.account-card h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 22px; color: var(--walnut); margin: 0 0 22px; }
+.account-nav__item {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: none; border-radius: 12px;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit; font-size: 14px; font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.account-nav__item:hover { background: var(--cream); }
+.account-nav__item--active,
+.account-nav__item--active:hover { background: var(--walnut); color: var(--cream); }
+.account-nav__icon { display: inline-flex; color: var(--gold-d); }
+.account-nav__item--active .account-nav__icon { color: var(--gold); }
+
+.account-content { min-width: 0; }
+
+/* Card nội dung: trắng, viền mảnh, bóng nhẹ */
+.account-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 32px 36px 36px;
+  box-shadow: 0 8px 28px rgba(59,42,26,.08);
+}
+.account-card h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 24px; color: var(--walnut); margin: 0 0 6px; }
+.account-card__sub { margin: 0 0 24px; padding-bottom: 20px; border-bottom: 1px solid var(--line); font-size: 13.5px; color: var(--text-muted); }
 
 .account-loading { color: var(--text-muted); font-size: 14px; }
 
-.account-form { display: flex; flex-direction: column; gap: 18px; }
+/* ── Form ── */
+.account-form { display: flex; flex-direction: column; gap: 18px; max-width: none; }
+/* Form hồ sơ: lưới 2 cột (họ tên | số điện thoại), email và địa chỉ chiếm cả hàng */
+.account-form--grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 20px;
+  max-width: none;
+}
+.account-field--full,
+.account-form--grid .account-msg { grid-column: 1 / -1; }
+.account-form--grid .btn-dark { grid-column: 1 / -1; justify-self: start; }
 
-.account-field { display: flex; flex-direction: column; gap: 6px; }
+.account-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
 .account-field label { font-size: 13px; font-weight: 600; color: var(--walnut); }
 .account-field input,
 .account-field textarea {
   padding: 12px 14px;
-  border-radius: 8px;
-  border: 1.5px solid rgba(200,169,110,.35);
-  background: #fff;
+  border-radius: 10px;
+  border: 1.5px solid var(--line);
+  background: var(--paper);
   font-size: 14px;
   font-family: inherit;
   outline: none;
-  transition: border-color .2s;
+  transition: border-color .2s, box-shadow .2s, background .2s;
   color: var(--text);
   resize: vertical;
+  width: 100%;
+  box-sizing: border-box;
 }
 .account-field input:focus,
-.account-field textarea:focus { border-color: var(--gold); }
-.account-field input:disabled { background: rgba(200,169,110,.08); color: var(--text-muted); cursor: not-allowed; }
+.account-field textarea:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 3px rgba(200,169,110,.2); }
+.account-field input:disabled { background: var(--cream); color: var(--text-muted); cursor: not-allowed; }
 
 .account-hint { font-size: 12px; color: var(--text-muted); }
+.account-hint--error { color: #b94141; }
 
-.account-msg {
-  font-size: 13px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  margin: 0;
-}
+.account-msg { font-size: 13px; padding: 10px 14px; border-radius: 10px; margin: 0; }
 .account-msg--success { background: rgba(122,184,122,.15); color: #3f7a3f; }
 .account-msg--error { background: rgba(224,122,122,.15); color: #b94141; }
+
+/* Độ mạnh mật khẩu + nút hiện mật khẩu */
+.pw-strength { display: flex; align-items: center; gap: 10px; }
+.pw-strength__bars { display: flex; gap: 4px; flex: 1; }
+.pw-strength__bar { flex: 1; height: 5px; border-radius: 3px; background: rgba(59,42,26,.12); transition: background .2s; }
+.pw-strength__bar--l1 { background: #d9534f; }
+.pw-strength__bar--l2 { background: #e0a030; }
+.pw-strength__bar--l3 { background: #4a9a4a; }
+.pw-strength__label { font-size: 12px; font-weight: 600; min-width: 74px; text-align: right; }
+.pw-strength__label--l1 { color: #b94141; }
+.pw-strength__label--l2 { color: #b9770e; }
+.pw-strength__label--l3 { color: #3f7a3f; }
+
+.pw-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); cursor: pointer; align-self: flex-start; user-select: none; }
+.pw-toggle input { width: 16px; height: 16px; accent-color: var(--walnut); cursor: pointer; }
 
 .myaccount-page .btn-dark {
   display: inline-flex;
@@ -83,25 +160,125 @@
   padding: 13px 28px;
   background: var(--walnut);
   color: var(--cream);
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 15px;
   font-weight: 600;
   border: 2px solid var(--walnut);
   cursor: pointer;
-  transition: background .2s, color .2s;
+  transition: background .2s, color .2s, transform .15s;
   font-family: inherit;
   align-self: flex-start;
+  text-decoration: none;
 }
 .myaccount-page .btn-dark:hover:not(:disabled) { background: var(--gold-d); border-color: var(--gold-d); }
+.myaccount-page .btn-dark:active:not(:disabled) { transform: translateY(1px); }
 .myaccount-page .btn-dark:disabled { opacity: .6; cursor: not-allowed; }
 
-/* Màn hình hẹp — không đủ chỗ chia 2 cột, quay lại xếp dọc như cũ */
+/* ── Tab Tổng quan ── */
+.acc-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 32px; }
+.acc-stat {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  display: flex; flex-direction: column; gap: 4px;
+  min-width: 0;
+}
+.acc-stat__icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: rgba(200,169,110,.18); color: var(--gold-d);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 8px;
+}
+.acc-stat__value { font-family: 'Playfair Display', Georgia, serif; font-size: 26px; font-weight: 700; color: var(--walnut); line-height: 1.2; overflow-wrap: anywhere; }
+/* Số tiền dài: thu nhỏ chữ để không bị chật ô */
+.acc-stat__value--money { font-size: clamp(16px, 1.7vw, 21px); line-height: 1.5; }
+.acc-stat__label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+.acc-recent__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 12px; }
+.acc-recent__header h3 { margin: 0; font-size: 17px; color: var(--walnut); font-family: 'Playfair Display', Georgia, serif; }
+.acc-recent__link { font-size: 13px; font-weight: 600; color: var(--gold-d); text-decoration: none; }
+.acc-recent__link:hover { text-decoration: underline; }
+
+.acc-orders { display: flex; flex-direction: column; gap: 10px; }
+.acc-order {
+  display: flex; align-items: center; gap: 14px;
+  background: #fff; border: 1px solid var(--line); border-radius: 14px;
+  padding: 14px 18px;
+  text-decoration: none; color: var(--text);
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.acc-order:hover { border-color: var(--gold); box-shadow: 0 6px 18px rgba(59,42,26,.08); transform: translateY(-1px); }
+.acc-order__left { display: flex; flex-direction: column; gap: 3px; font-size: 14px; flex: 1; min-width: 0; }
+.acc-order__left span { color: var(--text-muted); font-size: 12px; }
+.acc-order__right { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+.acc-order__right strong { color: var(--walnut); white-space: nowrap; }
+.acc-order__chevron { display: inline-flex; color: var(--gold-d); }
+
+.acc-status { display: inline-flex; padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.acc-status--done { background: rgba(122,184,122,.18); color: #3f7a3f; }
+.acc-status--shipping { background: rgba(79,114,227,.14); color: #3d5bc4; }
+.acc-status--processing { background: rgba(224,160,48,.18); color: #b9770e; }
+.acc-status--cancelled { background: rgba(224,122,122,.18); color: #b94141; }
+
+.acc-empty { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; color: var(--text-muted); font-size: 14px; }
+.acc-empty p { margin: 0; }
+
+/* ── Responsive ── */
 @media (max-width: 900px) {
-  .myaccount-body { grid-template-columns: 1fr; }
+  .myaccount-page .myaccount-body { grid-template-columns: 1fr; gap: 18px; margin-top: -40px; }
+  .account-nav { flex-direction: row; overflow-x: auto; position: static; }
+  .account-nav__item { width: auto; white-space: nowrap; }
+}
+@media (max-width: 700px) {
+  .acc-stats { grid-template-columns: 1fr; }
+  .account-form--grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .myaccount-header { padding: 120px 0 80px; }
+  .myaccount-header h1 { font-size: 28px; }
+  .myaccount-hero { gap: 16px; }
+  .account-avatar { width: 64px; height: 64px; font-size: 28px; }
+  .account-card { padding: 24px 20px 28px; }
+  .acc-order { flex-wrap: wrap; }
 }
 
-@media (max-width: 600px) {
-  .myaccount-header { padding: 120px 0 36px; }
-  .myaccount-header h1 { font-size: 28px; }
-  .account-card { padding: 24px 20px; }
+/* ── Ảnh đại diện: ảnh thật + nút đổi ảnh ── */
+.account-avatar-wrap { position: relative; flex-shrink: 0; }
+.account-avatar { overflow: hidden; }
+.account-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.account-avatar-edit {
+  position: absolute; right: -2px; bottom: -2px;
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--cream); color: var(--walnut);
+  border: 2px solid var(--walnut);
+  cursor: pointer;
+  transition: background .2s, transform .15s;
 }
+.account-avatar-edit:hover:not(:disabled) { background: var(--gold); transform: scale(1.06); }
+.account-avatar-edit:disabled { opacity: .6; cursor: wait; }
+
+.myaccount-hero__meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 13px; color: rgba(255,255,255,.55); }
+.account-avatar-remove {
+  background: none; border: none; padding: 0;
+  font-family: inherit; font-size: 13px; color: var(--gold);
+  text-decoration: underline; cursor: pointer;
+}
+.account-avatar-remove:hover { color: #fff; }
+.account-avatar-msg { margin: 8px 0 0 !important; font-size: 13px !important; color: #f0a0a0 !important; }
+
+@media (max-width: 600px) {
+  .account-avatar-edit { width: 28px; height: 28px; }
+}
+
+/* ── Viền focus: bỏ vòng trắng/xanh mặc định của trình duyệt (gây cảm giác "viền đôi" ở mục menu
+   đang chọn), thay bằng vòng vàng gọn — chỉ hiện khi điều hướng bằng bàn phím ── */
+.account-nav__item:focus,
+.account-avatar-edit:focus,
+.account-avatar-remove:focus { outline: none; }
+.account-nav__item:focus-visible,
+.account-avatar-edit:focus-visible,
+.account-avatar-remove:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.myaccount-page .btn-dark:focus { outline: none; }
+.myaccount-page .btn-dark:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
