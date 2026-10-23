@@ -131,6 +131,10 @@ export default function MyOrders() {
               <div className="orders-list">
                 {visibleOrders.map((o, idx) => {
                   const isOpen = openId === o.id;
+                  // Chi tiết giảm giá (chỉ có ở đơn tạo SAU khi có 2 cột này; đơn cũ = 0 nên không hiện)
+                  const bundleDiscount = Number(o.bundleDiscount || 0);
+                  const couponDiscount = Number(o.couponDiscount || 0);
+                  const hasDiscount = bundleDiscount > 0 || couponDiscount > 0;
                   return (
                     // Reveal chỉ bọc ở cấp order-card (không bọc riêng order-details bên trong) —
                     // vì phần chi tiết ẩn/hiện theo state khi bấm mở, nếu Reveal lại tự theo dõi
@@ -194,6 +198,28 @@ export default function MyOrders() {
                               <span>Địa chỉ giao hàng</span>
                               <strong>{o.address}</strong>
                             </div>
+
+                            {hasDiscount && (
+                              <>
+                                <div className="order-meta__row">
+                                  <span>Tạm tính</span>
+                                  <strong>{formatPrice(Number(o.total) + bundleDiscount + couponDiscount)}</strong>
+                                </div>
+                                {bundleDiscount > 0 && (
+                                  <div className="order-meta__row">
+                                    <span>Giảm giá combo</span>
+                                    <strong style={{ color: "#b3492f" }}>−{formatPrice(bundleDiscount)}</strong>
+                                  </div>
+                                )}
+                                {couponDiscount > 0 && (
+                                  <div className="order-meta__row">
+                                    <span>Mã giảm giá{o.couponCode ? ` (${o.couponCode})` : ""}</span>
+                                    <strong style={{ color: "#b3492f" }}>−{formatPrice(couponDiscount)}</strong>
+                                  </div>
+                                )}
+                              </>
+                            )}
+
                             <div className="order-meta__row order-meta__row--total">
                               <span>Tổng cộng</span>
                               <strong>{formatPrice(o.total)}</strong>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useCart } from "../../contexts/CartContext";
@@ -9,7 +9,9 @@ import RatingStars from "../../components/RatingStars/RatingStars";
 import Reveal from "../../components/Reveal/Reveal";
 import ProductReviews from "../../components/ProductReviews/ProductReviews";
 import SEO from "../../components/SEO/SEO";
+import { sanitizeRichHtml } from "../../utils/sanitizeHtml";
 import "./ProductDetail.css";
+import "./ProductDetailContent.css";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -67,6 +69,11 @@ const ProductDetail = () => {
 
   const hasDiscount = product?.discountPercent > 0;
   const salePrice = activePrice * (1 - (product?.discountPercent || 0) / 100);
+
+  // "Thông tin chi tiết" (HTML do Admin soạn) — LỌC an toàn trước khi hiển thị. useMemo để chỉ lọc lại
+  // khi nội dung đổi, không lọc lại mỗi lần đổi số lượng/biến thể. Rỗng → ẩn hẳn cả mục.
+  const detailHtml = useMemo(() => sanitizeRichHtml(product?.detailContent), [product?.detailContent]);
+  const hasDetail = detailHtml.replace(/<[^>]*>/g, "").trim().length > 0 || /<(img|table)\b/i.test(detailHtml);
 
   // Ảnh chính + tối đa 4 ảnh phụ (product.images là chuỗi "url1,url2,..." từ Backend) —
   // hiện thành cột thumbnail bên trái, CHỈ khi có ít nhất 1 ảnh phụ (sản phẩm cũ chưa có
@@ -287,6 +294,18 @@ const ProductDetail = () => {
             )}
           </Reveal>
         </div>
+
+        {/* ── THÔNG TIN CHI TIẾT — chữ định dạng, bảng thông số, ảnh, link do Admin soạn.
+            Không có nội dung thì ẩn hẳn cả mục (sản phẩm cũ vẫn hiển thị như trước). ── */}
+        {hasDetail && (
+          <section className="pd-detail">
+            <h2 className="pd-detail__title">Thông tin chi tiết</h2>
+            <div
+              className="pd-detail__content"
+              dangerouslySetInnerHTML={{ __html: detailHtml }}
+            />
+          </section>
+        )}
 
         <ProductReviews productId={product.id} />
 

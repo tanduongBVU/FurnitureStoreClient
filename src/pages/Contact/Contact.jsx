@@ -2,25 +2,52 @@ import { useState } from "react";
 import api from "../../services/api";
 import { useSettings } from "../../contexts/SettingsContext";
 import Reveal from "../../components/Reveal/Reveal";
+import FieldError from "../../components/FieldError/FieldError";
+import useFormValidation from "../../hooks/useFormValidation";
+import { required, email, phoneVN, minLength, maxLength } from "../../utils/validators";
 import "./Contact.css";
+
+// Luật kiểm tra từng ô — lỗi hiện chữ đỏ ngay dưới ô nhập
+const RULES = {
+  name: [
+    required("Vui lòng nhập họ và tên."),
+    minLength(2, "Họ tên cần ít nhất 2 ký tự."),
+    maxLength(100, "Họ tên tối đa 100 ký tự."),
+  ],
+  phone: [required("Vui lòng nhập số điện thoại."), phoneVN()],
+  email: [required("Vui lòng nhập email."), email()],
+  message: [
+    required("Vui lòng nhập nội dung cần tư vấn."),
+    minLength(10, "Nội dung quá ngắn, vui lòng mô tả rõ hơn (ít nhất 10 ký tự)."),
+    maxLength(2000, "Nội dung tối đa 2000 ký tự."),
+  ],
+};
 
 const Contact = () => {
   const { get } = useSettings();
   const [form, setForm] = useState({ name: "", phone: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState(""); // "", "success", "error"
-  const setField = (f, v) => setForm(p => ({ ...p, [f]: v }));
+  const { errors, validateField, validateAll, clearError } = useFormValidation(RULES);
+
+  // Gõ lại thì xoá lỗi của chính ô đó
+  const setField = (f, v) => {
+    setForm(p => ({ ...p, [f]: v }));
+    clearError(f);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSending(true);
     setStatus("");
+    if (!validateAll(form)) return;
+
+    setSending(true);
     try {
       await api.post("/Contacts", {
-        name: form.name,
-        phone: form.phone,
-        email: form.email,
-        message: form.message,
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim(),
+        message: form.message.trim(),
         status: "Mới",
       });
       setStatus("success");
@@ -101,7 +128,7 @@ const Contact = () => {
           </div>
         </Reveal>
 
-        <Reveal as="form" className="contact-form-col" direction="right" delay={120} onSubmit={handleSubmit}>
+        <Reveal as="form" className="contact-form-col" direction="right" delay={120} onSubmit={handleSubmit} noValidate>
           <h3>Gửi yêu cầu tư vấn</h3>
 
           {status === "success" && (
@@ -119,41 +146,59 @@ const Contact = () => {
             <label>Họ và tên *</label>
             <input
               type="text"
+              name="name"
               placeholder="Nguyễn Văn A"
+              className={errors.name ? "is-invalid" : ""}
               value={form.name}
               onChange={e => setField("name", e.target.value)}
-              required
+              onBlur={() => validateField("name", form)}
+              autoComplete="name"
             />
+            <FieldError message={errors.name} />
           </div>
           <div className="contact-form-field">
             <label>Số điện thoại *</label>
             <input
               type="tel"
+              name="phone"
               placeholder="09xxxxxxxx"
+              className={errors.phone ? "is-invalid" : ""}
               value={form.phone}
               onChange={e => setField("phone", e.target.value)}
-              required
+              onBlur={() => validateField("phone", form)}
+              autoComplete="tel"
             />
+            <FieldError message={errors.phone} />
           </div>
           <div className="contact-form-field">
             <label>Email *</label>
+            {/* type="text" + inputMode="email" (thay cho type="email") để trình duyệt KHÔNG tự hiện
+                bong bóng báo lỗi riêng đè lên lỗi chữ đỏ của mình; bàn phím điện thoại vẫn là bàn phím email */}
             <input
-              type="email"
+              type="text"
+              inputMode="email"
+              name="email"
               placeholder="ban@email.com"
+              className={errors.email ? "is-invalid" : ""}
               value={form.email}
               onChange={e => setField("email", e.target.value)}
-              required
+              onBlur={() => validateField("email", form)}
+              autoComplete="email"
             />
+            <FieldError message={errors.email} />
           </div>
           <div className="contact-form-field">
             <label>Nội dung *</label>
             <textarea
               rows={5}
+              name="message"
               placeholder="Nội dung cần tư vấn..."
+              className={errors.message ? "is-invalid" : ""}
               value={form.message}
               onChange={e => setField("message", e.target.value)}
-              required
+              onBlur={() => validateField("message", form)}
             />
+            <FieldError message={errors.message} />
           </div>
 
           <button type="submit" className="contact-form-submit" disabled={sending}>

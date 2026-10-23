@@ -4,7 +4,25 @@ import api from "../../services/api";
 import { useCart } from "../../contexts/CartContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { useSettings } from "../../contexts/SettingsContext";
+import FieldError from "../../components/FieldError/FieldError";
+import useFormValidation from "../../hooks/useFormValidation";
+import { required, phoneVN, minLength, maxLength } from "../../utils/validators";
 import "./Checkout.css";
+
+// Luật kiểm tra thông tin giao hàng — lỗi hiện chữ đỏ ngay dưới ô nhập
+const SHIPPING_RULES = {
+  customerName: [
+    required("Vui lòng nhập họ và tên."),
+    minLength(2, "Họ tên cần ít nhất 2 ký tự."),
+    maxLength(100, "Họ tên tối đa 100 ký tự."),
+  ],
+  phone: [required("Vui lòng nhập số điện thoại."), phoneVN()],
+  address: [
+    required("Vui lòng nhập địa chỉ giao hàng."),
+    minLength(5, "Địa chỉ quá ngắn, vui lòng nhập đầy đủ số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố."),
+    maxLength(250, "Địa chỉ tối đa 250 ký tự."),
+  ],
+};
 
 // Dựng URL ảnh QR qua dịch vụ MIỄN PHÍ img.vietqr.io — không cần đăng ký, không cần API
 // key, không cần webhook/callback (khác hẳn VNPay/MoMo). Trình duyệt tải thẳng ảnh PNG này,
@@ -30,8 +48,16 @@ const Checkout = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [createdOrder, setCreatedOrder] = useState(null); // { id, total } — dùng để dựng QR và hiện mã đơn
-  const set = (f, v) => setForm(p => ({ ...p, [f]: v }));
+  const [createdOrder, setCreatedOrder] = useState(null); // { id, total, confirmCode } — dùng để dựng QR, hiện mã đơn và xác nhận chuyển khoản
+  const [confirming, setConfirming] = useState(false); // đang gửi xác nhận "Tôi đã chuyển khoản"
+  const [confirmError, setConfirmError] = useState("");
+  const { errors, validateField, validateAll, clearError } = useFormValidation(SHIPPING_RULES);
+
+  // Gõ lại thì xoá lỗi của chính ô đó
+  const set = (f, v) => {
+    setForm(p => ({ ...p, [f]: v }));
+    clearError(f);
+  };
 
   const [couponInput, setCouponInput] = useState("");
   const [couponChecking, setCouponChecking] = useState(false);
@@ -66,9 +92,26 @@ const Checkout = () => {
 
   const finalTotal = appliedCoupon ? totalPrice - appliedCoupon.discountAmount : totalPrice;
 
+  // Tổng theo giá niêm yết (CHƯA trừ giảm giá combo) và số tiền combo đã giảm — để khách
+  // thấy rõ khoản giảm. totalPrice (giá thực phải trả) vốn đã gồm giảm giá combo.
+  const listTotal = cart.reduce(
+    (sum, item) =>
+      sum + (item.type === "bundle" && item.originalPrice > item.price ? item.originalPrice : item.price) * item.quantity,
+    0
+  );
+  const bundleSavings = listTotal - totalPrice;
+
   const handleApplyCoupon = async () => {
     const code = couponInput.trim();
-    if (!code) return;
+    // Kiểm tra phía trình duyệt trước khi hỏi Backend
+    if (!code) {
+      setCouponError("Vui lòng nhập mã giảm giá.");
+      return;
+    }
+    if (!/^[A-Za-z0-9_-]+$/.test(code)) {
+      setCouponError("Mã giảm giá chỉ gồm chữ cái, số và dấu - hoặc _.");
+      return;
+    }
     setCouponChecking(true);
     setCouponError("");
     try {
@@ -91,31 +134,40 @@ const Checkout = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (cart.length === 0) return;
-    setSaving(true);
     setError("");
+    if (!validateAll(form)) return;
+
+    setSaving(true);
     try {
+      // Client CHỈ gửi "mua gì, bao nhiêu" — giá và tổng tiền do Backend tự tính từ database
+      // (kể cả giảm giá combo). Riêng `price` của dòng có biến thể gửi kèm để Backend đối chiếu.
+      const plainLines = cart.filter(item => item.type !== "bundle");
+      const bundleLines = cart.filter(item => item.type === "bundle");
+
       const res = await api.post("/Orders", {
         userId: isLoggedIn ? user.id : null,
-        customerName: form.customerName,
-        phone: form.phone,
-        address: form.address,
-        status: "Chờ xác nhận",
-        total: totalPrice,
+        customerName: form.customerName.trim(),
+        phone: form.phone.trim(),
+        address: form.address.trim(),
         paymentMethod,
         couponCode: appliedCoupon ? appliedCoupon.code : null,
-        orderItems: cart.map(item => ({
+        orderItems: plainLines.map(item => ({
           productId: item.id,
-          productName: item.name,
           quantity: item.quantity,
           price: item.price,
           variantId: item.variantId ?? null,
           variantName: item.variantName ?? null,
         })),
+        bundles: bundleLines.map(item => ({
+          bundleId: item.bundleId,
+          quantity: item.quantity,
+        })),
       });
       // Backend trả về order trực tiếp (đường thường), HOẶC { order, couponNote } nếu mã
       // giảm giá bị từ chối ngầm lúc lưu — lấy đúng object order trong cả 2 trường hợp.
       const order = res.data.order || res.data;
-      setCreatedOrder({ id: order.id, total: order.total });
+      // confirmCode do Backend trả về, dùng để chính khách này xác nhận chuyển khoản ở bước QR
+      setCreatedOrder({ id: order.id, total: order.total, confirmCode: res.data.confirmCode });
 
       if (paymentMethod === "QR" && qrEnabled) {
         // Thanh toán QR: đơn ĐÃ được tạo (để có mã DH… ghi vào nội dung chuyển khoản) nhưng
@@ -126,24 +178,39 @@ const Checkout = () => {
         clearCart();
         setSuccess(true);
       }
-    } catch {
-      setError("Đặt hàng thất bại! Vui lòng kiểm tra lại thông tin hoặc thử lại sau.");
+    } catch (err) {
+      // Hiện đúng lý do Backend trả về (VD: "Combo ...: '...' không đủ hàng") nếu có
+      setError(
+        err.response?.data?.message ||
+        "Đặt hàng thất bại! Vui lòng kiểm tra lại thông tin hoặc thử lại sau."
+      );
     } finally {
       setSaving(false);
     }
   };
 
-  // Khách xác nhận đã chuyển khoản xong → lúc này mới báo "Đặt hàng thành công" + xoá giỏ hàng.
-  // Lưu ý: web không tự biết tiền đã về hay chưa, Admin sẽ đối chiếu và bấm "Đã nhận tiền" ở trang quản trị.
-  const handleConfirmTransfer = () => {
-    clearCart();
-    setSuccess(true);
+  // Khách xác nhận đã chuyển khoản xong → báo cho Backend ghi nhận đơn "Đã thanh toán" (Admin không
+  // cần bấm xác nhận nữa), rồi mới báo "Đặt hàng thành công" + xoá giỏ hàng. Lỗi thì giữ nguyên màn hình QR
+  // để khách bấm lại, không mất mã QR.
+  const handleConfirmTransfer = async () => {
+    setConfirmError("");
+    setConfirming(true);
+    try {
+      await api.post(`/Orders/${createdOrder.id}/confirm-transfer`, { code: createdOrder.confirmCode });
+      clearCart();
+      setSuccess(true);
+    } catch (err) {
+      setConfirmError(err.response?.data?.message || "Không gửi được xác nhận. Vui lòng bấm lại hoặc liên hệ cửa hàng.");
+    } finally {
+      setConfirming(false);
+    }
   };
 
   // ── Bước 2 của QR: đơn đã tạo, đang chờ khách quét mã & chuyển khoản ──
   if (createdOrder && paymentMethod === "QR" && qrEnabled && !success) {
     // Nội dung chuyển khoản dùng chữ KHÔNG DẤU, có mã đơn — an toàn với mọi app ngân hàng
     // (1 số app cũ xử lý dấu tiếng Việt trong nội dung CK không tốt).
+    // Số tiền lấy từ createdOrder.total = tổng do SERVER tính, nên luôn đúng số phải trả.
     const qrUrl = buildVietQrUrl({
       bankBin,
       accountNo: bankAccountNo,
@@ -173,16 +240,20 @@ const Checkout = () => {
                 Số tiền: <strong>{formatPrice(createdOrder.total)}</strong><br />
                 Nội dung chuyển khoản: <strong>DH{createdOrder.id}</strong>
               </p>
+              {confirmError && (
+                <div className="checkout-error" style={{ margin: 0 }}>⚠️ {confirmError}</div>
+              )}
               <button
                 type="button"
                 className="btn-primary-solid"
                 onClick={handleConfirmTransfer}
+                disabled={confirming}
               >
-                Tôi đã chuyển khoản
+                {confirming ? "Đang xác nhận..." : "Tôi đã chuyển khoản"}
               </button>
               <p style={{ fontSize: 12, color: "#9a9186", textAlign: "center", margin: 0, maxWidth: 360 }}>
-                Vui lòng không đóng trang này trước khi bấm nút xác nhận. Đơn hàng sẽ được
-                xử lý sau khi chúng tôi nhận được tiền.
+                Vui lòng không đóng trang này trước khi bấm nút xác nhận. Bấm xác nhận sau khi bạn
+                đã chuyển khoản xong, đơn hàng sẽ được ghi nhận đã thanh toán và chuyển đi xử lý.
               </p>
             </div>
           </div>
@@ -203,7 +274,7 @@ const Checkout = () => {
             {createdOrder && <p>Mã đơn hàng của bạn: <strong>#{createdOrder.id}</strong></p>}
 
             {paidByQr ? (
-              <p>Cảm ơn bạn! Chúng tôi sẽ xác nhận đơn hàng ngay sau khi nhận được thanh toán.</p>
+              <p>Cảm ơn bạn đã thanh toán! Đơn hàng đã được ghi nhận và chúng tôi sẽ xử lý trong thời gian sớm nhất.</p>
             ) : (
               <p>Cảm ơn bạn đã tin tưởng LuxWood. Chúng tôi sẽ liên hệ với bạn sớm nhất để xác nhận đơn hàng.</p>
             )}
@@ -241,7 +312,7 @@ const Checkout = () => {
         )}
 
         <div className="checkout-layout">
-          <form className="checkout-form" onSubmit={handleSubmit}>
+          <form className="checkout-form" onSubmit={handleSubmit} noValidate>
             <h3>Thông tin giao hàng</h3>
 
             {error && <div className="checkout-error">⚠️ {error}</div>}
@@ -249,30 +320,42 @@ const Checkout = () => {
             <div className="form-group">
               <label>Họ và tên *</label>
               <input
+                name="customerName"
+                className={errors.customerName ? "is-invalid" : ""}
                 value={form.customerName}
                 onChange={e => set("customerName", e.target.value)}
+                onBlur={() => validateField("customerName", form)}
                 placeholder="Nguyễn Văn A"
-                required
+                autoComplete="name"
               />
+              <FieldError message={errors.customerName} />
             </div>
             <div className="form-group">
               <label>Số điện thoại *</label>
               <input
+                name="phone"
+                className={errors.phone ? "is-invalid" : ""}
                 value={form.phone}
                 onChange={e => set("phone", e.target.value)}
+                onBlur={() => validateField("phone", form)}
                 placeholder="09xxxxxxxx"
-                required
+                autoComplete="tel"
               />
+              <FieldError message={errors.phone} />
             </div>
             <div className="form-group">
               <label>Địa chỉ giao hàng *</label>
               <textarea
                 rows={3}
+                name="address"
+                className={errors.address ? "is-invalid" : ""}
                 value={form.address}
                 onChange={e => set("address", e.target.value)}
+                onBlur={() => validateField("address", form)}
                 placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
-                required
+                autoComplete="street-address"
               />
+              <FieldError message={errors.address} />
             </div>
 
             <h3 style={{ marginTop: 8 }}>Phương thức thanh toán</h3>
@@ -335,13 +418,26 @@ const Checkout = () => {
                   <div className="checkout-item-img">
                     {item.image
                       ? <img src={item.image} alt={item.name} onError={e => e.target.style.display = "none"} />
-                      : <span>🪑</span>
+                      : <span>{item.type === "bundle" ? "🎁" : "🪑"}</span>
                     }
                     <span className="checkout-item-qty">{item.quantity}</span>
                   </div>
                   <div className="checkout-item-info">
-                    <p>{item.name}</p>
-                    <span>{formatPrice(item.price)} x {item.quantity}</span>
+                    <p>
+                      {item.type === "bundle" && <strong style={{ color: "#b3492f" }}>[Combo] </strong>}
+                      {item.name}
+                    </p>
+                    {item.type === "bundle" && item.items?.length > 0 && (
+                      <span style={{ display: "block", fontSize: 12, color: "#7a6a58", lineHeight: 1.4 }}>
+                        Gồm: {item.items.map(i => `${i.productName} x${i.quantity}`).join(", ")}
+                      </span>
+                    )}
+                    <span>
+                      {formatPrice(item.price)} x {item.quantity}
+                      {item.type === "bundle" && item.originalPrice > item.price && (
+                        <s style={{ marginLeft: 6, color: "#9a9186" }}>{formatPrice(item.originalPrice)}</s>
+                      )}
+                    </span>
                   </div>
                   <div className="checkout-item-total">{formatPrice(item.price * item.quantity)}</div>
                 </div>
@@ -362,12 +458,15 @@ const Checkout = () => {
                     type="text"
                     placeholder="Nhập mã giảm giá"
                     value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                    onChange={(e) => {
+                      setCouponInput(e.target.value.toUpperCase());
+                      if (couponError) setCouponError("");
+                    }}
                   />
                   <button
                     type="button"
                     onClick={handleApplyCoupon}
-                    disabled={couponChecking || !couponInput.trim()}
+                    disabled={couponChecking}
                   >
                     {couponChecking ? "Đang kiểm tra..." : "Áp dụng"}
                   </button>
@@ -378,8 +477,14 @@ const Checkout = () => {
 
             <div className="checkout-summary-row">
               <span>Tạm tính</span>
-              <span>{formatPrice(totalPrice)}</span>
+              <span>{formatPrice(listTotal)}</span>
             </div>
+            {bundleSavings > 0 && (
+              <div className="checkout-summary-row checkout-summary-row--discount">
+                <span>Giảm giá combo</span>
+                <span>−{formatPrice(bundleSavings)}</span>
+              </div>
+            )}
             {appliedCoupon && (
               <div className="checkout-summary-row checkout-summary-row--discount">
                 <span>Giảm giá ({appliedCoupon.code})</span>

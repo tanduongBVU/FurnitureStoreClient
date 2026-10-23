@@ -18,16 +18,25 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Các API "xác thực" — 401 ở đây nghĩa là NHẬP SAI (email/mật khẩu, token Google, link đặt lại
+// mật khẩu...) chứ KHÔNG phải phiên đăng nhập hết hạn. Phải để lỗi rơi về .catch() của form
+// để hiện chữ đỏ cho khách sửa lại, TUYỆT ĐỐI không được tải lại trang (sẽ làm mất thông báo lỗi).
+const AUTH_ENDPOINTS = /\/Auth\/(login|register|google|forgot-password|reset-password)\b/i;
+
 // Xử lý khi Backend trả về lỗi — quan trọng nhất là 401 (token hết hạn/không hợp lệ).
-// Tự động xoá token cũ + đá về /login, thay vì để lỗi rơi vào .catch() rời rạc ở từng
-// nơi gọi API rồi hiện thông báo lỗi chung chung, gây khó hiểu cho người dùng.
+// Với request thông thường: xoá token cũ + đưa về /login. Với các API xác thực ở trên: bỏ qua,
+// để nơi gọi tự hiện lỗi. Không chuyển hướng nếu đang ở sẵn trang /login để tránh nạp lại vô ích.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const isAuthRequest = AUTH_ENDPOINTS.test(error.config?.url || "");
+
+    if (error.response?.status === 401 && !isAuthRequest) {
       localStorage.removeItem("clientToken");
       localStorage.removeItem("clientUser");
-      window.location.href = "/login";
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

@@ -1,4 +1,5 @@
-import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import "./styles/global-effects.css";
 import { CartProvider } from "./contexts/CartContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
@@ -16,16 +17,27 @@ import Compare from "./pages/Compare/Compare";
 import Contact from "./pages/Contact/Contact";
 import ServiceList from "./pages/Services/ServiceList";
 import ServiceDetail from "./pages/Services/ServiceDetail";
-import ProjectList from "./pages/Projects/ProjectList";
-import ProjectDetail from "./pages/Projects/ProjectDetail";
 import BlogList from "./pages/Blog/BlogList";
 import BlogDetail from "./pages/Blog/BlogDetail";
 import Cart from "./pages/Cart/Cart";
 import Checkout from "./pages/Checkout/Checkout";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/ForgotPassword/ResetPassword";
 import MyOrders from "./pages/Orders/MyOrders";
 import MyAccount from "./pages/Account/MyAccount";
+
+// Mỗi lần ĐỔI TRANG (đường dẫn hoặc tham số tìm kiếm trên URL, VD ?category=...) thì cuộn về đầu trang.
+// Dùng behavior "instant" để không bị hiệu ứng cuộn mượt (scroll-behavior: smooth) kéo dài làm khách
+// thấy trang trượt từ cuối lên đầu.
+const ScrollToTop = () => {
+  const { pathname, search } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [pathname, search]);
+  return null;
+};
 
 const App = () => {
   return (
@@ -34,6 +46,7 @@ const App = () => {
         <CartProvider>
           <WishlistProvider>
             <CompareProvider>
+              <ScrollToTop />
               <Routes>
                 <Route element={<MainLayout />}>
                   <Route path="/" element={<Home />} />
@@ -46,14 +59,14 @@ const App = () => {
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/services/:type" element={<ServiceList />} />
                   <Route path="/services/:type/:id" element={<ServiceDetail />} />
-                  <Route path="/projects" element={<ProjectList />} />
-                  <Route path="/projects/:id" element={<ProjectDetail />} />
                   <Route path="/blog" element={<BlogList />} />
                   <Route path="/blog/:id" element={<BlogDetail />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/orders" element={<MyOrders />} />
                   <Route path="/account" element={<MyAccount />} />
                 </Route>

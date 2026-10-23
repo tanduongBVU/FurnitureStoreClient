@@ -16,12 +16,10 @@ const ROOM_CATEGORIES = [
   { label: "Ban công", icon: "🌿" },
 ];
 
-// 3 mục con của dropdown "Dịch vụ" — 2 mục đầu lọc theo Service.Type, mục cuối trỏ
-// sang trang Project (portfolio) riêng biệt, không dùng chung endpoint Service.
+// 2 mục con của dropdown "Dịch vụ" — lọc theo Service.Type (thi công / thiết kế).
 const SERVICE_LINKS = [
   { path: "/services/thi-cong", label: "Dịch vụ thi công", icon: "🛠️" },
   { path: "/services/thiet-ke", label: "Dịch vụ thiết kế", icon: "🎨" },
-  { path: "/projects", label: "Dự án kiến trúc", icon: "🏛️" },
 ];
 
 // Chữ cái đầu của TÊN (từ cuối trong họ tên) — dùng làm avatar khi chưa có ảnh
@@ -102,7 +100,7 @@ const Navbar = () => {
     { path: "/about", label: "Giới Thiệu" },
   ];
 
-  const isServicesActive = location.pathname.startsWith("/services") || location.pathname.startsWith("/projects");
+  const isServicesActive = location.pathname.startsWith("/services");
 
   const handleLogout = () => {
     logout();
@@ -177,7 +175,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Dropdown Dịch Vụ — thi công / thiết kế / dự án kiến trúc */}
+          {/* Dropdown Dịch Vụ — thi công / thiết kế */}
           <div
             className="navbar__dropdown"
             onMouseEnter={() => setServicesMenuOpen(true)}

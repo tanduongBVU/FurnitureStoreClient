@@ -1,0 +1,90 @@
+/* Mục "Thông tin chi tiết" ở trang chi tiết sản phẩm */
+.pd-detail {
+  margin-top: 56px;
+  padding-top: 40px;
+  border-top: 1px solid #e5ddd0;
+}
+.pd-detail__title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
+  color: var(--walnut, #3b2a1a);
+  margin: 0 0 24px;
+}
+
+.pd-detail__content {
+  color: var(--text, #2c1f10);
+  font-size: 15px;
+  line-height: 1.8;
+  overflow-wrap: anywhere; /* chữ/link dài không làm tràn khung */
+}
+.pd-detail__content > *:first-child { margin-top: 0; }
+.pd-detail__content p { margin: 0 0 14px; }
+.pd-detail__content h1,
+.pd-detail__content h2,
+.pd-detail__content h3,
+.pd-detail__content h4 {
+  font-family: 'Playfair Display', Georgia, serif;
+  color: var(--walnut, #3b2a1a);
+  line-height: 1.35;
+  margin: 28px 0 12px;
+}
+.pd-detail__content h2 { font-size: 22px; }
+.pd-detail__content h3 { font-size: 19px; }
+.pd-detail__content h4 { font-size: 16px; }
+
+.pd-detail__content ul,
+.pd-detail__content ol { margin: 0 0 14px; padding-left: 24px; }
+.pd-detail__content li { margin-bottom: 6px; }
+
+.pd-detail__content blockquote {
+  margin: 18px 0;
+  padding: 12px 18px;
+  background: var(--cream, #f5f0e8);
+  border-left: 4px solid var(--gold, #c8a96e);
+  border-radius: 0 10px 10px 0;
+  color: var(--text-muted, #7a6a58);
+}
+
+.pd-detail__content a { color: var(--gold-d, #a8854a); text-decoration: underline; }
+.pd-detail__content a:hover { opacity: .8; }
+
+.pd-detail__content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 16px auto;
+  border-radius: 10px;
+}
+
+/* Căn lề và thụt lề do trình soạn thảo tạo ra */
+.pd-detail__content .ql-align-center { text-align: center; }
+.pd-detail__content .ql-align-right { text-align: right; }
+.pd-detail__content .ql-align-justify { text-align: justify; }
+.pd-detail__content .ql-indent-1 { padding-left: 2em; }
+.pd-detail__content .ql-indent-2 { padding-left: 4em; }
+.pd-detail__content .ql-indent-3 { padding-left: 6em; }
+
+/* Bảng thông số */
+.pd-table-wrap { overflow-x: auto; margin: 18px 0; -webkit-overflow-scrolling: touch; }
+.pd-detail__content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+  background: #fff;
+}
+.pd-detail__content th,
+.pd-detail__content td {
+  border: 1px solid #e5ddd0;
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+}
+.pd-detail__content th { background: var(--cream, #f5f0e8); font-weight: 600; color: var(--walnut, #3b2a1a); }
+/* Cột đầu của bảng thông số (tên thông số) hơi đậm để dễ đọc */
+.pd-detail__content tr td:first-child:not(:last-child) { background: #faf7f2; font-weight: 600; width: 32%; }
+
+@media (max-width: 900px) {
+  .pd-detail { margin-top: 40px; padding-top: 32px; }
+  .pd-detail__content th,
+  .pd-detail__content td { padding: 8px 10px; }
+}

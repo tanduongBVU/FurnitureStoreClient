@@ -53,7 +53,7 @@ const getYouTubeId = (url) => {
 export default function Home() {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef(null);
-  const { addToCart } = useCart();
+  const { addToCart, addBundleToCart } = useCart();
   const { get } = useSettings();
   const location = useLocation();
 
@@ -143,6 +143,8 @@ export default function Home() {
   // ── Combo tiết kiệm ──
   const [bundles, setBundles] = useState([]);
   const [loadingBundles, setLoadingBundles] = useState(true);
+  // Thông báo ngắn ngay dưới nút của từng combo: { [bundleId]: { ok, text } }
+  const [bundleNotice, setBundleNotice] = useState({});
 
   const [contactForm, setContactForm] = useState({ name: "", phone: "", email: "", message: "" });
   const [contactSending, setContactSending] = useState(false);
@@ -204,17 +206,22 @@ export default function Home() {
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
   const salePriceOf = (p) => p.price * (1 - (p.discountPercent || 0) / 100);
 
-  // Thêm CẢ combo vào giỏ chỉ với 1 lần bấm — áp % giảm của combo lên TỪNG sản phẩm
-  // trước khi thêm, để tổng tiền hiện trong giỏ hàng khớp CHÍNH XÁC với FinalPrice đã
-  // quảng cáo ở thẻ combo (không lệch do làm tròn cộng dồn nhiều lần).
-  const addBundleToCart = (bundle) => {
-    bundle.items.forEach((item) => {
-      const discountedUnitPrice = item.productPrice * (1 - bundle.discountPercent / 100);
-      addToCart(
-        { id: item.productId, name: item.productName, image: item.productImage, price: discountedUnitPrice },
-        item.quantity
-      );
-    });
+  // Thêm CẢ combo vào giỏ — combo vào giỏ như MỘT dòng riêng, giá do Backend tính sẵn
+  // (finalPrice, đã gồm giảm giá combo), không còn tự tính/tách từng sản phẩm ở Client.
+  // CartContext tự từ chối nếu combo hết hàng hoặc vượt số lượng tồn kho còn đủ cho combo.
+  const handleAddBundle = (bundle) => {
+    const res = addBundleToCart(bundle, 1);
+    setBundleNotice(prev => ({
+      ...prev,
+      [bundle.id]: { ok: res.ok, text: res.ok ? "✓ Đã thêm combo vào giỏ hàng" : res.message },
+    }));
+    setTimeout(() => {
+      setBundleNotice(prev => {
+        const next = { ...prev };
+        delete next[bundle.id];
+        return next;
+      });
+    }, 3500);
   };
 
   // ── BANNER NGANG — chỉ lo phần ảnh ở giữa, không dính gì tới banner dọc. Không có ảnh
@@ -488,7 +495,7 @@ export default function Home() {
                           className="btn-add"
                           onClick={(e) => {
                             e.preventDefault();
-                            addToCart({ ...p, price: hasDiscount ? salePriceOf(p) : p.price }, 1);
+                            addToCart({ ...p, price: hasDiscount ? Math.round(salePriceOf(p)) : p.price }, 1);
                           }}
                         >+ Thêm</button>
                       </div>
@@ -522,12 +529,13 @@ export default function Home() {
             <div className="bundles-grid-home">
               {bundles.map((b, idx) => {
                 const coverImage = b.image || b.items[0]?.productImage;
+                const notice = bundleNotice[b.id];
                 return (
                   <Reveal as="div" key={b.id} delay={Math.min(idx * 90, 320)}>
                     <div className="bundle-card-home">
                       <div className="bundle-card-home__img">
                         {coverImage
-                          ? <img src={coverImage} alt={b.name} onError={e => e.target.style.display = "none"} />
+                          ? <img src={coverImage} alt={b.name} onError={e => e.target.style.display = "none"} style={b.isAvailable ? undefined : { filter: "grayscale(0.7)", opacity: 0.75 }} />
                           : <span style={{ fontSize: 40 }}>🎁</span>
                         }
                         {b.discountPercent > 0 && (
@@ -548,9 +556,31 @@ export default function Home() {
                           )}
                           <strong>{formatPrice(b.finalPrice)}</strong>
                         </div>
-                        <button className="btn-primary bundle-card-home__btn" style={{ background: "var(--walnut)", color: "#fff" }} onClick={() => addBundleToCart(b)}>
-                          Thêm cả combo vào giỏ
+
+                        {/* Combo thiếu hàng: báo rõ sản phẩm nào hết, và khoá nút thêm vào giỏ */}
+                        {!b.isAvailable && (
+                          <p style={{ fontSize: 13, color: "#c0392b", fontWeight: 600, margin: "8px 0 0", lineHeight: 1.4 }}>
+                            ⚠️ Tạm hết hàng{b.outOfStockItems?.length > 0 ? `: ${b.outOfStockItems.join(", ")}` : ""}
+                          </p>
+                        )}
+
+                        <button
+                          className="btn-primary bundle-card-home__btn"
+                          style={{
+                            background: "var(--walnut)", color: "#fff",
+                            ...(b.isAvailable ? {} : { opacity: 0.5, cursor: "not-allowed" }),
+                          }}
+                          onClick={() => handleAddBundle(b)}
+                          disabled={!b.isAvailable}
+                        >
+                          {b.isAvailable ? "Thêm cả combo vào giỏ" : "Hết hàng"}
                         </button>
+
+                        {notice && (
+                          <p style={{ fontSize: 13, margin: "8px 0 0", lineHeight: 1.4, color: notice.ok ? "#3f7d4e" : "#c0392b" }}>
+                            {notice.text}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </Reveal>

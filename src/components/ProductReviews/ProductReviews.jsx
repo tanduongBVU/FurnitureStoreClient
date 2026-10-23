@@ -20,6 +20,8 @@ const Stars = ({ value, onChange, readOnly = false, size = 16 }) => (
   </div>
 );
 
+const MAX_COMMENT = 1000; // khớp giới hạn của Backend (ReviewsController.Create)
+
 const ProductReviews = ({ productId }) => {
   const { isLoggedIn } = useAuth();
   const [reviews, setReviews] = useState([]);
@@ -35,11 +37,11 @@ const ProductReviews = ({ productId }) => {
   const [sendError, setSendError] = useState("");
   const [sent, setSent] = useState(false);
 
-  const fetchReviews = () => {
-    setLoading(true);
-    api.get(`/Reviews/product/${productId}`)
+  const fetchReviews = (silent = false) => {
+    if (!silent) setLoading(true);
+    return api.get(`/Reviews/product/${productId}`)
       .then(res => setReviews(res.data))
-      .catch(() => setReviews([]))
+      .catch(() => { if (!silent) setReviews([]); })
       .finally(() => setLoading(false));
   };
 
@@ -81,6 +83,7 @@ const ProductReviews = ({ productId }) => {
       setCanReview(false);
       setRating(0);
       setComment("");
+      // Đánh giá phải được Admin/Nhân viên duyệt mới hiện công khai → không tải lại danh sách ở đây
     } catch (err) {
       setSendError(err.response?.data?.message || "Lỗi khi gửi đánh giá! Vui lòng thử lại.");
     } finally {
@@ -132,7 +135,7 @@ const ProductReviews = ({ productId }) => {
           </p>
         ) : sent ? (
           <p className="pr-note pr-note--success">
-            ✓ Đã gửi đánh giá! Đánh giá của bạn sẽ hiện công khai sau khi được duyệt.
+            ✓ Cảm ơn bạn! Đánh giá của bạn đã được gửi và sẽ hiện công khai sau khi được duyệt.
           </p>
         ) : checkingEligibility ? (
           <p className="pr-note">Đang kiểm tra...</p>
@@ -151,11 +154,18 @@ const ProductReviews = ({ productId }) => {
               <textarea
                 id="pr-comment"
                 rows={3}
+                maxLength={MAX_COMMENT}
                 value={comment}
                 onChange={e => setComment(e.target.value)}
                 placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
               />
+              <span style={{ fontSize: 12, color: "#9a9186", textAlign: "right" }}>
+                {comment.length}/{MAX_COMMENT}
+              </span>
             </div>
+            <p style={{ fontSize: 12.5, color: "#7a6a58", margin: "0 0 10px" }}>
+              Đánh giá sẽ hiện công khai sau khi được cửa hàng duyệt.
+            </p>
             <button type="submit" className="pr-submit-btn" disabled={sending}>
               {sending ? "Đang gửi..." : "Gửi đánh giá"}
             </button>

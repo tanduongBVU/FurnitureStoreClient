@@ -3,6 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import Reveal from "../../components/Reveal/Reveal";
+import FieldError from "../../components/FieldError/FieldError";
+import useFormValidation from "../../hooks/useFormValidation";
+import { required, phoneVN, minLength, maxLength, sameAs } from "../../utils/validators";
 import "./MyAccount.css";
 
 // Đánh giá độ mạnh mật khẩu mới — chỉ là GỢI Ý hiển thị, quy tắc bắt buộc vẫn là tối thiểu 6 ký tự
@@ -66,9 +69,33 @@ const orderStatusClass = (status = "") => {
   return "acc-status--processing";
 };
 
+// Luật kiểm tra — lỗi hiện chữ đỏ ngay dưới ô nhập
+const PROFILE_RULES = {
+  name: [
+    required("Vui lòng nhập họ và tên."),
+    minLength(2, "Họ tên cần ít nhất 2 ký tự."),
+    maxLength(100, "Họ tên tối đa 100 ký tự."),
+  ],
+  phone: [phoneVN()], // không bắt buộc, nhưng nếu nhập thì phải đúng định dạng
+  address: [maxLength(250, "Địa chỉ tối đa 250 ký tự.")],
+};
+const PW_RULES = {
+  current: [required("Vui lòng nhập mật khẩu hiện tại.")],
+  next: [
+    required("Vui lòng nhập mật khẩu mới."),
+    minLength(6, "Mật khẩu mới phải có ít nhất 6 ký tự."),
+  ],
+  confirm: [
+    required("Vui lòng nhập lại mật khẩu mới."),
+    sameAs("next", "Xác nhận mật khẩu mới chưa khớp."),
+  ],
+};
+
 export default function MyAccount() {
   const { user, isLoggedIn, updateProfile, updateAvatar, changePassword } = useAuth();
   const navigate = useNavigate();
+  const profileV = useFormValidation(PROFILE_RULES);
+  const pwV = useFormValidation(PW_RULES);
 
   // Tab đang xem: "overview" | "profile" | "password"
   const [tab, setTab] = useState("overview");
@@ -123,11 +150,20 @@ export default function MyAccount() {
       .finally(() => setLoadingOrders(false));
   }, [isLoggedIn]);
 
-  const setProfileField = (f, v) => setProfileForm((p) => ({ ...p, [f]: v }));
-  const setPwField = (f, v) => setPwForm((p) => ({ ...p, [f]: v }));
+  // Gõ lại thì xoá lỗi của chính ô đó
+  const setProfileField = (f, v) => {
+    setProfileForm((p) => ({ ...p, [f]: v }));
+    profileV.clearError(f);
+  };
+  const setPwField = (f, v) => {
+    setPwForm((p) => ({ ...p, [f]: v }));
+    pwV.clearError(f);
+  };
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
+    setProfileMsg({ type: "", text: "" });
+    if (!profileV.validateAll(profileForm)) return;
     setSavingProfile(true);
     setProfileMsg({ type: "", text: "" });
     try {
@@ -147,14 +183,7 @@ export default function MyAccount() {
     e.preventDefault();
     setPwMsg({ type: "", text: "" });
 
-    if (pwForm.next.length < 6) {
-      setPwMsg({ type: "error", text: "Mật khẩu mới phải có ít nhất 6 ký tự." });
-      return;
-    }
-    if (pwForm.next !== pwForm.confirm) {
-      setPwMsg({ type: "error", text: "Xác nhận mật khẩu mới không khớp." });
-      return;
-    }
+    if (!pwV.validateAll(pwForm)) return;
 
     setSavingPw(true);
     try {
@@ -162,10 +191,13 @@ export default function MyAccount() {
       setPwMsg({ type: "success", text: "✓ Đã đổi mật khẩu thành công!" });
       setPwForm({ current: "", next: "", confirm: "" });
     } catch (err) {
-      setPwMsg({
-        type: "error",
-        text: err.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại.",
-      });
+      const msg = err.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại.";
+      // Sai mật khẩu hiện tại → hiện ngay dưới ô "Mật khẩu hiện tại"; lỗi khác → thông báo phía trên form
+      if (/hiện tại/i.test(msg)) {
+        pwV.setErrors((prev) => ({ ...prev, current: msg }));
+      } else {
+        setPwMsg({ type: "error", text: msg });
+      }
     } finally {
       setSavingPw(false);
     }
@@ -371,7 +403,7 @@ export default function MyAccount() {
               {loadingProfile ? (
                 <p className="account-loading">Đang tải thông tin...</p>
               ) : (
-                <form onSubmit={handleSaveProfile} className="account-form account-form--grid">
+                <form onSubmit={handleSaveProfile} className="account-form account-form--grid" noValidate>
                   {profileMsg.text && (
                     <p className={`account-msg account-msg--${profileMsg.type}`}>{profileMsg.text}</p>
                   )}
@@ -384,27 +416,38 @@ export default function MyAccount() {
                     <label>Họ và tên</label>
                     <input
                       type="text"
+                      name="name"
+                      className={profileV.errors.name ? "is-invalid" : ""}
                       value={profileForm.name}
                       onChange={(e) => setProfileField("name", e.target.value)}
-                      required
+                      onBlur={() => profileV.validateField("name", profileForm)}
                     />
+                    <FieldError message={profileV.errors.name} />
                   </div>
                   <div className="account-field">
                     <label>Số điện thoại</label>
                     <input
                       type="tel"
+                      name="phone"
+                      className={profileV.errors.phone ? "is-invalid" : ""}
                       value={profileForm.phone}
                       onChange={(e) => setProfileField("phone", e.target.value)}
+                      onBlur={() => profileV.validateField("phone", profileForm)}
                     />
+                    <FieldError message={profileV.errors.phone} />
                   </div>
                   <div className="account-field account-field--full">
                     <label>Địa chỉ</label>
                     <textarea
                       rows={2}
+                      name="address"
+                      className={profileV.errors.address ? "is-invalid" : ""}
                       value={profileForm.address}
                       onChange={(e) => setProfileField("address", e.target.value)}
+                      onBlur={() => profileV.validateField("address", profileForm)}
                       placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
                     />
+                    <FieldError message={profileV.errors.address} />
                     <span className="account-hint">Địa chỉ này sẽ được tự điền sẵn khi bạn đặt hàng.</span>
                   </div>
                   <button type="submit" className="btn-dark" disabled={savingProfile}>
@@ -420,7 +463,7 @@ export default function MyAccount() {
             <Reveal as="div" className="account-card" direction="right" key="password">
               <h2>Đổi mật khẩu</h2>
               <p className="account-card__sub">Dùng mật khẩu đủ mạnh để bảo vệ tài khoản của bạn.</p>
-              <form onSubmit={handleChangePassword} className="account-form">
+              <form onSubmit={handleChangePassword} className="account-form" noValidate>
                 {pwMsg.text && (
                   <p className={`account-msg account-msg--${pwMsg.type}`}>{pwMsg.text}</p>
                 )}
@@ -428,22 +471,31 @@ export default function MyAccount() {
                   <label>Mật khẩu hiện tại</label>
                   <input
                     type={pwInputType}
+                    name="current"
+                    className={pwV.errors.current ? "is-invalid" : ""}
                     value={pwForm.current}
                     onChange={(e) => setPwField("current", e.target.value)}
+                    onBlur={() => pwV.validateField("current", pwForm)}
                     autoComplete="current-password"
-                    required
                   />
+                  <FieldError message={pwV.errors.current} />
                 </div>
                 <div className="account-field">
                   <label>Mật khẩu mới</label>
                   <input
                     type={pwInputType}
+                    name="next"
+                    className={pwV.errors.next ? "is-invalid" : ""}
                     value={pwForm.next}
                     onChange={(e) => setPwField("next", e.target.value)}
+                    onBlur={() => {
+                      pwV.validateField("next", pwForm);
+                      // Đổi mật khẩu mới sau khi đã nhập ô xác nhận → kiểm tra lại độ khớp
+                      if (pwForm.confirm) pwV.validateField("confirm", pwForm);
+                    }}
                     autoComplete="new-password"
-                    required
-                    minLength={6}
                   />
+                  <FieldError message={pwV.errors.next} />
                   {pwForm.next ? (
                     <div className="pw-strength">
                       <div className="pw-strength__bars">
@@ -464,14 +516,14 @@ export default function MyAccount() {
                   <label>Xác nhận mật khẩu mới</label>
                   <input
                     type={pwInputType}
+                    name="confirm"
+                    className={pwV.errors.confirm ? "is-invalid" : ""}
                     value={pwForm.confirm}
                     onChange={(e) => setPwField("confirm", e.target.value)}
+                    onBlur={() => pwV.validateField("confirm", pwForm)}
                     autoComplete="new-password"
-                    required
                   />
-                  {pwForm.confirm && pwForm.next !== pwForm.confirm && (
-                    <span className="account-hint account-hint--error">Mật khẩu xác nhận chưa khớp.</span>
-                  )}
+                  <FieldError message={pwV.errors.confirm} />
                 </div>
                 <label className="pw-toggle">
                   <input type="checkbox" checked={showPw} onChange={(e) => setShowPw(e.target.checked)} />
