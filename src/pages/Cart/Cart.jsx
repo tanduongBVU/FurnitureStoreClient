@@ -9,7 +9,15 @@ import "./Cart.css";
 // Cảnh báo của 1 dòng COMBO trong giỏ (null nếu ổn). Dữ liệu isAvailable/stock được đồng bộ
 // từ server mỗi lần mở trang này (syncBundleLines).
 const bundleProblem = (item) => {
-  if (item.type !== "bundle") return null;
+  if (item.type !== "bundle") {
+    // Dòng sản phẩm thường: dữ liệu được đồng bộ từ server (syncProductLines)
+    if (item.removed) return "Sản phẩm này không còn được bán. Vui lòng xoá khỏi giỏ hàng.";
+    if (typeof item.stock === "number" && item.stock <= 0) return "Sản phẩm tạm hết hàng. Vui lòng xoá khỏi giỏ hoặc quay lại sau.";
+    if (typeof item.stock === "number" && item.quantity > item.stock) {
+      return `Kho chỉ còn ${item.stock} sản phẩm — vui lòng giảm số lượng.`;
+    }
+    return null;
+  }
   if (item.removed) return "Combo này không còn được bán. Vui lòng xoá khỏi giỏ hàng.";
   if (item.isAvailable === false) {
     const names = item.outOfStockItems?.length ? `: ${item.outOfStockItems.join(", ")}` : "";
@@ -22,7 +30,7 @@ const bundleProblem = (item) => {
 };
 
 const Cart = () => {
-  const { cart, removeFromCart, updateQuantity, totalPrice, addToCart, cartProductIds, syncBundleLines } = useCart();
+  const { cart, removeFromCart, updateQuantity, totalPrice, addToCart, cartProductIds, syncBundleLines, syncProductLines } = useCart();
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
@@ -73,6 +81,33 @@ const Cart = () => {
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bundleIdsKey]);
+
+  // ── Làm mới giá / tồn kho / còn bán của các SẢN PHẨM thường trong giỏ mỗi khi mở giỏ hàng ──
+  // Chỉ gọi lại khi TẬP HỢP sản phẩm đổi (không gọi lại chỉ vì đổi số lượng).
+  const productIdsKey = [
+    ...new Set(cart.filter((item) => item.type !== "bundle").map((item) => item.id)),
+  ]
+    .sort((a, b) => a - b)
+    .join(",");
+
+  useEffect(() => {
+    if (!productIdsKey) return;
+    let cancelled = false;
+    const ids = productIdsKey.split(",").map(Number);
+    Promise.all(
+      ids.map((id) =>
+        api
+          .get(`/Products/${id}`)
+          .then((res) => ({ id, product: res.data }))
+          // 404 = sản phẩm đã ẩn / bị xoá → đánh dấu không còn bán. Lỗi khác (mạng...) → bỏ qua, giữ giỏ cũ.
+          .catch((err) => (err.response?.status === 404 ? { id, product: null } : null))
+      )
+    ).then((results) => {
+      if (!cancelled) syncProductLines(results.filter(Boolean));
+    });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productIdsKey]);
 
   const hasBlockingProblem = cart.some((item) => bundleProblem(item));
 
@@ -208,6 +243,11 @@ const Cart = () => {
                     )}
                     <p className="cart-item-price">
                       {formatPrice(item.price)}
+                      {!isBundle && item.priceChangedFrom != null && (
+                        <span style={{ marginLeft: 8, fontSize: 12, color: "#b3492f", fontWeight: 600 }}>
+                          Giá đã cập nhật (trước: {formatPrice(item.priceChangedFrom)})
+                        </span>
+                      )}
                       {isBundle && item.originalPrice > item.price && (
                         <span style={{ marginLeft: 8, fontSize: 12, color: "#9a9186", textDecoration: "line-through" }}>
                           {formatPrice(item.originalPrice)}
@@ -263,7 +303,7 @@ const Cart = () => {
             </button>
             {hasBlockingProblem && (
               <p style={{ fontSize: 12, color: "#c0392b", margin: "8px 0 0", textAlign: "center" }}>
-                Vui lòng xử lý các combo có cảnh báo trước khi thanh toán.
+                Vui lòng xử lý các sản phẩm / combo có cảnh báo trước khi thanh toán.
               </p>
             )}
             <Link to="/products" className="cart-continue">← Tiếp tục mua sắm</Link>

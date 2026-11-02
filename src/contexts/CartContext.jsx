@@ -175,6 +175,58 @@ export const CartProvider = ({ children }) => {
     });
   };
 
+  // Đồng bộ các dòng SẢN PHẨM thường (không phải combo) trong giỏ với dữ liệu MỚI NHẤT từ
+  // GET /api/products/{id}: giá, tồn kho, còn bán hay không. Giỏ lưu ở localStorage nên có thể cũ
+  // (Admin đã đổi giá / hết hàng / ẩn sản phẩm). Gọi khi mở trang Giỏ hàng.
+  // fetched: [{ id, product }] — product = null nghĩa là sản phẩm không còn bán (404/đã ẩn).
+  // Không có gì đổi thì trả lại đúng mảng cũ (không render lại, không lặp vô hạn).
+  const syncProductLines = (fetched) => {
+    setCart(prev => {
+      let changed = false;
+      const next = prev.map(item => {
+        if (item.type === "bundle") return item;
+        const found = fetched.find(f => f.id === item.id);
+        if (!found) return item; // chưa tải được dòng này (lỗi mạng) → giữ nguyên
+
+        let merged;
+        if (!found.product) {
+          merged = { ...item, removed: true, stock: 0 };
+        } else {
+          const p = found.product;
+          let price = item.price;
+          let stock = item.stock;
+          let removed = false;
+
+          if (item.variantId != null) {
+            const v = (p.variants || []).find(x => x.id === item.variantId);
+            if (v) {
+              price = v.price; // giá biến thể lấy từ database
+              stock = v.stock;
+            } else {
+              removed = true; // biến thể đã bị xoá khỏi sản phẩm
+              stock = 0;
+            }
+          } else {
+            price = Math.round(p.price * (1 - (p.discountPercent || 0) / 100));
+            stock = p.stock;
+          }
+          if (p.isActive === false) { removed = true; stock = 0; }
+
+          merged = { ...item, price, stock, removed };
+          // Ghi nhớ giá cũ để Giỏ hàng báo cho khách biết giá đã đổi
+          if (price !== item.price) merged.priceChangedFrom = item.price;
+        }
+
+        if (JSON.stringify(merged) !== JSON.stringify(item)) {
+          changed = true;
+          return merged;
+        }
+        return item;
+      });
+      return changed ? next : prev;
+    });
+  };
+
   // Đổi sang dùng cartKey thay vì id — để xoá/sửa ĐÚNG DÒNG biến thể đang thao tác,
   // không lỡ đụng vào biến thể khác của cùng 1 sản phẩm.
   const removeFromCart = (cartKey) => {
@@ -202,7 +254,7 @@ export const CartProvider = ({ children }) => {
 
   return (
     <CartContext.Provider value={{
-      cart, addToCart, addBundleToCart, syncBundleLines,
+      cart, addToCart, addBundleToCart, syncBundleLines, syncProductLines,
       removeFromCart, updateQuantity, clearCart,
       totalItems, totalPrice, cartProductIds,
     }}>
