@@ -230,17 +230,17 @@ export default function About() {
         <div className="section-inner">
           <div className="mission-grid">
             <Reveal as="div" className="mission-card mission-card--dark" delay={0}>
-              <span className="mission-icon">🎯</span>
+              <span className="mission-no">01</span>
               <h3>Sứ mệnh</h3>
               <p>Mang đến những sản phẩm nội thất gỗ tự nhiên chất lượng cao, giúp mỗi gia đình Việt Nam có được không gian sống đẹp, bền vững và đậm chất riêng.</p>
             </Reveal>
             <Reveal as="div" className="mission-card mission-card--gold" delay={100}>
-              <span className="mission-icon">🔭</span>
+              <span className="mission-no">02</span>
               <h3>Tầm nhìn</h3>
               <p>Trở thành thương hiệu nội thất gỗ tự nhiên uy tín hàng đầu Đông Nam Á vào năm 2030, được khách hàng tin tưởng và lựa chọn vì chất lượng và giá trị bền vững.</p>
             </Reveal>
             <Reveal as="div" className="mission-card mission-card--light" delay={200}>
-              <span className="mission-icon">💡</span>
+              <span className="mission-no">03</span>
               <h3>Triết lý</h3>
               <p>Chúng tôi tin rằng một ngôi nhà đẹp không chỉ đến từ thiết kế — mà từ những vật liệu chân thật, tự nhiên và câu chuyện đằng sau mỗi món đồ.</p>
             </Reveal>
@@ -257,7 +257,7 @@ export default function About() {
           <div className="values-grid">
             {values.map((v, i) => (
               <Reveal as="div" className="value-card" key={i} delay={Math.min(i * 80, 320)}>
-                <span className="value-icon">{v.icon}</span>
+                <span className="value-icon">{String(i + 1).padStart(2, "0")}</span>
                 <h3>{v.title}</h3>
                 <p>{v.desc}</p>
               </Reveal>

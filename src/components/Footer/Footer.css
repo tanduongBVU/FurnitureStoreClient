@@ -5,36 +5,179 @@
   --gold-d: #a8854a;
 }
 
-/* Bản riêng của .section-inner cho Footer — trước đây dùng chung rule ".home
-   .section-inner" trong Home.css, chỉ có hiệu lực khi Footer còn nằm TRONG
-   Home.jsx. Giờ Footer hiện độc lập ở mọi trang (đặt tại MainLayout, ngoài
-   .home), nên cần tự định nghĩa lại max-width/padding, không phụ thuộc vào
-   Home.css nữa. */
-.footer .section-inner {
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 0 24px;
+.footer {
+  background: #140c04;
+  color: rgba(255, 255, 255, 0.6);
 }
 
-.footer { background: #1a0f05; padding: 64px 0 0; }
-.footer-inner {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 48px;
-  padding-bottom: 48px;
+/* Khung nội dung riêng của Footer. LƯU Ý: chỉ đặt padding NGANG ở đây (padding-inline),
+   tuyệt đối không dùng shorthand "padding: 0 24px" — shorthand đó từng ghi đè mất
+   padding-bottom của khối lưới và làm dòng cuối của cột dính sát đường kẻ bên dưới. */
+.footer__wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-inline: 32px;
 }
-.footer-brand .footer-logo { font-size: 20px; color: var(--cream); display: block; margin-bottom: 12px; }
-.footer-brand p { font-size: 14px; color: rgba(255,255,255,.45); margin: 0; }
-.footer-links { display: flex; flex-direction: column; gap: 10px; }
-.footer-links h4 { color: var(--cream); font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 0 0 4px; }
-.footer-links a { color: rgba(255,255,255,.5); font-size: 14px; text-decoration: none; transition: color .2s; }
-.footer-links a:hover { color: var(--gold); }
-.footer-bottom { border-top: 1px solid rgba(255,255,255,.08); padding: 20px 24px; text-align: center; }
-.footer-bottom p { color: rgba(255,255,255,.3); font-size: 13px; margin: 0; }
+
+/* ── Dải CTA ── */
+.footer__cta {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(200, 169, 110, 0.16), transparent 55%),
+    #1b1007;
+}
+.footer__cta-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  padding-block: 72px;
+}
+.footer__cta h2 {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(30px, 4.4vw, 56px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--cream);
+}
+.footer__cta-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 30px;
+  border: 1px solid var(--gold);
+  border-radius: 2px;
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: background 0.25s ease, color 0.25s ease, gap 0.25s ease;
+}
+.footer__cta-btn:hover {
+  background: var(--gold);
+  color: #1a1208;
+  gap: 16px;
+}
+
+/* ── Lưới thông tin ── */
+.footer__grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr 1.1fr;
+  gap: 56px;
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+.footer__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--cream);
+}
+.footer__logo-icon {
+  color: var(--gold);
+  font-size: 24px;
+  letter-spacing: 0;
+}
+.footer__brand p {
+  margin: 18px 0 26px;
+  max-width: 340px;
+  font-size: 14.5px;
+  line-height: 1.75;
+}
+.footer__contact {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.footer__contact dt {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 3px;
+}
+.footer__contact dd {
+  margin: 0;
+  font-size: 14.5px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.footer__col {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.footer__col h4 {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+.footer__col a {
+  position: relative;
+  align-self: flex-start;
+  font-size: 14.5px;
+  color: rgba(255, 255, 255, 0.58);
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.25s ease;
+}
+.footer__col a:hover {
+  color: var(--gold);
+  transform: translateX(4px);
+}
+
+/* ── Dải bản quyền ── */
+.footer__bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+.footer__bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 22px;
+}
+.footer__bottom p {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.38);
+}
+.footer__top {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.footer__top:hover { color: var(--gold); }
 
 @media (max-width: 1024px) {
-  .footer-inner { grid-template-columns: 1fr 1fr; }
+  .footer__grid { grid-template-columns: 1fr 1fr; gap: 44px; }
+  .footer__brand { grid-column: 1 / -1; }
 }
 @media (max-width: 768px) {
-  .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+  .footer__wrap { padding-inline: 20px; }
+  .footer__cta-inner { flex-direction: column; align-items: flex-start; padding-block: 52px; }
+  .footer__grid { padding-top: 48px; padding-bottom: 48px; }
+}
+@media (max-width: 480px) {
+  .footer__grid { grid-template-columns: 1fr; }
+  .footer__bottom-inner { flex-direction: column; align-items: flex-start; }
 }

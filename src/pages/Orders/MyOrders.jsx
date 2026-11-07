@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
@@ -33,6 +33,15 @@ const FILTERS = [
 ];
 
 const formatPrice = (n) => Number(n || 0).toLocaleString("vi-VN", { maximumFractionDigits: 0 }) + " ₫";
+// Nhóm đơn theo tháng để danh sách dài dễ đọc (đơn đã sắp xếp mới → cũ từ Backend)
+const monthKey = (d) => {
+  const t = new Date(d);
+  return `${t.getFullYear()}-${t.getMonth()}`;
+};
+const monthLabel = (d) => {
+  const t = new Date(d);
+  return `Tháng ${t.getMonth() + 1}/${t.getFullYear()}`;
+};
 const formatDate = (d) =>
   new Date(d).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" }) +
   " " +
@@ -83,7 +92,7 @@ export default function MyOrders() {
     <div className="myorders-page">
       <div className="myorders-header">
         <div className="section-inner">
-          <span className="eyebrow" style={{ color: "#c8a96e" }}>Tài khoản của bạn</span>
+          <span className="eyebrow">Tài khoản của bạn</span>
           <h1>Đơn hàng của tôi</h1>
           <p>Tra cứu lịch sử mua hàng và theo dõi trạng thái đơn hàng.</p>
         </div>
@@ -97,23 +106,29 @@ export default function MyOrders() {
           </div>
         ) : error ? (
           <div className="myorders-empty">
-            <span style={{ fontSize: 40 }}>⚠️</span>
+            <span className="myorders-empty__icon" aria-hidden="true">⚠️</span>
             <p>{error}</p>
           </div>
         ) : orders.length === 0 ? (
           <div className="myorders-empty">
-            <span style={{ fontSize: 48 }}>🛍️</span>
-            <p>Bạn chưa có đơn hàng nào.</p>
+            <svg className="myorders-empty__svg" viewBox="0 0 48 48" width="60" height="60" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 15h30l-2 25H11L9 15z" />
+              <path d="M17 15v-3a7 7 0 0 1 14 0v3" />
+            </svg>
+            <h2>Bạn chưa có đơn hàng nào</h2>
+            <p>Những đơn hàng bạn đặt sẽ xuất hiện ở đây để bạn theo dõi.</p>
             <Link to="/products" className="btn-dark">Khám phá sản phẩm →</Link>
           </div>
         ) : (
           <>
             {/* ── Bộ lọc theo trạng thái — chỉ hiện nhóm có đơn (và "Tất cả") ── */}
-            <div className="orders-filters">
+            <div className="orders-filters" role="tablist">
               {FILTERS.filter((f) => f.key === "all" || counts[f.key] > 0).map((f) => (
                 <button
                   key={f.key}
                   type="button"
+                  role="tab"
+                  aria-selected={filter === f.key}
                   className={`orders-filter ${filter === f.key ? "orders-filter--active" : ""}`}
                   onClick={() => changeFilter(f.key)}
                 >
@@ -129,38 +144,42 @@ export default function MyOrders() {
               </div>
             ) : (
               <div className="orders-list">
+                <div className="orders-list__head" aria-hidden="true">
+                  <span>Đơn hàng</span>
+                  <span>Trạng thái</span>
+                  <span>Tổng tiền</span>
+                </div>
                 {visibleOrders.map((o, idx) => {
                   const isOpen = openId === o.id;
                   // Chi tiết giảm giá (chỉ có ở đơn tạo SAU khi có 2 cột này; đơn cũ = 0 nên không hiện)
                   const bundleDiscount = Number(o.bundleDiscount || 0);
                   const couponDiscount = Number(o.couponDiscount || 0);
                   const hasDiscount = bundleDiscount > 0 || couponDiscount > 0;
+                  const showMonth = idx === 0 || monthKey(visibleOrders[idx - 1].createdAt) !== monthKey(o.createdAt);
                   return (
-                    // Reveal chỉ bọc ở cấp order-card (không bọc riêng order-details bên trong) —
-                    // vì phần chi tiết ẩn/hiện theo state khi bấm mở, nếu Reveal lại tự theo dõi
-                    // riêng phần đó, IntersectionObserver có thể chưa kịp trigger lúc vừa bấm mở
-                    // (phần tử vừa render ra) khiến nó bị đứng khuất không hiện.
+                    <Fragment key={o.id}>
+                      {showMonth && <div className="orders-month">{monthLabel(o.createdAt)}</div>}
+                    {/* Reveal chỉ bọc ở cấp order-card (không bọc riêng order-details bên trong) — vì phần chi tiết
+                        ẩn/hiện theo state khi bấm mở, nếu Reveal lại tự theo dõi riêng phần đó, IntersectionObserver có thể
+                        chưa kịp trigger lúc vừa bấm mở (phần tử vừa render ra) khiến nó bị đứng khuất không hiện. */}
                     <Reveal
                       as="div"
                       className={`order-card ${isOpen ? "order-card--open" : ""}`}
-                      key={o.id}
                       delay={Math.min(idx * 70, 350)}
                     >
-                      <button className="order-summary" onClick={() => toggleOrder(o.id)}>
+                      <button type="button" className="order-summary" onClick={() => toggleOrder(o.id)} aria-expanded={isOpen}>
                         <div className="order-summary__left">
                           <span className="order-code">Đơn hàng #{o.id}</span>
                           <span className="order-date">{formatDate(o.createdAt)}</span>
                         </div>
-                        <div className="order-summary__right">
-                          <span className={`order-status ${statusStyle(o.status)}`}>{o.status}</span>
-                          <strong className="order-total">{formatPrice(o.total)}</strong>
-                          <span className="order-chevron" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
-                              strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M9 6l6 6-6 6" />
-                            </svg>
-                          </span>
-                        </div>
+                        <span className={`order-status ${statusStyle(o.status)}`}>{o.status}</span>
+                        <strong className="order-total">{formatPrice(o.total)}</strong>
+                        <span className="order-chevron" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 6l6 6-6 6" />
+                          </svg>
+                        </span>
                       </button>
 
                       {isOpen && (
@@ -172,7 +191,7 @@ export default function MyOrders() {
                                   {item.product?.image ? (
                                     <img src={item.product.image} alt={item.productName} />
                                   ) : (
-                                    <span style={{ fontSize: 22 }}>🪑</span>
+                                    <span className="order-item__placeholder">🪑</span>
                                   )}
                                 </div>
                                 <div className="order-item__info">
@@ -208,13 +227,13 @@ export default function MyOrders() {
                                 {bundleDiscount > 0 && (
                                   <div className="order-meta__row">
                                     <span>Giảm giá combo</span>
-                                    <strong style={{ color: "#b3492f" }}>−{formatPrice(bundleDiscount)}</strong>
+                                    <strong className="order-meta__discount">−{formatPrice(bundleDiscount)}</strong>
                                   </div>
                                 )}
                                 {couponDiscount > 0 && (
                                   <div className="order-meta__row">
                                     <span>Mã giảm giá{o.couponCode ? ` (${o.couponCode})` : ""}</span>
-                                    <strong style={{ color: "#b3492f" }}>−{formatPrice(couponDiscount)}</strong>
+                                    <strong className="order-meta__discount">−{formatPrice(couponDiscount)}</strong>
                                   </div>
                                 )}
                               </>
@@ -228,6 +247,7 @@ export default function MyOrders() {
                         </div>
                       )}
                     </Reveal>
+                    </Fragment>
                   );
                 })}
               </div>

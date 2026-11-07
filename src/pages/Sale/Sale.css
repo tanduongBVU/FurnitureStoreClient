@@ -1,0 +1,63 @@
+/* ═══════════════════════════════════════════════════════════
+   TRANG KHUYẾN MÃI — dùng chung thẻ sản phẩm với trang Sản phẩm (Products.css),
+   file này chỉ thêm phần đầu trang và bố cục lưới riêng.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Đầu trang: nền nâu đậm pha ánh đỏ ấm ở góc phải → gợi cảm giác "ưu đãi" nhưng vẫn hợp tông thương hiệu */
+.sale-page .sale-hero {
+  background:
+    radial-gradient(ellipse at 88% 0%, rgba(185, 28, 28, 0.32), transparent 55%),
+    radial-gradient(ellipse at 10% 100%, rgba(200, 169, 110, 0.14), transparent 50%),
+    linear-gradient(180deg, #2a1c10 0%, #3b2a1a 100%);
+  padding-bottom: 56px;
+}
+
+/* Hai con số nổi bật: số sản phẩm + mức giảm cao nhất */
+.sale-hero__stats {
+  display: flex;
+  gap: 0;
+  margin-top: 48px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  max-width: 560px;
+}
+.sale-hero__stats > div { display: flex; flex-direction: column; padding-right: 48px; }
+.sale-hero__stats > div + div { padding-left: 48px; padding-right: 0; border-left: 1px solid rgba(255, 255, 255, 0.22); }
+.sale-hero__stats strong {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 500;
+  line-height: 1;
+  color: #fff;
+}
+.sale-hero__stats span { margin-top: 10px; font-size: 13px; color: rgba(255, 255, 255, 0.62); }
+
+/* Thân trang: không có cột lọc nên lưới rộng hơn (4 cột) */
+.sale-page .sale-body { padding-top: 64px; padding-bottom: 112px; }
+.sale-page .client-products-grid { grid-template-columns: repeat(4, 1fr); gap: 40px 24px; }
+
+@media (max-width: 1100px) {
+  .sale-page .client-products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+  .sale-page .client-products-grid { grid-template-columns: repeat(2, 1fr); }
+  .sale-page .sale-body { padding-top: 48px; padding-bottom: 72px; }
+}
+@media (max-width: 640px) {
+  .sale-page .client-products-grid { gap: 16px 12px; }
+  .sale-hero__stats { margin-top: 36px; }
+  .sale-hero__stats > div { padding-right: 24px; }
+  .sale-hero__stats > div + div { padding-left: 24px; }
+}
+@media (max-width: 380px) {
+  .sale-page .client-products-grid { grid-template-columns: 1fr; }
+}
+
+/* ═══ Đầu trang GỌN (thu nhỏ để nhường chỗ cho nội dung chính) — đặt cuối file để thắng các rule cũ ═══ */
+.sale-page .sale-hero { padding: 44px 0 36px; }
+.sale-hero__stats { margin-top: 22px; padding-top: 18px; max-width: 460px; }
+.sale-hero__stats > div { padding-right: 32px; }
+.sale-hero__stats > div + div { padding-left: 32px; }
+.sale-hero__stats strong { font-size: clamp(24px, 2.8vw, 32px); }
+.sale-hero__stats span { margin-top: 6px; font-size: 12.5px; }
+@media (max-width: 640px) { .sale-page .sale-hero { padding: 32px 0 28px; } }

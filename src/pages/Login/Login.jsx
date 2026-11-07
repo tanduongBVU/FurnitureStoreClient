@@ -61,7 +61,7 @@ const Login = () => {
         <h1>Đăng nhập</h1>
         <p className="auth-desc">Chào mừng bạn quay lại LuxWood</p>
 
-        {error && <div className="auth-error">⚠️ {error}</div>}
+        {error && <div className="auth-error" role="alert">{error}</div>}
 
         <div className="auth-google-wrap">
           <GoogleLoginButton onSuccess={handleGoogleSuccess} onError={setError} />
@@ -73,8 +73,9 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="auth-form" noValidate>
           <div className="form-group">
-            <label>Email</label>
+            <label htmlFor="login-email">Email</label>
             <input
+              id="login-email"
               type="email"
               name="email"
               placeholder="ban@email.com"
@@ -87,8 +88,9 @@ const Login = () => {
             <FieldError message={errors.email} />
           </div>
           <div className="form-group">
-            <label>Mật khẩu</label>
+            <label htmlFor="login-password">Mật khẩu</label>
             <input
+              id="login-password"
               type="password"
               name="password"
               placeholder="••••••••"
@@ -100,10 +102,8 @@ const Login = () => {
             />
             <FieldError message={errors.password} />
             {/* Quên mật khẩu → gửi link đặt lại qua email (xem pages/ForgotPassword) */}
-            <div style={{ textAlign: "right", marginTop: 6 }}>
-              <Link to="/forgot-password" style={{ fontSize: 13, color: "#a8854a", textDecoration: "none" }}>
-                Quên mật khẩu?
-              </Link>
+            <div className="auth-forgot">
+              <Link to="/forgot-password">Quên mật khẩu?</Link>
             </div>
           </div>
           <button type="submit" className="auth-btn" disabled={loading}>

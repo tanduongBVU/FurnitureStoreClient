@@ -39,13 +39,27 @@ const ServiceList = () => {
     <div className="service-list-page">
       <div className="service-list-hero">
         <div className="section-inner">
-          <span className="eyebrow" style={{ color: "#c8a96e" }}>Dịch vụ</span>
+          <span className="eyebrow">Dịch vụ</span>
           <h1>{meta.title}</h1>
           <p>{meta.subtitle}</p>
         </div>
       </div>
 
       <div className="section-inner service-list-body">
+        {/* Chuyển nhanh giữa 2 loại dịch vụ */}
+        <nav className="service-tabs" aria-label="Loại dịch vụ">
+          {Object.entries(TYPE_META).map(([key, m]) => (
+            <Link
+              key={key}
+              to={`/services/${key}`}
+              className={`service-tab ${key === type ? "service-tab--active" : ""}`}
+            >
+              {m.title.replace("Dịch Vụ ", "")}
+            </Link>
+          ))}
+          {!loading && <span className="service-count">{services.length} dịch vụ</span>}
+        </nav>
+
         {error && <div className="error-box">⚠️ {error}</div>}
 
         {loading ? (
@@ -63,11 +77,12 @@ const ServiceList = () => {
                     ) : (
                       <span className="service-card__placeholder">🏗️</span>
                     )}
+                    <span className="service-card__no">{String(idx + 1).padStart(2, "0")}</span>
                   </div>
                   <div className="service-card__body">
                     <h3>{s.title}</h3>
                     <p>{s.shortDescription}</p>
-                    <span className="service-card__more">Xem chi tiết →</span>
+                    <span className="service-card__more">Xem chi tiết <span aria-hidden="true">→</span></span>
                   </div>
                 </Link>
               </Reveal>

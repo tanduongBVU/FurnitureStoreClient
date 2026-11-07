@@ -59,10 +59,13 @@
 
 .navbar__logo-text {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 22px;
+  font-size: 21px;
   font-weight: 700;
   color: var(--walnut);
-  letter-spacing: 0.5px;
+  /* Chữ in hoa giãn chữ kiểu thương hiệu cao cấp — muốn về như cũ chỉ cần xoá 2 dòng dưới */
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
 }
 
 .navbar__logo-text span {
@@ -749,3 +752,60 @@ button.navbar__link:focus-visible {
     max-width: 70px;
   }
 }
+/* ═══════════════════════════════════════════════════════════
+   MENU TRONG SUỐT TRÊN TRANG CHỦ (class .navbar--overlay)
+   Chỉ bật khi đang ở "/" và chưa cuộn. Chữ trắng đè lên ảnh hero;
+   một lớp mờ tối ở đầu trang giữ cho chữ luôn đọc được.
+   ═══════════════════════════════════════════════════════════ */
+.navbar::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -48px 0;
+  background: linear-gradient(to bottom, rgba(20, 12, 4, 0.62), rgba(20, 12, 4, 0));
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.35s ease;
+}
+.navbar--overlay::before { opacity: 1; }
+
+.navbar--overlay {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom-color: transparent;
+  box-shadow: none;
+}
+.navbar--overlay .navbar__logo-text,
+.navbar--overlay .navbar__logo-text span { color: #fff; }
+.navbar--overlay .navbar__link { color: rgba(255, 255, 255, 0.9); }
+.navbar--overlay .navbar__link:hover,
+.navbar--overlay .navbar__link--active { color: #fff; }
+/* Đỏ đậm của "Khuyến Mãi" không đọc được trên ảnh tối → dùng hồng san hô sáng */
+.navbar--overlay .navbar__link--promo,
+.navbar--overlay .navbar__link--promo:hover { color: #ffb8a8; }
+.navbar--overlay .navbar__link--promo::after { background: #ffb8a8; }
+.navbar--overlay .navbar__cart { color: #fff; }
+.navbar--overlay .navbar__cart:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
+.navbar--overlay .navbar__cart-badge {
+  background: var(--gold);
+  color: var(--walnut);
+  box-shadow: none;
+}
+.navbar--overlay .navbar__login-link {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+.navbar--overlay .navbar__login-link:hover { background: #fff; color: var(--walnut); box-shadow: none; }
+.navbar--overlay .navbar__account-btn {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #fff;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.navbar--overlay .navbar__account-btn:hover,
+.navbar--overlay .navbar__account-btn--open { background: rgba(255, 255, 255, 0.24); }
+.navbar--overlay .navbar__account-chevron { color: #fff; }
+.navbar--overlay .navbar__hamburger span { background: #fff; }

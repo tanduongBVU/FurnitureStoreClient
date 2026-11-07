@@ -21,6 +21,15 @@ const rooms = [
   { id: 6, label: "Ban Công", icon: "🌿", desc: "Bàn ghế ngoài trời, xích đu, đèn sân vườn", category: "Ban công" },
 ];
 
+// Dải cam kết ngay dưới hero. Nội dung lấy từ các trang hiện có của website (Giới thiệu, Giỏ hàng) —
+// sửa trực tiếp ở đây nếu muốn đổi lời lẽ.
+const TRUST = [
+  { title: "Gỗ tự nhiên cao cấp", desc: "Chọn lọc kỹ và qua kiểm định chất lượng" },
+  { title: "Bảo hành 5 năm", desc: "Cam kết bảo hành dài hạn cho mọi sản phẩm" },
+  { title: "Thiết kế theo yêu cầu", desc: "Tư vấn và thi công riêng cho từng không gian" },
+  { title: "Miễn phí vận chuyển", desc: "Giao hàng và lắp đặt tận nơi" },
+];
+
 // Nếu sản phẩm đang giảm giá, trả về bản sao với price = giá đã giảm
 // (dùng khi thêm vào giỏ để giỏ hàng luôn tính đúng giá đang bán, không phải giá gốc)
 const withSalePrice = (p) =>
@@ -204,7 +213,36 @@ export default function Home() {
 
   const slide = slides[current];
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
-  const salePriceOf = (p) => p.price * (1 - (p.discountPercent || 0) / 100);
+  // Làm tròn tới đồng — trước đây không làm tròn nên giá hiện số lẻ kiểu "2.999.999.999,7 ₫"
+  const salePriceOf = (p) => Math.round(p.price * (1 - (p.discountPercent || 0) / 100));
+  const year = new Date().getFullYear();
+
+  // Phần chữ của hero (dùng chung cho chế độ video và chế độ slides). key đổi theo slide để chữ
+  // chạy lại hiệu ứng xuất hiện mỗi lần chuyển slide.
+  const renderHeroCopy = (d) => (
+    <div className="hero-content">
+      <div className="hero-content__inner" key={d.key}>
+        <span className="hero-eyebrow" style={{ color: d.accent }}>
+          <i className="hero-eyebrow__line" style={{ background: d.accent }} />
+          LuxWood Collection {year}
+        </span>
+        <h1 className="hero-title">
+          {d.title.split("\n").map((line, i, arr) => (
+            <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+          ))}
+        </h1>
+        <p className="hero-sub">{d.sub}</p>
+        <div className="hero-actions">
+          <Link to="/products" className="btn-primary" style={{ background: d.accent, color: "#1a1208" }}>
+            Khám phá ngay
+          </Link>
+          <Link to="/about" className="hero-link">
+            Về chúng tôi <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 
   // Thêm CẢ combo vào giỏ — combo vào giỏ như MỘT dòng riêng, giá do Backend tính sẵn
   // (finalPrice, đã gồm giảm giá combo), không còn tự tính/tách từng sản phẩm ở Client.
@@ -343,23 +381,8 @@ export default function Home() {
             />
           )}
           <div className="hero-overlay" />
-
-          <div className="hero-content">
-            <span className="hero-eyebrow" style={{ color: heroVideo.accent }}>LuxWood Collection 2025</span>
-            <h1 className="hero-title" style={{ "--accent": heroVideo.accent }}>
-              {heroVideo.title.split("\n").map((line, i) => (
-                <span key={i}>{line}<br /></span>
-              ))}
-            </h1>
-            <p className="hero-sub">{heroVideo.sub}</p>
-            <div className="hero-actions">
-              <Link to="/products" className="btn-primary" style={{ background: heroVideo.accent, color: "#1a1208" }}>
-                Khám phá ngay
-              </Link>
-              <Link to="/about" className="btn-ghost">Về chúng tôi</Link>
-            </div>
-          </div>
-          {/* Không dots, không arrows — chỉ 1 video duy nhất, không có gì để chuyển */}
+          {renderHeroCopy({ key: "video", title: heroVideo.title, sub: heroVideo.sub, accent: heroVideo.accent })}
+          {/* Không có điều khiển — chỉ 1 video duy nhất, không có gì để chuyển */}
         </section>
       ) : (
         /* ── HERO — chế độ SLIDES (xoay vòng 3 ảnh, hành vi gốc) ── */
@@ -371,39 +394,39 @@ export default function Home() {
             className="hero-bg-image"
           />
           <div className="hero-overlay" />
+          {renderHeroCopy({ key: slide.id, title: slide.title, sub: slide.sub, accent: slide.accent })}
 
-          <div className="hero-content">
-            <span className="hero-eyebrow" style={{ color: slide.accent }}>LuxWood Collection 2025</span>
-            <h1 className="hero-title" style={{ "--accent": slide.accent }}>
-              {slide.title.split("\n").map((line, i) => (
-                <span key={i}>{line}<br /></span>
-              ))}
-            </h1>
-            <p className="hero-sub">{slide.sub}</p>
-            <div className="hero-actions">
-              <Link to="/products" className="btn-primary" style={{ background: slide.accent, color: "#1a1208" }}>
-                Khám phá ngay
-              </Link>
-              <Link to="/about" className="btn-ghost">Về chúng tôi</Link>
+          {/* Bộ đếm 01 / 03 + thanh tiến trình chạy đúng 4,5 giây (bằng chu kỳ tự chuyển) + nút chuyển slide */}
+          <div className="hero-controls">
+            <div className="hero-counter">
+              <strong>{String(current + 1).padStart(2, "0")}</strong>
+              <span className="hero-progress">
+                <i key={current} style={{ background: slide.accent }} />
+              </span>
+              <em>{String(slides.length).padStart(2, "0")}</em>
+            </div>
+            <div className="hero-arrows">
+              <button type="button" aria-label="Slide trước" onClick={() => goTo(current - 1)}>←</button>
+              <button type="button" aria-label="Slide sau" onClick={() => goTo(current + 1)}>→</button>
             </div>
           </div>
-
-          {/* Dots */}
-          <div className="slider-dots">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                className={`dot ${i === current ? "dot--active" : ""}`}
-                style={{ background: i === current ? slide.accent : "rgba(255,255,255,0.4)" }}
-                onClick={() => goTo(i)}
-              />
-            ))}
-          </div>
-          {/* Arrows */}
-          <button className="arrow arrow--left" onClick={() => goTo(current - 1)}>‹</button>
-          <button className="arrow arrow--right" onClick={() => goTo(current + 1)}>›</button>
         </section>
       )}
+
+      {/* ── DẢI CAM KẾT ── */}
+      <section className="trust-strip">
+        <div className="section-inner trust-strip__grid">
+          {TRUST.map((t, i) => (
+            <div className="trust-item" key={t.title}>
+              <span className="trust-item__no">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <strong>{t.title}</strong>
+                <p>{t.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {renderBannersAt("after-hero")}
 
@@ -441,16 +464,19 @@ export default function Home() {
       <section className="products-section">
         <div className="section-inner">
           <Reveal as="div" className="section-header">
-            <span className="eyebrow">Được yêu thích nhất</span>
-            <h2>Sản phẩm bán chạy</h2>
+            <div className="section-header__text">
+              <span className="eyebrow">Được yêu thích nhất</span>
+              <h2>Sản phẩm bán chạy</h2>
+            </div>
+            <Link to="/products" className="section-header__link">
+              Xem tất cả sản phẩm <span aria-hidden="true">→</span>
+            </Link>
           </Reveal>
 
           {loadingProducts ? (
-            <p style={{ textAlign: "center", color: "var(--text-muted)" }}>Đang tải sản phẩm...</p>
+            <p className="section-note">Đang tải sản phẩm...</p>
           ) : bestSellers.length === 0 ? (
-            <p style={{ textAlign: "center", color: "var(--text-muted)" }}>
-              Chưa có sản phẩm nào được đánh dấu bán chạy.
-            </p>
+            <p className="section-note">Chưa có sản phẩm nào được đánh dấu bán chạy.</p>
           ) : (
             <div className="products-grid">
               {bestSellers.map((p, idx) => {
@@ -464,17 +490,7 @@ export default function Home() {
                         : <span style={{ fontSize: 40 }}>🪑</span>
                       }
                       <span className="product-tag">Bán chạy</span>
-                      {hasDiscount && (
-                        <span
-                          style={{
-                            position: "absolute", top: 52, right: 12,
-                            background: "#c0392b", color: "#fff", fontSize: 11, fontWeight: 700,
-                            padding: "4px 10px", borderRadius: 20, letterSpacing: .5,
-                          }}
-                        >
-                          -{p.discountPercent}%
-                        </span>
-                      )}
+                      {hasDiscount && <span className="product-sale">-{p.discountPercent}%</span>}
                       <WishlistButton product={p} />
                       <CompareButton product={p} />
                     </div>
@@ -484,9 +500,9 @@ export default function Home() {
                       <RatingStars avg={p.averageRating} count={p.reviewCount} />
                       <div className="product-footer">
                         {hasDiscount ? (
-                          <span style={{ display: "flex", flexDirection: "column" }}>
-                            <strong className="product-price" style={{ color: "#b3492f" }}>{formatPrice(salePriceOf(p))}</strong>
-                            <span style={{ fontSize: 12, color: "#9a9186", textDecoration: "line-through" }}>{formatPrice(p.price)}</span>
+                          <span className="product-prices">
+                            <strong className="product-price product-price--sale">{formatPrice(salePriceOf(p))}</strong>
+                            <span className="product-price-original">{formatPrice(p.price)}</span>
                           </span>
                         ) : (
                           <strong className="product-price">{formatPrice(p.price)}</strong>
@@ -495,7 +511,7 @@ export default function Home() {
                           className="btn-add"
                           onClick={(e) => {
                             e.preventDefault();
-                            addToCart({ ...p, price: hasDiscount ? Math.round(salePriceOf(p)) : p.price }, 1);
+                            addToCart({ ...p, price: hasDiscount ? salePriceOf(p) : p.price }, 1);
                           }}
                         >+ Thêm</button>
                       </div>
@@ -506,10 +522,6 @@ export default function Home() {
               })}
             </div>
           )}
-
-          <div style={{ textAlign: "center", marginTop: 40 }}>
-            <Link to="/products" className="btn-outline">Xem tất cả sản phẩm →</Link>
-          </div>
         </div>
       </section>
 
@@ -521,9 +533,11 @@ export default function Home() {
       {!loadingBundles && bundles.length > 0 && (
         <section className="bundles-section">
           <div className="section-inner">
-            <Reveal as="div" className="section-header">
-              <span className="eyebrow">Mua trọn bộ, tiết kiệm hơn</span>
-              <h2>Combo tiết kiệm</h2>
+            <Reveal as="div" className="section-header section-header--light">
+              <div className="section-header__text">
+                <span className="eyebrow">Mua trọn bộ, tiết kiệm hơn</span>
+                <h2>Combo tiết kiệm</h2>
+              </div>
             </Reveal>
 
             <div className="bundles-grid-home">
@@ -559,17 +573,13 @@ export default function Home() {
 
                         {/* Combo thiếu hàng: báo rõ sản phẩm nào hết, và khoá nút thêm vào giỏ */}
                         {!b.isAvailable && (
-                          <p style={{ fontSize: 13, color: "#c0392b", fontWeight: 600, margin: "8px 0 0", lineHeight: 1.4 }}>
+                          <p className="bundle-card-home__note bundle-card-home__note--err">
                             ⚠️ Tạm hết hàng{b.outOfStockItems?.length > 0 ? `: ${b.outOfStockItems.join(", ")}` : ""}
                           </p>
                         )}
 
                         <button
                           className="btn-primary bundle-card-home__btn"
-                          style={{
-                            background: "var(--walnut)", color: "#fff",
-                            ...(b.isAvailable ? {} : { opacity: 0.5, cursor: "not-allowed" }),
-                          }}
                           onClick={() => handleAddBundle(b)}
                           disabled={!b.isAvailable}
                         >
@@ -577,7 +587,7 @@ export default function Home() {
                         </button>
 
                         {notice && (
-                          <p style={{ fontSize: 13, margin: "8px 0 0", lineHeight: 1.4, color: notice.ok ? "#3f7d4e" : "#c0392b" }}>
+                          <p className={`bundle-card-home__note ${notice.ok ? "bundle-card-home__note--ok" : "bundle-card-home__note--err"}`}>
                             {notice.text}
                           </p>
                         )}
@@ -595,14 +605,19 @@ export default function Home() {
       <section className="rooms-section">
         <div className="section-inner">
           <Reveal as="div" className="section-header">
-            <span className="eyebrow">Danh mục</span>
-            <h2>Nội thất theo từng phòng</h2>
+            <div className="section-header__text">
+              <span className="eyebrow">Danh mục</span>
+              <h2>Nội thất theo từng phòng</h2>
+            </div>
+            <Link to="/products" className="section-header__link">
+              Tất cả sản phẩm <span aria-hidden="true">→</span>
+            </Link>
           </Reveal>
           <div className="rooms-grid">
             {rooms.map((r, idx) => {
               const roomImage = get(`rooms.room${r.id}.image`, "");
               return (
-                <Reveal as="div" key={r.id} delay={Math.min(idx * 70, 350)}>
+                <Reveal as="div" key={r.id} className="room-cell" delay={Math.min(idx * 70, 350)}>
                 <Link to={`/products?category=${encodeURIComponent(r.category)}`} className="room-card">
                   <div className="room-img">
                     {roomImage ? (
@@ -613,9 +628,11 @@ export default function Home() {
                       </div>
                     )}
                   </div>
+                  <span className="room-index">{String(idx + 1).padStart(2, "0")}</span>
                   <div className="room-card-body">
                     <h3>{r.label}</h3>
                     <p>{r.desc}</p>
+                    <span className="room-cta">Xem sản phẩm <span aria-hidden="true">→</span></span>
                   </div>
                 </Link>
                 </Reveal>
@@ -631,24 +648,24 @@ export default function Home() {
       <section className="contact-section" id="contact">
         <div className="section-inner contact-inner">
           <Reveal as="div" className="contact-text" direction="left">
-            <span className="eyebrow" style={{ color: "#c8a96e" }}>Liên hệ</span>
-            <h2 style={{ color: "#fff" }}>Bạn cần tư vấn?</h2>
-            <p style={{ color: "rgba(255,255,255,0.7)" }}>Đội ngũ chuyên gia của chúng tôi sẵn sàng hỗ trợ bạn chọn lựa nội thất phù hợp nhất.</p>
-            <ul className="contact-list">
-              <li>📍 {get("footer.address", "123 Đường Nội Thất, Quận 1, TP.HCM")}</li>
-              <li>📞 {get("footer.phone", "0909 123 456")}</li>
-              <li>✉️ {get("footer.email", "hello@luxwood.vn")}</li>
-              <li>🕐 {get("footer.hours", "Thứ 2 – Thứ 7: 8:00 – 20:00")}</li>
-            </ul>
+            <span className="eyebrow">Liên hệ</span>
+            <h2>Bạn cần tư vấn?</h2>
+            <p>Đội ngũ chuyên gia của chúng tôi sẵn sàng hỗ trợ bạn chọn lựa nội thất phù hợp nhất.</p>
+            <dl className="contact-list">
+              <div><dt>Địa chỉ</dt><dd>{get("footer.address", "123 Đường Nội Thất, Quận 1, TP.HCM")}</dd></div>
+              <div><dt>Điện thoại</dt><dd>{get("footer.phone", "0909 123 456")}</dd></div>
+              <div><dt>Email</dt><dd>{get("footer.email", "hello@luxwood.vn")}</dd></div>
+              <div><dt>Giờ làm việc</dt><dd>{get("footer.hours", "Thứ 2 – Thứ 7: 8:00 – 20:00")}</dd></div>
+            </dl>
           </Reveal>
           <Reveal as="form" className="contact-form" direction="right" delay={120} onSubmit={handleContactSubmit}>
             {contactStatus === "success" && (
-              <p style={{ color: "#7ab87a", fontSize: 14, margin: 0 }}>
+              <p className="contact-form__msg contact-form__msg--ok">
                 ✓ Gửi yêu cầu thành công! Chúng tôi sẽ liên hệ lại sớm nhất.
               </p>
             )}
             {contactStatus === "error" && (
-              <p style={{ color: "#e07a7a", fontSize: 14, margin: 0 }}>
+              <p className="contact-form__msg contact-form__msg--err">
                 ⚠️ Gửi thất bại, vui lòng thử lại sau.
               </p>
             )}
@@ -682,8 +699,7 @@ export default function Home() {
             />
             <button
               type="submit"
-              className="btn-primary"
-              style={{ background: "#c8a96e", color: "#1a1208", width: "100%", justifyContent: "center" }}
+              className="btn-primary btn-gold"
               disabled={contactSending}
             >
               {contactSending ? "Đang gửi..." : "Gửi yêu cầu"}

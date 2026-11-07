@@ -38,6 +38,17 @@ const buildVietQrUrl = ({ bankBin, accountNo, accountName, amount, content }) =>
   return `${base}?${params.toString()}`;
 };
 
+// Phần đầu trang dùng chung cho mọi màn hình của trang thanh toán
+const Hero = ({ eyebrow, title, children }) => (
+  <div className="checkout-hero">
+    <div className="section-inner">
+      <span className="checkout-eyebrow checkout-eyebrow--light">{eyebrow}</span>
+      <h1 className="checkout-title">{title}</h1>
+      {children && <p>{children}</p>}
+    </div>
+  </div>
+);
+
 const Checkout = () => {
   const { cart, totalPrice, clearCart } = useCart();
   const { user, isLoggedIn } = useAuth();
@@ -221,28 +232,30 @@ const Checkout = () => {
 
     return (
       <div className="checkout-page">
-        <div className="section-inner">
-          <div className="checkout-success">
-            <span className="checkout-success-icon">📲</span>
-            <h2>Thanh toán đơn hàng #{createdOrder.id}</h2>
-            <p>
-              Vui lòng quét mã QR bên dưới bằng app ngân hàng để chuyển khoản. Chuyển xong,
-              bấm nút <strong>“Tôi đã chuyển khoản”</strong> để hoàn tất đặt hàng.
-            </p>
+        <Hero eyebrow="Bước cuối cùng" title="Chuyển Khoản">
+          Quét mã QR bằng app ngân hàng bất kỳ để hoàn tất đơn hàng
+        </Hero>
+        <div className="section-inner checkout-body">
+          <div className="checkout-qr">
+            <div className="checkout-qr__frame">
+              <img src={qrUrl} alt="Mã QR chuyển khoản" />
+            </div>
 
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, marginTop: 10 }}>
-              <img
-                src={qrUrl}
-                alt="Mã QR chuyển khoản"
-                style={{ maxWidth: 320, width: "100%", borderRadius: 12, border: "1px solid #e5ddd0" }}
-              />
-              <p style={{ textAlign: "center", fontSize: 14, color: "#3b2a1a", margin: 0 }}>
-                Số tiền: <strong>{formatPrice(createdOrder.total)}</strong><br />
-                Nội dung chuyển khoản: <strong>DH{createdOrder.id}</strong>
+            <div className="checkout-qr__info">
+              <span className="checkout-eyebrow">Đơn hàng #{createdOrder.id}</span>
+              <h2>Thanh toán đơn hàng #{createdOrder.id}</h2>
+              <p>
+                Vui lòng quét mã QR bên cạnh bằng app ngân hàng để chuyển khoản. Chuyển xong,
+                bấm nút <strong>“Tôi đã chuyển khoản”</strong> để hoàn tất đặt hàng.
               </p>
-              {confirmError && (
-                <div className="checkout-error" style={{ margin: 0 }}>⚠️ {confirmError}</div>
-              )}
+
+              <dl className="checkout-qr__facts">
+                <div><dt>Số tiền</dt><dd>{formatPrice(createdOrder.total)}</dd></div>
+                <div><dt>Nội dung chuyển khoản</dt><dd>DH{createdOrder.id}</dd></div>
+              </dl>
+
+              {confirmError && <div className="checkout-error">⚠️ {confirmError}</div>}
+
               <button
                 type="button"
                 className="btn-primary-solid"
@@ -251,7 +264,7 @@ const Checkout = () => {
               >
                 {confirming ? "Đang xác nhận..." : "Tôi đã chuyển khoản"}
               </button>
-              <p style={{ fontSize: 12, color: "#9a9186", textAlign: "center", margin: 0, maxWidth: 360 }}>
+              <p className="checkout-qr__note">
                 Vui lòng không đóng trang này trước khi bấm nút xác nhận. Bấm xác nhận sau khi bạn
                 đã chuyển khoản xong, đơn hàng sẽ được ghi nhận đã thanh toán và chuyển đi xử lý.
               </p>
@@ -267,9 +280,13 @@ const Checkout = () => {
     const paidByQr = paymentMethod === "QR" && qrEnabled;
     return (
       <div className="checkout-page">
-        <div className="section-inner">
+        <Hero eyebrow="Hoàn tất" title="Cảm Ơn Bạn" />
+        <div className="section-inner checkout-body">
           <div className="checkout-success">
-            <span className="checkout-success-icon">✅</span>
+            <svg className="checkout-success-icon" viewBox="0 0 48 48" width="64" height="64" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="24" cy="24" r="19" />
+              <path d="M15 24.5l6.5 6.5L33 18" />
+            </svg>
             <h2>Đặt hàng thành công!</h2>
             {createdOrder && <p>Mã đơn hàng của bạn: <strong>#{createdOrder.id}</strong></p>}
 
@@ -279,7 +296,7 @@ const Checkout = () => {
               <p>Cảm ơn bạn đã tin tưởng LuxWood. Chúng tôi sẽ liên hệ với bạn sớm nhất để xác nhận đơn hàng.</p>
             )}
 
-            <Link to="/products" className="btn-outline-dark" style={{ marginTop: 20 }}>Tiếp tục mua sắm</Link>
+            <Link to="/products" className="btn-outline-dark">Tiếp tục mua sắm</Link>
           </div>
         </div>
       </div>
@@ -289,11 +306,12 @@ const Checkout = () => {
   if (cart.length === 0) {
     return (
       <div className="checkout-page">
-        <div className="section-inner">
+        <Hero eyebrow="Đơn hàng của bạn" title="Thanh Toán" />
+        <div className="section-inner checkout-body">
           <div className="checkout-success">
             <h2>Giỏ hàng của bạn đang trống</h2>
             <p>Vui lòng thêm sản phẩm trước khi thanh toán.</p>
-            <Link to="/products" className="btn-primary-solid">Khám phá sản phẩm</Link>
+            <Link to="/products" className="btn-primary-solid">Khám phá sản phẩm →</Link>
           </div>
         </div>
       </div>
@@ -302,9 +320,11 @@ const Checkout = () => {
 
   return (
     <div className="checkout-page">
-      <div className="section-inner">
-        <h1 className="checkout-title">Thanh Toán</h1>
+      <Hero eyebrow="Hoàn tất đơn hàng" title="Thanh Toán">
+        Điền thông tin giao hàng và chọn cách thanh toán
+      </Hero>
 
+      <div className="section-inner checkout-body">
         {!isLoggedIn && (
           <div className="checkout-guest-note">
             Bạn đang đặt hàng với tư cách khách. <Link to="/login">Đăng nhập</Link> để theo dõi đơn hàng dễ dàng hơn.
@@ -313,13 +333,17 @@ const Checkout = () => {
 
         <div className="checkout-layout">
           <form className="checkout-form" onSubmit={handleSubmit} noValidate>
-            <h3>Thông tin giao hàng</h3>
+            <div className="checkout-step">
+              <span className="checkout-step__no">01</span>
+              <h3>Thông tin giao hàng</h3>
+            </div>
 
             {error && <div className="checkout-error">⚠️ {error}</div>}
 
             <div className="form-group">
-              <label>Họ và tên *</label>
+              <label htmlFor="ck-name">Họ và tên *</label>
               <input
+                id="ck-name"
                 name="customerName"
                 className={errors.customerName ? "is-invalid" : ""}
                 value={form.customerName}
@@ -331,8 +355,9 @@ const Checkout = () => {
               <FieldError message={errors.customerName} />
             </div>
             <div className="form-group">
-              <label>Số điện thoại *</label>
+              <label htmlFor="ck-phone">Số điện thoại *</label>
               <input
+                id="ck-phone"
                 name="phone"
                 className={errors.phone ? "is-invalid" : ""}
                 value={form.phone}
@@ -344,8 +369,9 @@ const Checkout = () => {
               <FieldError message={errors.phone} />
             </div>
             <div className="form-group">
-              <label>Địa chỉ giao hàng *</label>
+              <label htmlFor="ck-address">Địa chỉ giao hàng *</label>
               <textarea
+                id="ck-address"
                 rows={3}
                 name="address"
                 className={errors.address ? "is-invalid" : ""}
@@ -358,49 +384,40 @@ const Checkout = () => {
               <FieldError message={errors.address} />
             </div>
 
-            <h3 style={{ marginTop: 8 }}>Phương thức thanh toán</h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
-              <label
-                style={{
-                  display: "flex", gap: 12, alignItems: "flex-start",
-                  padding: "14px 16px", borderRadius: 10, cursor: "pointer",
-                  border: paymentMethod === "COD" ? "2px solid #c8a96e" : "1.5px solid #e5ddd0",
-                  background: paymentMethod === "COD" ? "rgba(200,169,110,.08)" : "#fff",
-                }}
-              >
+            <div className="checkout-step checkout-step--second">
+              <span className="checkout-step__no">02</span>
+              <h3>Phương thức thanh toán</h3>
+            </div>
+            <div className="pay-options" role="radiogroup" aria-label="Phương thức thanh toán">
+              <label className={`pay-option ${paymentMethod === "COD" ? "pay-option--active" : ""}`}>
                 <input
                   type="radio"
+                  className="pay-option__input"
                   name="paymentMethod"
                   checked={paymentMethod === "COD"}
                   onChange={() => setPaymentMethod("COD")}
-                  style={{ marginTop: 3 }}
                 />
-                <div>
-                  <strong style={{ display: "block", marginBottom: 2 }}>Thanh toán khi nhận hàng (COD)</strong>
-                  <span style={{ fontSize: 13, color: "#7a6a58" }}>Trả tiền mặt trực tiếp cho nhân viên giao hàng.</span>
-                </div>
+                <span className="pay-option__dot" aria-hidden="true" />
+                <span className="pay-option__text">
+                  <strong>Thanh toán khi nhận hàng (COD)</strong>
+                  <span>Trả tiền mặt trực tiếp cho nhân viên giao hàng.</span>
+                </span>
               </label>
 
               {qrEnabled && (
-                <label
-                  style={{
-                    display: "flex", gap: 12, alignItems: "flex-start",
-                    padding: "14px 16px", borderRadius: 10, cursor: "pointer",
-                    border: paymentMethod === "QR" ? "2px solid #c8a96e" : "1.5px solid #e5ddd0",
-                    background: paymentMethod === "QR" ? "rgba(200,169,110,.08)" : "#fff",
-                  }}
-                >
+                <label className={`pay-option ${paymentMethod === "QR" ? "pay-option--active" : ""}`}>
                   <input
                     type="radio"
+                    className="pay-option__input"
                     name="paymentMethod"
                     checked={paymentMethod === "QR"}
                     onChange={() => setPaymentMethod("QR")}
-                    style={{ marginTop: 3 }}
                   />
-                  <div>
-                    <strong style={{ display: "block", marginBottom: 2 }}>Chuyển khoản QR</strong>
-                    <span style={{ fontSize: 13, color: "#7a6a58" }}>Hiện mã QR ngay sau khi bấm đặt hàng — quét bằng app ngân hàng bất kỳ, chuyển xong bấm xác nhận để hoàn tất.</span>
-                  </div>
+                  <span className="pay-option__dot" aria-hidden="true" />
+                  <span className="pay-option__text">
+                    <strong>Chuyển khoản QR</strong>
+                    <span>Hiện mã QR ngay sau khi bấm đặt hàng — quét bằng app ngân hàng bất kỳ, chuyển xong bấm xác nhận để hoàn tất.</span>
+                  </span>
                 </label>
               )}
             </div>
@@ -424,18 +441,18 @@ const Checkout = () => {
                   </div>
                   <div className="checkout-item-info">
                     <p>
-                      {item.type === "bundle" && <strong style={{ color: "#b3492f" }}>[Combo] </strong>}
+                      {item.type === "bundle" && <strong className="checkout-item-combo">[Combo] </strong>}
                       {item.name}
                     </p>
                     {item.type === "bundle" && item.items?.length > 0 && (
-                      <span style={{ display: "block", fontSize: 12, color: "#7a6a58", lineHeight: 1.4 }}>
+                      <span className="checkout-item-bundle">
                         Gồm: {item.items.map(i => `${i.productName} x${i.quantity}`).join(", ")}
                       </span>
                     )}
-                    <span>
+                    <span className="checkout-item-unit">
                       {formatPrice(item.price)} x {item.quantity}
                       {item.type === "bundle" && item.originalPrice > item.price && (
-                        <s style={{ marginLeft: 6, color: "#9a9186" }}>{formatPrice(item.originalPrice)}</s>
+                        <s>{formatPrice(item.originalPrice)}</s>
                       )}
                     </span>
                   </div>
@@ -457,6 +474,7 @@ const Checkout = () => {
                   <input
                     type="text"
                     placeholder="Nhập mã giảm giá"
+                    aria-label="Mã giảm giá"
                     value={couponInput}
                     onChange={(e) => {
                       setCouponInput(e.target.value.toUpperCase());

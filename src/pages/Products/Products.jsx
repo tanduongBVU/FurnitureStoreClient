@@ -135,7 +135,7 @@ const Products = () => {
       <div className="section-inner">
         <div className="products-toolbar">
           <div className="search-box">
-            <span>🔍</span>
+            <svg className="search-box__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
             <input
               placeholder="Tìm kiếm sản phẩm..."
               value={search}
@@ -149,6 +149,7 @@ const Products = () => {
           >
             ⚙️ Bộ lọc{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
           </button>
+          <span className="products-count">{loading ? "" : `${filtered.length} sản phẩm`}</span>
           <select className="sort-select" value={sort} onChange={e => setSort(e.target.value)}>
             <option value="default">Mặc định</option>
             <option value="price-asc">Giá tăng dần</option>
@@ -158,23 +159,29 @@ const Products = () => {
           </select>
         </div>
 
+        {/* Danh mục: dải tab ngang, luôn hiện */}
+        <div className="cat-tabs" role="tablist">
+          {CATEGORIES.map(c => (
+            <button
+              key={c}
+              type="button"
+              role="tab"
+              aria-selected={category === c}
+              className={`cat-tab ${category === c ? "cat-tab--active" : ""}`}
+              onClick={() => handleCategoryClick(c)}
+            >{c}</button>
+          ))}
+        </div>
+
         <div className="products-layout">
+          {showFilters && <div className="filter-overlay" onClick={() => setShowFilters(false)} />}
           {/* ── SIDEBAR — danh mục + bộ lọc nâng cao, luôn hiện trên desktop,
               chỉ bật/tắt qua nút "Bộ lọc" ở màn hình hẹp (xem CSS) ── */}
           <aside className={`products-sidebar ${showFilters ? "products-sidebar--open" : ""}`}>
-            <div className="sidebar-section">
-              <h4>Danh mục</h4>
-              <div className="sidebar-categories">
-                {CATEGORIES.map(c => (
-                  <button
-                    key={c}
-                    className={`sidebar-cat-btn ${category === c ? "sidebar-cat-btn--active" : ""}`}
-                    onClick={() => handleCategoryClick(c)}
-                  >{c}</button>
-                ))}
-              </div>
+            <div className="sidebar-head">
+              <strong>Bộ lọc</strong>
+              <button type="button" className="sidebar-close" onClick={() => setShowFilters(false)} aria-label="Đóng bộ lọc">✕</button>
             </div>
-
             <div className="sidebar-section">
               <h4>Khoảng giá (₫)</h4>
               <div className="price-range-inputs">
@@ -284,7 +291,7 @@ const Products = () => {
                       {p.stock === 0 ? (
                         <span className="product-tag product-tag--out">Hết hàng</span>
                       ) : p.discountPercent > 0 ? (
-                        <span className="product-tag" style={{ background: "#b91c1c" }}>-{p.discountPercent}%</span>
+                        <span className="product-tag product-tag--sale">-{p.discountPercent}%</span>
                       ) : p.isBestSeller ? (
                         <span className="product-tag">Bán chạy</span>
                       ) : null}
@@ -297,12 +304,12 @@ const Products = () => {
                       <RatingStars avg={p.averageRating} count={p.reviewCount} />
                       <div className="product-footer">
                         {p.discountPercent > 0 ? (
-                          <div style={{ display: "flex", flexDirection: "column" }}>
-                            <span style={{ textDecoration: "line-through", color: "#9a9a9a", fontSize: 12 }}>
-                              {formatPrice(priceOf(p))}
+                          <div className="product-prices">
+                            <span className="product-price product-price--sale">
+                              {formatPrice(Math.round(priceOf(p) * (1 - p.discountPercent / 100)))}
                             </span>
-                            <span className="product-price" style={{ color: "#b91c1c" }}>
-                              {formatPrice(priceOf(p) * (1 - p.discountPercent / 100))}
+                            <span className="product-price-original">
+                              {formatPrice(priceOf(p))}
                             </span>
                           </div>
                         ) : (

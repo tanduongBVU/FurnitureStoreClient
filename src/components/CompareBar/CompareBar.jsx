@@ -20,6 +20,7 @@ const CompareBar = () => {
                 <span>🪑</span>
               )}
               <button
+                type="button"
                 className="compare-bar__thumb-remove"
                 onClick={() => removeFromCompare(p.id)}
                 aria-label={`Bỏ ${p.name} khỏi so sánh`}
@@ -36,8 +37,9 @@ const CompareBar = () => {
 
         <div className="compare-bar__actions">
           <span className="compare-bar__count">{totalItems}/{maxCompare} sản phẩm</span>
-          <button className="compare-bar__clear" onClick={clearCompare}>Xoá hết</button>
+          <button type="button" className="compare-bar__clear" onClick={clearCompare}>Xoá hết</button>
           <button
+            type="button"
             className="compare-bar__cta"
             onClick={() => navigate("/compare")}
             disabled={totalItems < 2}

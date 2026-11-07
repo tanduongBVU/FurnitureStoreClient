@@ -1,205 +1,112 @@
+/* ═══════════════════════════════════════════════════════════
+   TRANG LIÊN HỆ — chia đôi màn hình: trái nền nâu đậm (thông tin + bản đồ), phải nền trắng (form)
+   ═══════════════════════════════════════════════════════════ */
 .contact-page {
+  --ct-walnut: var(--walnut, #3b2a1a);
+  --ct-gold: var(--gold, #c8a96e);
+  --ct-gold-d: var(--gold-d, #a8854a);
+  --ct-muted: var(--text-muted, #7a6a58);
+  --ct-line: rgba(59, 42, 26, 0.16);
+  --ct-serif: 'Playfair Display', Georgia, serif;
+  --ct-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Lề hai bên để nội dung thẳng hàng với phần còn lại của site (khung 1240px) */
+  --ct-gutter: max(32px, calc((100vw - 1240px) / 2 + 32px));
   min-height: 70vh;
-  padding-bottom: 60px;
-}
-
-/* Class dùng chung trong toàn site nhưng KHÔNG có định nghĩa global — mỗi trang tự khai báo
-   scoped theo class gốc của trang đó (xem cùng pattern ở .products-page .section-inner trong
-   Products.css). Thiếu dòng này khiến nội dung chạy full-width sát mép thay vì canh giữa. */
-.contact-page .section-inner {
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-.contact-hero {
-  background: #3b2a1a;
-  padding: 56px 0;
-  margin-bottom: 48px;
-  text-align: left;
-}
-/* THIẾU HOÀN TOÀN trước đây — Contact.jsx có dùng <span className="eyebrow"> nhưng
-   file này chưa từng định nghĩa rule cho nó (chỉ có màu set qua inline style), khiến
-   chữ "Liên hệ" dính sát vào tiêu đề "Liên Hệ Với Chúng Tôi" bên dưới, không có
-   khoảng cách và cỡ chữ to bằng chữ thường thay vì caption nhỏ như thiết kế. */
-.contact-hero .eyebrow {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  line-height: 1.4;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-.contact-hero h1 {
-  color: #fff;
-  line-height: 1.1;
-  margin: 0 0 14px;
-}
-.contact-hero p {
-  color: rgba(255, 255, 255, 0.75);
-  line-height: 1.5;
-  margin: 0;
-}
-
-.contact-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-  align-items: start;
-}
-
-/* ── Cột thông tin ── */
-.contact-info-col h2 {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 28px;
-  color: #3b2a1a;
-  margin: 8px 0 12px;
-}
-.contact-info-desc {
-  color: #7a6a58;
-  font-size: 14px;
-  line-height: 1.7;
-  margin: 0 0 28px;
-}
-
-.contact-info-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.contact-info-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-}
-.contact-info-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: #f4efe6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 17px;
-  flex-shrink: 0;
-}
-.contact-info-list li strong {
-  display: block;
-  font-size: 14px;
-  color: #3b2a1a;
-  margin-bottom: 2px;
-}
-.contact-info-list li span {
-  font-size: 13px;
-  color: #7a6a58;
-  line-height: 1.5;
-}
-
-.contact-map {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid #e5ddd0;
-}
-.contact-map iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-/* ── Cột form ── */
-.contact-form-col {
   background: #fff;
-  border: 1px solid #e5ddd0;
-  border-radius: 16px;
-  padding: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.contact-form-col h3 {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 20px;
-  color: #3b2a1a;
-  margin: 0 0 4px;
+  padding-bottom: 0;
+  overflow-x: hidden; /* hiệu ứng trượt của Reveal không gây thanh cuộn ngang */
 }
 
-.contact-form-msg {
-  font-size: 13px;
-  margin: 0;
-  padding: 10px 14px;
-  border-radius: 8px;
-}
-.contact-form-msg--success {
-  background: #f0f9f0;
-  color: #2d5a2d;
-  border: 1px solid #bfe6bf;
-}
-.contact-form-msg--error {
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
-}
+.contact-split { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - var(--nav-height, 80px)); }
 
-.contact-form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+/* ── Bên trái: nền nâu đậm ── */
+.contact-info-col {
+  background: radial-gradient(ellipse at 90% 0%, rgba(200, 169, 110, 0.2), transparent 55%), linear-gradient(180deg, #2a1c10 0%, #3b2a1a 100%);
+  padding: 96px 72px 96px var(--ct-gutter);
+  color: #fff;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; align-items: flex-start;
 }
-.contact-form-field label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #2c1f10;
+.contact-info-col > * { position: relative; z-index: 1; }
+/* Hoạ tiết rất nhạt: lục giác (biểu tượng thương hiệu) nét mảnh ở góc dưới */
+.contact-info-col::after { content: ""; position: absolute; right: -150px; bottom: -170px; width: 460px; height: 460px; z-index: 0; pointer-events: none; opacity: .16;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23c8a96e' stroke-width='0.6'><path d='M50 4 90 27v46L50 96 10 73V27z'/><path d='M50 18 78 34v32L50 82 22 66V34z'/></svg>") center / contain no-repeat; }
+.contact-info-list { width: 100%; }
+.contact-info-note { margin-top: auto; padding-top: 56px; max-width: 480px; }
+.contact-info-quote { font-family: var(--ct-serif); font-size: clamp(24px, 2.4vw, 32px); font-weight: 400; line-height: 1.3; letter-spacing: -0.01em; color: #fff; margin: 0 0 18px; }
+.contact-info-sla { display: inline-flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--ct-gold); }
+.contact-info-sla::before { content: ""; width: 36px; height: 1px; background: currentColor; }
+.contact-info-col .eyebrow {
+  display: inline-flex; align-items: center; gap: 14px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ct-gold); margin-bottom: 18px;
 }
+.contact-info-col .eyebrow::before { content: ""; width: 36px; height: 1px; background: currentColor; }
+/* h1 phải khai báo color rõ ràng, nếu không rule "h1, h2" toàn cục trong index.css sẽ đè (chữ đen) */
+.contact-info-col h1 { font-family: var(--ct-serif); font-size: clamp(38px, 4.6vw, 68px); font-weight: 500; line-height: 1.04; letter-spacing: -0.03em; color: #fff; margin: 0 0 24px; }
+.contact-info-desc { color: rgba(255, 255, 255, 0.72); font-size: 16.5px; line-height: 1.8; margin: 0 0 48px; max-width: 480px; }
+
+.contact-info-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+.contact-info-list li { display: block; padding: 20px 0; border-top: 1px solid rgba(255, 255, 255, 0.16); }
+.contact-info-list li:last-child { border-bottom: 1px solid rgba(255, 255, 255, 0.16); }
+.contact-info-list li strong { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ct-gold); margin-bottom: 8px; }
+.contact-info-list li span { font-size: 17px; color: rgba(255, 255, 255, 0.92); line-height: 1.5; }
+
+.contact-map-block { display: flex; flex-direction: column; gap: 16px; padding-top: 32px; border-top: 1px solid var(--ct-line); }
+.contact-map-label { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ct-gold-d); }
+.contact-map { width: 100%; aspect-ratio: 16 / 10; border-radius: 2px; overflow: hidden; border: 1px solid var(--ct-line); background: #f5f0e8; }
+.contact-map iframe { width: 100%; height: 100%; border: none; filter: grayscale(0.35) contrast(1.02); }
+
+/* ── Bên phải: nền trắng, form không khung ── */
+.contact-form-wrap { padding: 96px var(--ct-gutter) 96px 72px; background: #fff; }
+.contact-form-col {
+  background: none; border: none; border-radius: 0; padding: 0; max-width: 520px;
+  display: flex; flex-direction: column; gap: 24px;
+}
+/* Cột phải: form + bản đồ xếp dọc, cùng bề rộng */
+.contact-form-stack { max-width: 520px; display: flex; flex-direction: column; gap: 56px; }
+.contact-form-col h3 { font-family: var(--ct-serif); font-size: clamp(30px, 3.2vw, 44px); font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; color: var(--ct-walnut); margin: 0 0 8px; }
+
+.contact-form-msg { font-size: 14px; line-height: 1.6; margin: 0; padding: 13px 16px; border-radius: 0; border: none; border-left: 3px solid; }
+.contact-form-msg--success { background: #f0f7f2; color: #14532d; border-color: #15803d; }
+.contact-form-msg--error { background: #fbf1ef; color: #7f1d1d; border-color: #b91c1c; }
+
+.contact-form-field { display: flex; flex-direction: column; gap: 4px; }
+.contact-form-field label { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ct-walnut); }
 .contact-form-field input,
 .contact-form-field textarea {
-  padding: 12px 14px;
-  border: 1.5px solid #e5ddd0;
-  border-radius: 10px;
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  color: #2c1f10;
-  color-scheme: light;
-  transition: border-color 0.2s;
-  resize: vertical;
+  padding: 12px 0; border: none; border-bottom: 1px solid rgba(59, 42, 26, 0.3); border-radius: 0; background: transparent;
+  font-size: 16px; font-family: inherit; outline: none; color: #2c1f10; color-scheme: light; transition: border-color 0.25s; resize: vertical;
 }
+.contact-form-field input::placeholder,
+.contact-form-field textarea::placeholder { color: rgba(59, 42, 26, 0.4); }
 .contact-form-field input:focus,
-.contact-form-field textarea:focus {
-  border-color: #c8a96e;
-}
+.contact-form-field textarea:focus { border-bottom-color: var(--ct-walnut); }
+.contact-form-field input.is-invalid,
+.contact-form-field textarea.is-invalid { border-bottom-color: #b91c1c; }
 
 .contact-form-submit {
-  margin-top: 8px;
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  background: #a8854a;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
+  margin-top: 12px; padding: 18px 34px; border-radius: 2px; border: none; background: var(--ct-walnut); color: #fff;
+  font-size: 14px; font-weight: 600; letter-spacing: 0.04em; cursor: pointer; transition: background 0.25s;
 }
-.contact-form-submit:hover:not(:disabled) {
-  opacity: 0.88;
-}
-.contact-form-submit:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+.contact-form-submit:hover:not(:disabled) { background: var(--ct-gold-d); opacity: 1; }
+.contact-form-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .contact-info-col { padding: 80px 40px 80px var(--ct-gutter); }
+  .contact-form-wrap { padding: 80px var(--ct-gutter) 80px 40px; }
+}
 @media (max-width: 900px) {
-  .contact-body {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-  .contact-hero {
-    padding: 40px 0;
-  }
+  .contact-split { grid-template-columns: 1fr; min-height: 0; }
+  .contact-page { --ct-gutter: 24px; }
+  .contact-info-col { padding: 72px var(--ct-gutter) 64px; }
+  .contact-form-wrap { padding: 64px var(--ct-gutter) 72px; }
+  .contact-form-col, .contact-form-stack { max-width: none; }
+}
+@media (max-width: 480px) {
+  .contact-page { --ct-gutter: 20px; }
+  .contact-info-list li span { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-page *, .contact-page *::before, .contact-page *::after { transition-duration: .01ms !important; }
 }

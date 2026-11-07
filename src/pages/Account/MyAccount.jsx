@@ -91,6 +91,12 @@ const PW_RULES = {
   ],
 };
 
+const TABS = [
+  { key: "overview", label: "Tổng quan", icon: "home" },
+  { key: "profile", label: "Hồ sơ cá nhân", icon: "user" },
+  { key: "password", label: "Đổi mật khẩu", icon: "lock" },
+];
+
 export default function MyAccount() {
   const { user, isLoggedIn, updateProfile, updateAvatar, changePassword } = useAuth();
   const navigate = useNavigate();
@@ -282,13 +288,13 @@ export default function MyAccount() {
             <input
               ref={avatarInputRef}
               type="file"
+              className="account-avatar-input"
               accept="image/jpeg,image/png,image/webp"
-              style={{ display: "none" }}
               onChange={handleAvatarFile}
             />
           </div>
           <div className="myaccount-hero__text">
-            <span className="eyebrow" style={{ color: "#c8a96e" }}>Tài khoản của bạn</span>
+            <span className="eyebrow">Tài khoản của bạn</span>
             <h1>{displayName}</h1>
             <p>{user?.email}</p>
             <div className="myaccount-hero__meta">
@@ -308,27 +314,17 @@ export default function MyAccount() {
       <div className="section-inner myaccount-body">
         {/* ── Menu tài khoản (thành thanh tab ngang khi màn hình hẹp) ── */}
         <nav className="account-nav" aria-label="Menu tài khoản">
-          <button
-            type="button"
-            className={`account-nav__item ${tab === "overview" ? "account-nav__item--active" : ""}`}
-            onClick={() => setTab("overview")}
-          >
-            <span className="account-nav__icon"><Icon name="home" /></span> Tổng quan
-          </button>
-          <button
-            type="button"
-            className={`account-nav__item ${tab === "profile" ? "account-nav__item--active" : ""}`}
-            onClick={() => setTab("profile")}
-          >
-            <span className="account-nav__icon"><Icon name="user" /></span> Hồ sơ cá nhân
-          </button>
-          <button
-            type="button"
-            className={`account-nav__item ${tab === "password" ? "account-nav__item--active" : ""}`}
-            onClick={() => setTab("password")}
-          >
-            <span className="account-nav__icon"><Icon name="lock" /></span> Đổi mật khẩu
-          </button>
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              className={`account-nav__item ${tab === t.key ? "account-nav__item--active" : ""}`}
+              aria-current={tab === t.key ? "page" : undefined}
+              onClick={() => setTab(t.key)}
+            >
+              <span className="account-nav__icon"><Icon name={t.icon} /></span> {t.label}
+            </button>
+          ))}
         </nav>
 
         <div className="account-content">
@@ -381,10 +377,8 @@ export default function MyAccount() {
                             <strong>Đơn hàng #{o.id}</strong>
                             <span>{formatDateShort(o.createdAt)}</span>
                           </div>
-                          <div className="acc-order__right">
-                            <span className={`acc-status ${orderStatusClass(o.status)}`}>{o.status}</span>
-                            <strong>{formatPrice(o.total)}</strong>
-                          </div>
+                          <span className={`acc-status ${orderStatusClass(o.status)}`}>{o.status}</span>
+                          <strong className="acc-order__total">{formatPrice(o.total)}</strong>
                           <span className="acc-order__chevron"><Icon name="chevron" size={16} /></span>
                         </Link>
                       ))}
@@ -408,13 +402,14 @@ export default function MyAccount() {
                     <p className={`account-msg account-msg--${profileMsg.type}`}>{profileMsg.text}</p>
                   )}
                   <div className="account-field account-field--full">
-                    <label>Email</label>
-                    <input type="email" value={user?.email || ""} disabled />
+                    <label htmlFor="acc-email">Email</label>
+                    <input id="acc-email" type="email" value={user?.email || ""} disabled />
                     <span className="account-hint">Email không thể thay đổi.</span>
                   </div>
                   <div className="account-field">
-                    <label>Họ và tên</label>
+                    <label htmlFor="acc-name">Họ và tên</label>
                     <input
+                      id="acc-name"
                       type="text"
                       name="name"
                       className={profileV.errors.name ? "is-invalid" : ""}
@@ -425,8 +420,9 @@ export default function MyAccount() {
                     <FieldError message={profileV.errors.name} />
                   </div>
                   <div className="account-field">
-                    <label>Số điện thoại</label>
+                    <label htmlFor="acc-phone">Số điện thoại</label>
                     <input
+                      id="acc-phone"
                       type="tel"
                       name="phone"
                       className={profileV.errors.phone ? "is-invalid" : ""}
@@ -437,8 +433,9 @@ export default function MyAccount() {
                     <FieldError message={profileV.errors.phone} />
                   </div>
                   <div className="account-field account-field--full">
-                    <label>Địa chỉ</label>
+                    <label htmlFor="acc-address">Địa chỉ</label>
                     <textarea
+                      id="acc-address"
                       rows={2}
                       name="address"
                       className={profileV.errors.address ? "is-invalid" : ""}
@@ -468,8 +465,9 @@ export default function MyAccount() {
                   <p className={`account-msg account-msg--${pwMsg.type}`}>{pwMsg.text}</p>
                 )}
                 <div className="account-field">
-                  <label>Mật khẩu hiện tại</label>
+                  <label htmlFor="acc-pw-current">Mật khẩu hiện tại</label>
                   <input
+                    id="acc-pw-current"
                     type={pwInputType}
                     name="current"
                     className={pwV.errors.current ? "is-invalid" : ""}
@@ -481,8 +479,9 @@ export default function MyAccount() {
                   <FieldError message={pwV.errors.current} />
                 </div>
                 <div className="account-field">
-                  <label>Mật khẩu mới</label>
+                  <label htmlFor="acc-pw-next">Mật khẩu mới</label>
                   <input
+                    id="acc-pw-next"
                     type={pwInputType}
                     name="next"
                     className={pwV.errors.next ? "is-invalid" : ""}
@@ -513,8 +512,9 @@ export default function MyAccount() {
                   )}
                 </div>
                 <div className="account-field">
-                  <label>Xác nhận mật khẩu mới</label>
+                  <label htmlFor="acc-pw-confirm">Xác nhận mật khẩu mới</label>
                   <input
+                    id="acc-pw-confirm"
                     type={pwInputType}
                     name="confirm"
                     className={pwV.errors.confirm ? "is-invalid" : ""}

@@ -1,3 +1,4 @@
+/* Token dùng chung (giữ nguyên như bản gốc) */
 :root {
   --walnut: #3b2a1a;
   --cream: #f5f0e8;
@@ -9,276 +10,166 @@
   --line: rgba(200,169,110,.28);
 }
 
-/* Nền trang kem nhạt để các card trắng nổi lên, thay vì trắng + card kem phẳng */
-.myaccount-page { width: 100%; min-height: 60vh; background: var(--paper); }
-
-.myaccount-page .section-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-
-.myaccount-page .eyebrow { display: block; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-d); margin-bottom: 10px; }
-
-/* ── Header: chừa thêm đáy để card phía dưới "gác" lên mép nâu ── */
-.myaccount-header {
-  background: var(--walnut);
-  padding: 140px 0 96px;
+/* ═══════════════════════════════════════════════════════════
+   TÀI KHOẢN CỦA TÔI — phong cách tạp chí
+   ═══════════════════════════════════════════════════════════ */
+.myaccount-page {
+  --ma-line: rgba(59, 42, 26, 0.14);
+  --ma-serif: 'Playfair Display', Georgia, serif;
+  width: 100%; min-height: 60vh; background: #fff;
 }
-.myaccount-header h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 38px; color: #fff; margin: 0 0 8px; }
-.myaccount-header p { color: rgba(255,255,255,.65); font-size: 15px; margin: 0; }
+.myaccount-page .section-inner { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+.myaccount-page .eyebrow { display: inline-flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+.myaccount-page .eyebrow::before { content: ""; width: 36px; height: 1px; background: currentColor; }
 
-.myaccount-hero { display: flex; align-items: center; gap: 24px; }
+/* ── Đầu trang: ảnh đại diện + tên ── */
+.myaccount-header { padding: 64px 0 56px; background: radial-gradient(ellipse at 85% 0%, rgba(200, 169, 110, 0.18), transparent 55%), linear-gradient(180deg, #2a1c10 0%, #3b2a1a 100%); }
+.myaccount-page .myaccount-hero { display: flex; align-items: center; gap: 36px; }
+.account-avatar-wrap { position: relative; flex-shrink: 0; }
+.account-avatar { width: 112px; height: 112px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--cream); color: var(--walnut); font-family: var(--ma-serif); font-size: 46px; font-weight: 500; border: 1px solid rgba(200,169,110,.6); box-shadow: 0 0 0 6px rgba(255,255,255,.06); }
+.account-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.account-avatar-edit { position: absolute; right: -2px; bottom: 2px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--gold); color: var(--walnut); border: 2px solid #3b2a1a; cursor: pointer; padding: 0; transition: background .2s; }
+.account-avatar-edit:hover:not(:disabled) { background: #fff; }
+.account-avatar-edit:disabled { opacity: .6; cursor: wait; }
+.account-avatar-input { display: none; }
 .myaccount-hero__text { min-width: 0; }
-.myaccount-hero__text h1 { overflow-wrap: anywhere; }
-.account-avatar {
-  width: 84px; height: 84px; flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--gold);
-  color: var(--walnut);
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 38px; font-weight: 700;
-  box-shadow: 0 0 0 4px rgba(200,169,110,.25);
-}
+.myaccount-header h1 { font-family: var(--ma-serif); font-size: clamp(34px, 4.4vw, 56px); font-weight: 500; line-height: 1.08; letter-spacing: -0.03em; color: #fff; margin: 0 0 10px; overflow-wrap: anywhere; }
+.myaccount-header p { color: rgba(255,255,255,.72); font-size: 16px; line-height: 1.6; margin: 0; overflow-wrap: anywhere; }
+.myaccount-hero__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; margin-top: 14px; font-size: 13px; color: rgba(255,255,255,.55); letter-spacing: .04em; }
+.account-avatar-remove { background: none; border: none; padding: 0; font: inherit; color: var(--gold); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.account-avatar-remove:hover { color: #fff; }
+.myaccount-header .account-avatar-msg { margin-top: 12px; font-size: 13.5px; color: #f3b4a6; }
 
-/* ── Bố cục: menu trái + nội dung phải, kéo lên đè mép header.
-   Dùng cùng độ đặc hiệu với ".myaccount-page .section-inner" (đặt SAU nó) để KHÔNG bị ghi đè
-   padding — đây là lỗi khiến card dính sát header ở bản cũ. ── */
-.myaccount-page .myaccount-body {
-  margin: -48px auto 0;
-  padding: 0 24px 96px;
-  position: relative;
-  display: grid;
-  grid-template-columns: 250px 1fr;
-  gap: 24px;
-  align-items: start;
-}
-
-/* Menu */
-.account-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 10px;
-  box-shadow: 0 8px 28px rgba(59,42,26,.08);
-  position: sticky;
-  top: 96px;
-}
-.account-nav__item {
-  display: flex; align-items: center; gap: 12px;
-  width: 100%;
-  padding: 12px 14px;
-  border: none; border-radius: 12px;
-  background: transparent;
-  color: var(--text);
-  font-family: inherit; font-size: 14px; font-weight: 600;
-  text-align: left;
-  cursor: pointer;
-  transition: background .2s, color .2s;
-}
-.account-nav__item:hover { background: var(--cream); }
-.account-nav__item--active,
-.account-nav__item--active:hover { background: var(--walnut); color: var(--cream); }
+/* ── Thân trang: menu trái + nội dung phải ── */
+.myaccount-page .myaccount-body { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 72px; padding-top: 64px; padding-bottom: 112px; align-items: start; }
+.account-nav { position: sticky; top: calc(var(--nav-height, 80px) + var(--banner-h, 0px) + 24px); display: flex; flex-direction: column; border-top: 1px solid var(--ma-line); }
+.account-nav__item { position: relative; display: flex; align-items: center; gap: 14px; width: 100%; padding: 20px 0 20px 18px; background: none; border: none; border-bottom: 1px solid var(--ma-line); border-radius: 0; text-align: left; cursor: pointer; font-family: var(--ma-serif); font-size: 18px; color: var(--text-muted); transition: color .2s, padding .25s; }
+.account-nav__item::before { content: ""; position: absolute; left: 0; top: -1px; bottom: -1px; width: 2px; background: var(--walnut); transform: scaleY(0); transition: transform .3s cubic-bezier(.22,1,.36,1); }
+.account-nav__item:hover { color: var(--walnut); background: none; }
+.account-nav__item--active, .account-nav__item--active:hover { color: var(--walnut); background: none; padding-left: 24px; }
+.account-nav__item--active::before { transform: scaleY(1); }
+.account-nav__item:focus-visible { outline: 2px solid var(--gold-d); outline-offset: 2px; }
 .account-nav__icon { display: inline-flex; color: var(--gold-d); }
-.account-nav__item--active .account-nav__icon { color: var(--gold); }
 
-.account-content { min-width: 0; }
+.account-card { background: none; border: none; border-radius: 0; box-shadow: none; padding: 0; min-width: 0; }
+.account-card h2 { font-family: var(--ma-serif); font-size: clamp(28px, 3.4vw, 40px); font-weight: 500; letter-spacing: -0.02em; color: var(--walnut); margin: 0 0 10px; }
+.account-card__sub { color: var(--text-muted); font-size: 15.5px; line-height: 1.7; margin: 0 0 36px; padding-bottom: 28px; border-bottom: 1px solid var(--ma-line); }
+.account-loading { color: var(--text-muted); padding: 40px 0; margin: 0; }
 
-/* Card nội dung: trắng, viền mảnh, bóng nhẹ */
-.account-card {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 32px 36px 36px;
-  box-shadow: 0 8px 28px rgba(59,42,26,.08);
-}
-.account-card h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 24px; color: var(--walnut); margin: 0 0 6px; }
-.account-card__sub { margin: 0 0 24px; padding-bottom: 20px; border-bottom: 1px solid var(--line); font-size: 13.5px; color: var(--text-muted); }
+/* ── Tổng quan: số liệu ── */
+.acc-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--cream); border-radius: 2px; }
+.acc-stat { display: flex; flex-direction: column; gap: 8px; padding: 30px 28px; border-right: 1px solid var(--ma-line); min-width: 0; }
+.acc-stat:last-child { border-right: none; }
+.acc-stat__icon { color: var(--gold-d); display: inline-flex; }
+.acc-stat__value { font-family: inherit; font-variant-numeric: lining-nums tabular-nums; font-size: 38px; font-weight: 700; line-height: 1.1; color: var(--walnut); letter-spacing: -0.02em; }
+.acc-stat__value--money { font-size: 22px; padding: 8px 0 7px; letter-spacing: 0; overflow-wrap: anywhere; }
+.acc-stat__label { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
 
-.account-loading { color: var(--text-muted); font-size: 14px; }
+.acc-recent__header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 56px 0 8px; }
+.acc-recent__header h3 { font-family: var(--ma-serif); font-size: 24px; font-weight: 500; color: var(--walnut); margin: 0; }
+.acc-recent__link { font-size: 13.5px; font-weight: 600; letter-spacing: .04em; color: var(--gold-d); text-decoration: none; transition: color .2s; }
+.acc-recent__link:hover { color: var(--walnut); }
+.acc-orders { border-top: 1px solid var(--ma-line); margin-top: 12px; }
+.acc-order { display: grid; grid-template-columns: minmax(0, 1fr) 170px 150px 20px; align-items: center; column-gap: 20px; padding: 22px 0; border-bottom: 1px solid var(--ma-line); text-decoration: none; color: var(--text); transition: background .2s; }
+.acc-order:hover { background: rgba(245,240,232,.45); }
+.acc-order__left { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.acc-order__left strong { font-family: var(--ma-serif); font-size: 18px; font-weight: 500; color: var(--walnut); }
+.acc-order__left span { font-size: 13px; color: var(--text-muted); font-variant-numeric: lining-nums; }
+.acc-order__total { font-variant-numeric: lining-nums tabular-nums; font-size: 16px; font-weight: 700; color: var(--walnut); text-align: right; white-space: nowrap; }
+.acc-order__chevron { display: inline-flex; justify-content: flex-end; color: var(--gold-d); }
+.acc-status { display: inline-flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+.acc-status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.acc-status--done { color: #15803d; }
+.acc-status--shipping { color: #2f55c7; }
+.acc-status--processing { color: #b45309; }
+.acc-status--cancelled { color: #b91c1c; }
+.acc-empty { padding: 56px 0 8px; text-align: center; }
+.acc-empty p { color: var(--text-muted); margin: 0 0 24px; }
 
 /* ── Form ── */
-.account-form { display: flex; flex-direction: column; gap: 18px; max-width: none; }
-/* Form hồ sơ: lưới 2 cột (họ tên | số điện thoại), email và địa chỉ chiếm cả hàng */
-.account-form--grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px 20px;
-  max-width: none;
-}
-.account-field--full,
-.account-form--grid .account-msg { grid-column: 1 / -1; }
-.account-form--grid .btn-dark { grid-column: 1 / -1; justify-self: start; }
-
-.account-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
-.account-field label { font-size: 13px; font-weight: 600; color: var(--walnut); }
-.account-field input,
-.account-field textarea {
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1.5px solid var(--line);
-  background: var(--paper);
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color .2s, box-shadow .2s, background .2s;
-  color: var(--text);
-  resize: vertical;
-  width: 100%;
-  box-sizing: border-box;
-}
-.account-field input:focus,
-.account-field textarea:focus { border-color: var(--gold); background: #fff; box-shadow: 0 0 0 3px rgba(200,169,110,.2); }
+.account-form { display: flex; flex-direction: column; gap: 26px; max-width: 560px; }
+.account-form--grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 28px; max-width: none; }
+.account-field { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
+.account-field--full { grid-column: 1 / -1; }
+.account-field label { font-size: 11.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--text-muted); }
+.account-field input, .account-field textarea { width: 100%; box-sizing: border-box; padding: 14px 16px; background: #fff; border: 1px solid var(--ma-line); border-radius: 2px; font-family: inherit; font-size: 15px; color: var(--text); transition: border-color .2s, box-shadow .2s; resize: vertical; }
+.account-field input:focus, .account-field textarea:focus { outline: none; border-color: var(--gold-d); box-shadow: 0 0 0 3px rgba(200,169,110,.2); }
 .account-field input:disabled { background: var(--cream); color: var(--text-muted); cursor: not-allowed; }
+.account-field input.is-invalid, .account-field textarea.is-invalid { border-color: #b91c1c; }
+.account-hint { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+.account-form .btn-dark, .account-form--grid .btn-dark { justify-self: start; align-self: flex-start; }
+.account-form--grid .btn-dark { grid-column: 1 / -1; }
+.account-msg { margin: 0; padding: 14px 18px; font-size: 14px; line-height: 1.6; border-left: 3px solid; background: var(--cream); }
+.account-form--grid .account-msg { grid-column: 1 / -1; }
+.account-msg--success { border-color: #15803d; color: #14532d; background: #f0f7f2; }
+.account-msg--error { border-color: #b91c1c; color: #7f1d1d; background: #fbf1ef; }
 
-.account-hint { font-size: 12px; color: var(--text-muted); }
-.account-hint--error { color: #b94141; }
+.pw-strength { display: flex; align-items: center; gap: 14px; }
+.pw-strength__bars { display: flex; gap: 6px; flex: 1; max-width: 200px; }
+.pw-strength__bar { flex: 1; height: 3px; background: var(--ma-line); }
+.pw-strength__bar--l1 { background: #b91c1c; }
+.pw-strength__bar--l2 { background: #b45309; }
+.pw-strength__bar--l3 { background: #15803d; }
+.pw-strength__label { font-size: 12.5px; font-weight: 600; }
+.pw-strength__label--l1 { color: #b91c1c; }
+.pw-strength__label--l2 { color: #b45309; }
+.pw-strength__label--l3 { color: #15803d; }
+.pw-toggle { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-muted); cursor: pointer; }
+.pw-toggle input { width: 16px; height: 16px; accent-color: var(--walnut); }
 
-.account-msg { font-size: 13px; padding: 10px 14px; border-radius: 10px; margin: 0; }
-.account-msg--success { background: rgba(122,184,122,.15); color: #3f7a3f; }
-.account-msg--error { background: rgba(224,122,122,.15); color: #b94141; }
-
-/* Độ mạnh mật khẩu + nút hiện mật khẩu */
-.pw-strength { display: flex; align-items: center; gap: 10px; }
-.pw-strength__bars { display: flex; gap: 4px; flex: 1; }
-.pw-strength__bar { flex: 1; height: 5px; border-radius: 3px; background: rgba(59,42,26,.12); transition: background .2s; }
-.pw-strength__bar--l1 { background: #d9534f; }
-.pw-strength__bar--l2 { background: #e0a030; }
-.pw-strength__bar--l3 { background: #4a9a4a; }
-.pw-strength__label { font-size: 12px; font-weight: 600; min-width: 74px; text-align: right; }
-.pw-strength__label--l1 { color: #b94141; }
-.pw-strength__label--l2 { color: #b9770e; }
-.pw-strength__label--l3 { color: #3f7a3f; }
-
-.pw-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); cursor: pointer; align-self: flex-start; user-select: none; }
-.pw-toggle input { width: 16px; height: 16px; accent-color: var(--walnut); cursor: pointer; }
-
-.myaccount-page .btn-dark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 13px 28px;
-  background: var(--walnut);
-  color: var(--cream);
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  border: 2px solid var(--walnut);
-  cursor: pointer;
-  transition: background .2s, color .2s, transform .15s;
-  font-family: inherit;
-  align-self: flex-start;
-  text-decoration: none;
-}
+.myaccount-page .btn-dark { display: inline-flex; align-items: center; justify-content: center; padding: 16px 34px; background: var(--walnut); color: #fff; border-radius: 2px; font-size: 14px; font-weight: 600; letter-spacing: .04em; border: 1px solid var(--walnut); text-decoration: none; cursor: pointer; transition: background .25s, border-color .25s; font-family: inherit; }
 .myaccount-page .btn-dark:hover:not(:disabled) { background: var(--gold-d); border-color: var(--gold-d); }
-.myaccount-page .btn-dark:active:not(:disabled) { transform: translateY(1px); }
-.myaccount-page .btn-dark:disabled { opacity: .6; cursor: not-allowed; }
-
-/* ── Tab Tổng quan ── */
-.acc-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 32px; }
-.acc-stat {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 18px 18px 16px;
-  display: flex; flex-direction: column; gap: 4px;
-  min-width: 0;
-}
-.acc-stat__icon {
-  width: 38px; height: 38px; border-radius: 10px;
-  background: rgba(200,169,110,.18); color: var(--gold-d);
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 8px;
-}
-.acc-stat__value { font-family: 'Playfair Display', Georgia, serif; font-size: 26px; font-weight: 700; color: var(--walnut); line-height: 1.2; overflow-wrap: anywhere; }
-/* Số tiền dài: thu nhỏ chữ để không bị chật ô */
-.acc-stat__value--money { font-size: clamp(16px, 1.7vw, 21px); line-height: 1.5; }
-.acc-stat__label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-
-.acc-recent__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 12px; }
-.acc-recent__header h3 { margin: 0; font-size: 17px; color: var(--walnut); font-family: 'Playfair Display', Georgia, serif; }
-.acc-recent__link { font-size: 13px; font-weight: 600; color: var(--gold-d); text-decoration: none; }
-.acc-recent__link:hover { text-decoration: underline; }
-
-.acc-orders { display: flex; flex-direction: column; gap: 10px; }
-.acc-order {
-  display: flex; align-items: center; gap: 14px;
-  background: #fff; border: 1px solid var(--line); border-radius: 14px;
-  padding: 14px 18px;
-  text-decoration: none; color: var(--text);
-  transition: border-color .2s, box-shadow .2s, transform .2s;
-}
-.acc-order:hover { border-color: var(--gold); box-shadow: 0 6px 18px rgba(59,42,26,.08); transform: translateY(-1px); }
-.acc-order__left { display: flex; flex-direction: column; gap: 3px; font-size: 14px; flex: 1; min-width: 0; }
-.acc-order__left span { color: var(--text-muted); font-size: 12px; }
-.acc-order__right { display: flex; align-items: center; gap: 16px; font-size: 14px; }
-.acc-order__right strong { color: var(--walnut); white-space: nowrap; }
-.acc-order__chevron { display: inline-flex; color: var(--gold-d); }
-
-.acc-status { display: inline-flex; padding: 4px 11px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-.acc-status--done { background: rgba(122,184,122,.18); color: #3f7a3f; }
-.acc-status--shipping { background: rgba(79,114,227,.14); color: #3d5bc4; }
-.acc-status--processing { background: rgba(224,160,48,.18); color: #b9770e; }
-.acc-status--cancelled { background: rgba(224,122,122,.18); color: #b94141; }
-
-.acc-empty { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; color: var(--text-muted); font-size: 14px; }
-.acc-empty p { margin: 0; }
+.myaccount-page .btn-dark:disabled { opacity: .6; cursor: wait; }
 
 /* ── Responsive ── */
+@media (max-width: 1100px) {
+  .myaccount-page .myaccount-body { gap: 48px; }
+}
 @media (max-width: 900px) {
-  .myaccount-page .myaccount-body { grid-template-columns: 1fr; gap: 18px; margin-top: -40px; }
-  .account-nav { flex-direction: row; overflow-x: auto; position: static; }
-  .account-nav__item { width: auto; white-space: nowrap; }
+  .myaccount-page .section-inner { padding-left: 24px; padding-right: 24px; }
+  .myaccount-page .myaccount-body { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-top: 0; }
+  .account-nav { position: static; flex-direction: row; overflow-x: auto; border-top: none; border-bottom: 1px solid var(--ma-line); scrollbar-width: none; margin: 0 -24px; padding: 0 24px; }
+  .account-nav::-webkit-scrollbar { display: none; }
+  .account-nav__item, .account-nav__item--active, .account-nav__item--active:hover { flex-shrink: 0; width: auto; padding: 20px 0; margin-right: 28px; border-bottom: none; font-size: 17px; white-space: nowrap; }
+  .account-nav__item::before { left: 0; right: 0; top: auto; bottom: -1px; width: auto; height: 2px; transform: scaleX(0); }
+  .account-nav__item--active::before { transform: scaleX(1); }
+  .account-nav__icon { display: none; }
+  .acc-order { grid-template-columns: minmax(0, 1fr) auto 20px; grid-template-areas: "left total chev" "status status status"; row-gap: 10px; }
+  .acc-order__left { grid-area: left; }
+  .acc-order__total { grid-area: total; }
+  .acc-order__chevron { grid-area: chev; }
+  .acc-status { grid-area: status; }
 }
-@media (max-width: 700px) {
-  .acc-stats { grid-template-columns: 1fr; }
-  .account-form--grid { grid-template-columns: 1fr; }
+@media (max-width: 720px) {
+  .acc-stats { grid-template-columns: minmax(0, 1fr); }
+  .acc-stat { border-right: none; border-bottom: 1px solid var(--ma-line); padding: 22px 24px; }
+  .acc-stat:last-child { border-bottom: none; }
+  .account-form--grid { grid-template-columns: minmax(0, 1fr); }
 }
-@media (max-width: 600px) {
-  .myaccount-header { padding: 120px 0 80px; }
-  .myaccount-header h1 { font-size: 28px; }
-  .myaccount-hero { gap: 16px; }
-  .account-avatar { width: 64px; height: 64px; font-size: 28px; }
-  .account-card { padding: 24px 20px 28px; }
-  .acc-order { flex-wrap: wrap; }
+@media (max-width: 640px) {
+  .myaccount-page .section-inner { padding-left: 20px; padding-right: 20px; }
+  .account-nav { margin: 0 -20px; padding: 0 20px; }
+  .myaccount-header { padding: 48px 0 40px; }
+  .myaccount-page .myaccount-hero { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .account-avatar { width: 96px; height: 96px; font-size: 38px; }
+  .myaccount-page .myaccount-body { padding-bottom: 72px; }
+  .account-card__sub { margin-bottom: 28px; padding-bottom: 22px; }
+  .account-form .btn-dark, .account-form--grid .btn-dark { width: 100%; justify-self: stretch; }
 }
+@media (prefers-reduced-motion: reduce) { .myaccount-page *, .myaccount-page *::before, .myaccount-page *::after { transition-duration: .01ms !important; } }
 
-/* ── Ảnh đại diện: ảnh thật + nút đổi ảnh ── */
-.account-avatar-wrap { position: relative; flex-shrink: 0; }
-.account-avatar { overflow: hidden; }
-.account-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.account-avatar-edit {
-  position: absolute; right: -2px; bottom: -2px;
-  width: 32px; height: 32px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: var(--cream); color: var(--walnut);
-  border: 2px solid var(--walnut);
-  cursor: pointer;
-  transition: background .2s, transform .15s;
+/* ═══ Đầu trang GỌN (thu nhỏ để nhường chỗ cho nội dung chính) — đặt cuối file để thắng các rule cũ ═══ */
+.myaccount-header { padding: 36px 0 32px; }
+.myaccount-page .myaccount-hero { gap: 28px; }
+.account-avatar { width: 88px; height: 88px; font-size: 36px; }
+.account-avatar-edit { width: 30px; height: 30px; }
+.myaccount-page .eyebrow { margin-bottom: 8px; }
+.myaccount-header h1 { font-size: clamp(28px, 3.4vw, 40px); margin: 0 0 6px; }
+.myaccount-header p { font-size: 15px; }
+.myaccount-hero__meta { margin-top: 10px; }
+@media (max-width: 640px) {
+  .myaccount-header { padding: 28px 0 26px; }
+  .myaccount-page .myaccount-hero { flex-direction: row; align-items: center; gap: 18px; }
+  .account-avatar { width: 72px; height: 72px; font-size: 30px; }
+  .myaccount-header h1 { font-size: 26px; }
 }
-.account-avatar-edit:hover:not(:disabled) { background: var(--gold); transform: scale(1.06); }
-.account-avatar-edit:disabled { opacity: .6; cursor: wait; }
-
-.myaccount-hero__meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 13px; color: rgba(255,255,255,.55); }
-.account-avatar-remove {
-  background: none; border: none; padding: 0;
-  font-family: inherit; font-size: 13px; color: var(--gold);
-  text-decoration: underline; cursor: pointer;
-}
-.account-avatar-remove:hover { color: #fff; }
-.account-avatar-msg { margin: 8px 0 0 !important; font-size: 13px !important; color: #f0a0a0 !important; }
-
-@media (max-width: 600px) {
-  .account-avatar-edit { width: 28px; height: 28px; }
-}
-
-/* ── Viền focus: bỏ vòng trắng/xanh mặc định của trình duyệt (gây cảm giác "viền đôi" ở mục menu
-   đang chọn), thay bằng vòng vàng gọn — chỉ hiện khi điều hướng bằng bàn phím ── */
-.account-nav__item:focus,
-.account-avatar-edit:focus,
-.account-avatar-remove:focus { outline: none; }
-.account-nav__item:focus-visible,
-.account-avatar-edit:focus-visible,
-.account-avatar-remove:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.myaccount-page .btn-dark:focus { outline: none; }
-.myaccount-page .btn-dark:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }

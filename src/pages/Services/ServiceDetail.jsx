@@ -11,8 +11,8 @@ import "./ServiceList.css";
 // trắng) đổi thành <p><br></p> để vẫn giữ nguyên khoảng cách, không bị xẹp mất.
 const cleanContentHtml = (html) =>
   (html || "")
-    .replace(/<p>(\s|&nbsp;|\u00a0)*<\/p>/g, "<p><br></p>")
-    .replace(/&nbsp;|\u00a0/g, " ");
+    .replace(/<p>(\s|&nbsp;| )*<\/p>/g, "<p><br></p>")
+    .replace(/&nbsp;| /g, " ");
 
 const ServiceDetail = () => {
   const { type, id } = useParams();
@@ -78,8 +78,15 @@ const ServiceDetail = () => {
             <p>Chưa có nội dung chi tiết cho dịch vụ này.</p>
           )}
         </Reveal>
+      </div>
 
-        <div style={{ textAlign: "center", marginTop: 40 }}>
+      {/* Kêu gọi hành động cuối bài */}
+      <div className="service-detail-cta">
+        <div className="section-inner">
+          <div className="service-detail-cta__text">
+            <h2>Bạn quan tâm dịch vụ này?</h2>
+            <p>Đội ngũ của chúng tôi sẵn sàng tư vấn miễn phí cho không gian của bạn.</p>
+          </div>
           <Link to="/contact" className="btn-dark">Liên hệ tư vấn →</Link>
         </div>
       </div>

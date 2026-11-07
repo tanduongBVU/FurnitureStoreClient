@@ -1,0 +1,61 @@
+/* ═══════════════════════════════════════════════════════════
+   TRANG YÊU THÍCH — dùng chung hero/thẻ sản phẩm với Products.css,
+   file này chỉ thêm phần riêng của trang (import SAU Products.css)
+   ═══════════════════════════════════════════════════════════ */
+/* Khoảng đệm dọc của thân trang: viết "2 class" để thắng .products-page .section-inner (padding: 0 32px) */
+.wishlist-page .wishlist-body { padding-top: 48px; padding-bottom: 112px; min-height: 360px; }
+
+.wish-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 20px; margin-bottom: 36px; border-bottom: 1px solid var(--pp-line); }
+.wish-count { font-size: 15px; color: var(--pp-muted); }
+.wish-count strong { font-family: var(--pp-serif); font-size: 22px; font-weight: 500; color: var(--pp-walnut); margin-right: 4px; }
+.wish-link { font-size: 14px; font-weight: 600; color: var(--pp-walnut); text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 3px; transition: color .2s; }
+.wish-link:hover { color: var(--pp-gold-d); }
+
+/* Lưới 4 cột (Products.css dùng 3) — media query riêng vì selector này mạnh hơn .client-products-grid */
+.wishlist-page .client-products-grid { grid-template-columns: repeat(4, 1fr); gap: 28px 20px; }
+.wishlist-page .client-products-grid > * { min-width: 0; }
+
+.wish-card { position: relative; }
+.wish-img-link { display: block; width: 100%; height: 100%; }
+.wishlist-page .wish-img-link img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.wishlist-page .product-info h3 a { color: inherit; text-decoration: none; }
+.wishlist-page .product-info h3 a:hover { color: var(--pp-gold-d); }
+
+/* Nút ♥ bỏ khỏi yêu thích — luôn hiện (đây là hành động chính của thẻ) */
+.wish-remove {
+  position: absolute; top: 12px; right: 12px; z-index: 3; width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+  background: rgba(255, 255, 255, 0.96); color: #e0245e; font-size: 16px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .16); transition: transform .2s, background .2s, color .2s;
+}
+.wish-remove:hover { transform: scale(1.1); background: #e0245e; color: #fff; }
+
+/* Giá nằm trên, nút thêm giỏ full-width nằm dưới → thẻ không bị chật, mọi thẻ cùng hàng thẳng đáy */
+.wish-prices { display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; margin-top: auto; padding-top: 6px; min-height: 58px; }
+.wishlist-page .wish-prices .product-price { font-size: 17px; }
+.wishlist-page .wish-prices .product-price-original { margin-top: 0; }
+
+.wish-add {
+  margin-top: 14px; width: 100%; padding: 13px 16px; border-radius: 2px; border: 1px solid var(--pp-walnut); background: transparent; color: var(--pp-walnut);
+  font-family: inherit; font-size: 13.5px; font-weight: 600; letter-spacing: .03em; cursor: pointer; transition: background .25s, color .25s, border-color .25s;
+}
+.wish-add:hover:not(:disabled) { background: var(--pp-walnut); color: #fff; }
+.wish-add:disabled { cursor: not-allowed; color: #b8ada0; border-color: #e5ddd0; background: #faf7f2; }
+
+/* Trạng thái rỗng */
+.wish-empty { max-width: 520px; margin: 48px auto 0; padding: 64px 0 24px; text-align: center; }
+.wish-empty__icon { display: block; font-family: var(--pp-serif); font-size: 72px; line-height: 1; color: var(--pp-gold); margin-bottom: 20px; }
+.wish-empty h2 { font-family: var(--pp-serif); font-size: clamp(26px, 3.2vw, 36px); font-weight: 500; letter-spacing: -0.02em; color: var(--pp-walnut); margin: 0 0 14px; }
+.wish-empty p { color: var(--pp-muted); font-size: 16px; line-height: 1.7; margin: 0 0 32px; }
+.wish-btn-solid { display: inline-flex; align-items: center; padding: 16px 34px; border-radius: 2px; background: var(--pp-walnut); color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; letter-spacing: .04em; transition: background .25s; }
+.wish-btn-solid:hover { background: var(--pp-gold-d); }
+
+@media (max-width: 1200px) { .wishlist-page .client-products-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px) { .wishlist-page .client-products-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 14px; } }
+@media (max-width: 640px) {
+  .wishlist-page .wishlist-body { padding-top: 32px; padding-bottom: 72px; }
+  .wish-toolbar { margin-bottom: 24px; }
+  .wishlist-page .wish-prices .product-price { font-size: 15px; }
+  .wish-add { padding: 12px 8px; font-size: 12.5px; }
+}
+@media (max-width: 400px) { .wishlist-page .client-products-grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .wishlist-page *, .wishlist-page *::before, .wishlist-page *::after { transition-duration: .01ms !important; } }

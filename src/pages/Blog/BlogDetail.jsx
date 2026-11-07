@@ -12,8 +12,8 @@ import "./Blog.css";
 // khoảng cách, không bị xẹp mất.
 const cleanContentHtml = (html) =>
   (html || "")
-    .replace(/<p>(\s|&nbsp;|\u00a0)*<\/p>/g, "<p><br></p>")
-    .replace(/&nbsp;|\u00a0/g, " ");
+    .replace(/<p>(\s|&nbsp;| )*<\/p>/g, "<p><br></p>")
+    .replace(/&nbsp;| /g, " ");
 
 const BlogDetail = () => {
   const { id } = useParams();
@@ -53,7 +53,8 @@ const BlogDetail = () => {
 
   return (
     <div className="blog-page">
-      <Reveal as="div" className="section-inner blog-detail" direction="fade">
+      {/* Đầu bài: breadcrumb, chuyên mục, tiêu đề lớn, tác giả + ngày */}
+      <header className="section-inner blog-detail-head">
         <div className="blog-breadcrumb">
           <Link to="/blog">Cẩm nang</Link> <span>/</span> <span>{post.title}</span>
         </div>
@@ -65,13 +66,18 @@ const BlogDetail = () => {
           <span>•</span>
           <span>{formatDate(post.createdAt)}</span>
         </div>
+      </header>
 
-        {post.thumbnail && (
+      {/* Ảnh bìa rộng hết khung */}
+      {post.thumbnail && (
+        <div className="section-inner blog-detail-cover">
           <div className="blog-detail-img">
             <img src={post.thumbnail} alt={post.title} onError={e => e.target.style.display = "none"} />
           </div>
-        )}
+        </div>
+      )}
 
+      <Reveal as="article" className="section-inner blog-detail" direction="fade">
         {/* Nội dung soạn từ rich text editor bên Admin (đã qua Authorize, chỉ Admin/Nhân viên
             mới tạo/sửa được) — không nhận nội dung này trực tiếp từ khách nên an toàn để render HTML.
             Vẫn dọn "&nbsp;" trước khi hiển thị để chữ xuống dòng đúng, không tràn khung. */}

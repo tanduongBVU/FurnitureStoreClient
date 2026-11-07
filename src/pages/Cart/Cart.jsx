@@ -123,6 +123,21 @@ const Cart = () => {
   // Làm tròn đồng, khớp cách server tính giá (PricingHelper.SaleUnitPrice)
   const salePriceOf = (p) => Math.round(p.price * (1 - (p.discountPercent || 0) / 100));
 
+  // Phần đầu trang (dùng chung cho giỏ có hàng / giỏ trống)
+  const hero = (
+    <div className="cart-hero">
+      <div className="section-inner">
+        <span className="cart-eyebrow cart-eyebrow--light">Đơn hàng của bạn</span>
+        <h1 className="cart-title">Giỏ Hàng</h1>
+        <p>
+          {cart.length > 0
+            ? `${cart.length} mục trong giỏ — kiểm tra lại trước khi thanh toán`
+            : "Chưa có sản phẩm nào trong giỏ"}
+        </p>
+      </div>
+    </div>
+  );
+
   const renderSuggestions = () => {
     // Bỏ ngay khỏi gợi ý những món vừa được thêm vào giỏ (không đợi gọi lại API)
     const shown = suggestions.filter((p) => !cartProductIds.includes(p.id));
@@ -131,84 +146,100 @@ const Cart = () => {
       // Đang tải lần đầu: báo cho khách biết thay vì để trống
       return loadingSuggestions ? (
         <div className="cart-suggestions">
-          <h3>Có thể bạn cũng thích</h3>
-          <p style={{ fontSize: 14, color: "#9a9186", margin: 0 }}>Đang tìm gợi ý phù hợp cho bạn...</p>
+          <div className="section-inner">
+            <span className="cart-eyebrow">Gợi ý cho bạn</span>
+            <h3>Có thể bạn cũng thích</h3>
+            <p className="cart-suggestions__loading">Đang tìm gợi ý phù hợp cho bạn...</p>
+          </div>
         </div>
       ) : null;
     }
     return (
-      <Reveal as="div" className="cart-suggestions">
-        <h3>Có thể bạn cũng thích</h3>
-        <div className="cart-suggestions__grid">
-          {shown.map((p) => {
-            const hasDiscount = p.discountPercent > 0;
-            return (
-              <Link to={`/products/${p.id}`} className="cart-suggestion-card" key={p.id}>
-                <div className="cart-suggestion-card__img">
-                  {p.image
-                    ? <img src={p.image} alt={p.name} onError={(e) => (e.target.style.display = "none")} />
-                    : <span>🪑</span>
-                  }
-                  {hasDiscount && <span className="cart-suggestion-card__badge">-{p.discountPercent}%</span>}
-                </div>
-                <div className="cart-suggestion-card__info">
-                  <p className="cart-suggestion-card__name">{p.name}</p>
-                  {p.reason && (
-                    <p style={{ fontSize: 12, color: "#7a6a58", fontStyle: "italic", margin: "2px 0 6px", lineHeight: 1.4 }}>
-                      {p.reason}
-                    </p>
-                  )}
-                  {hasDiscount ? (
-                    <p className="cart-suggestion-card__price">
-                      <span className="cart-suggestion-card__price--sale">{formatPrice(salePriceOf(p))}</span>
-                      <span className="cart-suggestion-card__price--original">{formatPrice(p.price)}</span>
-                    </p>
-                  ) : (
-                    <p className="cart-suggestion-card__price">{formatPrice(p.price)}</p>
-                  )}
-                  <button
-                    type="button"
-                    className="cart-suggestion-card__add"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      addToCart({ ...p, price: hasDiscount ? salePriceOf(p) : p.price }, 1);
-                    }}
-                  >
-                    + Thêm vào giỏ
-                  </button>
-                </div>
-              </Link>
-            );
-          })}
+      <div className="cart-suggestions">
+        <div className="section-inner">
+          <span className="cart-eyebrow">Gợi ý cho bạn</span>
+          <h3>Có thể bạn cũng thích</h3>
+          <div className="cart-suggestions__grid">
+            {shown.map((p, idx) => {
+              const hasDiscount = p.discountPercent > 0;
+              return (
+                <Reveal as="div" key={p.id} delay={Math.min(idx * 60, 300)}>
+                  <Link to={`/products/${p.id}`} className="cart-suggestion-card">
+                    <div className="cart-suggestion-card__img">
+                      {p.image
+                        ? <img src={p.image} alt={p.name} onError={(e) => (e.target.style.display = "none")} />
+                        : <span>🪑</span>
+                      }
+                      {hasDiscount && <span className="cart-suggestion-card__badge">-{p.discountPercent}%</span>}
+                    </div>
+                    <div className="cart-suggestion-card__info">
+                      <p className="cart-suggestion-card__name">{p.name}</p>
+                      {p.reason && <p className="cart-suggestion-card__reason">{p.reason}</p>}
+                      <div className="cart-suggestion-card__prices">
+                        {hasDiscount ? (
+                          <>
+                            <span className="cart-suggestion-card__price cart-suggestion-card__price--sale">{formatPrice(salePriceOf(p))}</span>
+                            <span className="cart-suggestion-card__price--original">{formatPrice(p.price)}</span>
+                          </>
+                        ) : (
+                          <span className="cart-suggestion-card__price">{formatPrice(p.price)}</span>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        className="cart-suggestion-card__add"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          addToCart({ ...p, price: hasDiscount ? salePriceOf(p) : p.price }, 1);
+                        }}
+                      >
+                        + Thêm vào giỏ
+                      </button>
+                    </div>
+                  </Link>
+                </Reveal>
+              );
+            })}
+          </div>
         </div>
-      </Reveal>
+      </div>
     );
   };
 
   if (cart.length === 0) {
     return (
       <div className="cart-page">
-        <div className="section-inner">
+        {hero}
+        <div className="section-inner cart-body cart-body--empty">
           <Reveal as="div" className="cart-empty">
-            <span className="cart-empty-icon">🛒</span>
+            <svg className="cart-empty-icon" viewBox="0 0 48 48" width="64" height="64" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 7h6l4.5 22h20L40 14H13" />
+              <circle cx="19" cy="38" r="2.6" />
+              <circle cx="33" cy="38" r="2.6" />
+            </svg>
             <h2>Giỏ hàng của bạn đang trống</h2>
             <p>Hãy khám phá những sản phẩm nội thất tuyệt vời của LuxWood</p>
-            <Link to="/products" className="btn-primary-solid">Khám phá sản phẩm</Link>
+            <Link to="/products" className="btn-primary-solid">Khám phá sản phẩm →</Link>
           </Reveal>
-
-          {renderSuggestions()}
         </div>
+        {renderSuggestions()}
       </div>
     );
   }
 
   return (
     <div className="cart-page">
-      <div className="section-inner">
-        <h1 className="cart-title">Giỏ Hàng</h1>
+      {hero}
 
+      <div className="section-inner cart-body">
         <div className="cart-layout">
           <div className="cart-items">
+            <div className="cart-items-head" aria-hidden="true">
+              <span className="cart-head-product">Sản phẩm</span>
+              <span className="cart-head-qty">Số lượng</span>
+              <span className="cart-head-total">Thành tiền</span>
+            </div>
+
             {/* key/remove/update dùng item.cartKey (không phải item.id) — vì 2 biến thể
                 khác nhau của CÙNG 1 sản phẩm có id giống nhau nhưng cartKey khác nhau,
                 dùng id sẽ khiến bấm xoá/sửa 1 dòng bị ảnh hưởng nhầm sang dòng kia. */}
@@ -220,7 +251,7 @@ const Cart = () => {
                 : (item.stock ? item.quantity >= item.stock : false);
 
               return (
-                <Reveal as="div" className="cart-item" key={item.cartKey} delay={Math.min(idx * 60, 300)}>
+                <Reveal as="div" className={`cart-item ${problem ? "cart-item--problem" : ""}`} key={item.cartKey} delay={Math.min(idx * 60, 300)}>
                   <div className="cart-item-img">
                     {item.image
                       ? <img src={item.image} alt={item.name} onError={e => e.target.style.display = "none"} />
@@ -228,46 +259,44 @@ const Cart = () => {
                     }
                   </div>
                   <div className="cart-item-info">
-                    <h3>
-                      {isBundle && (
-                        <span style={{ fontSize: 11, fontWeight: 700, background: "#c8a96e", color: "#1a1208", padding: "2px 8px", borderRadius: 20, marginRight: 8, verticalAlign: "middle" }}>
-                          COMBO{item.discountPercent > 0 ? ` -${item.discountPercent}%` : ""}
-                        </span>
-                      )}
-                      {item.name}
-                    </h3>
+                    {isBundle && (
+                      <span className="cart-badge">
+                        Combo{item.discountPercent > 0 ? ` -${item.discountPercent}%` : ""}
+                      </span>
+                    )}
+                    <h3>{item.name}</h3>
                     {isBundle && item.items?.length > 0 && (
-                      <p style={{ fontSize: 12, color: "#7a6a58", margin: "2px 0 4px", lineHeight: 1.5 }}>
+                      <p className="cart-item-bundle">
                         Gồm: {item.items.map(i => `${i.productName} x${i.quantity}`).join(", ")}
                       </p>
                     )}
                     <p className="cart-item-price">
-                      {formatPrice(item.price)}
-                      {!isBundle && item.priceChangedFrom != null && (
-                        <span style={{ marginLeft: 8, fontSize: 12, color: "#b3492f", fontWeight: 600 }}>
-                          Giá đã cập nhật (trước: {formatPrice(item.priceChangedFrom)})
-                        </span>
-                      )}
+                      <span>{formatPrice(item.price)}</span>
                       {isBundle && item.originalPrice > item.price && (
-                        <span style={{ marginLeft: 8, fontSize: 12, color: "#9a9186", textDecoration: "line-through" }}>
-                          {formatPrice(item.originalPrice)}
-                        </span>
+                        <span className="cart-item-orig">{formatPrice(item.originalPrice)}</span>
                       )}
                     </p>
-                    {problem && (
-                      <p style={{ fontSize: 13, color: "#c0392b", margin: "6px 0 0", fontWeight: 600 }}>⚠️ {problem}</p>
+                    {!isBundle && item.priceChangedFrom != null && (
+                      <p className="cart-item-pricechange">Giá đã cập nhật (trước: {formatPrice(item.priceChangedFrom)})</p>
                     )}
+                    {problem && <p className="cart-item-problem">⚠️ {problem}</p>}
                   </div>
                   <div className="cart-item-qty">
-                    <button onClick={() => updateQuantity(item.cartKey, item.quantity - 1)} disabled={item.quantity <= 1}>−</button>
+                    <button type="button" aria-label="Giảm số lượng" onClick={() => updateQuantity(item.cartKey, item.quantity - 1)} disabled={item.quantity <= 1}>−</button>
                     <span>{item.quantity}</span>
                     <button
+                      type="button"
+                      aria-label="Tăng số lượng"
                       onClick={() => updateQuantity(item.cartKey, item.quantity + 1)}
                       disabled={plusDisabled}
                     >+</button>
                   </div>
                   <div className="cart-item-total">{formatPrice(item.price * item.quantity)}</div>
-                  <button className="cart-item-remove" onClick={() => removeFromCart(item.cartKey)} title="Xoá">🗑️</button>
+                  <button type="button" className="cart-item-remove" onClick={() => removeFromCart(item.cartKey)} title="Xoá" aria-label={`Xoá ${item.name} khỏi giỏ`}>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
+                    </svg>
+                  </button>
                 </Reveal>
               );
             })}
@@ -280,7 +309,7 @@ const Cart = () => {
               <span>{formatPrice(listTotal)}</span>
             </div>
             {bundleSavings > 0 && (
-              <div className="cart-summary-row" style={{ color: "#b3492f", fontWeight: 600 }}>
+              <div className="cart-summary-row cart-summary-row--save">
                 <span>Giảm giá combo</span>
                 <span>−{formatPrice(bundleSavings)}</span>
               </div>
@@ -294,24 +323,24 @@ const Cart = () => {
               <span>{formatPrice(totalPrice)}</span>
             </div>
             <button
+              type="button"
               className="btn-primary-solid btn-full"
               onClick={() => navigate("/checkout")}
               disabled={hasBlockingProblem}
-              style={hasBlockingProblem ? { opacity: 0.55, cursor: "not-allowed" } : undefined}
             >
               Tiến hành thanh toán
             </button>
             {hasBlockingProblem && (
-              <p style={{ fontSize: 12, color: "#c0392b", margin: "8px 0 0", textAlign: "center" }}>
+              <p className="cart-checkout-warn">
                 Vui lòng xử lý các sản phẩm / combo có cảnh báo trước khi thanh toán.
               </p>
             )}
             <Link to="/products" className="cart-continue">← Tiếp tục mua sắm</Link>
           </Reveal>
         </div>
-
-        {renderSuggestions()}
       </div>
+
+      {renderSuggestions()}
     </div>
   );
 };

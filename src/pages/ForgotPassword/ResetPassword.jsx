@@ -7,6 +7,20 @@ import useFormValidation from "../../hooks/useFormValidation";
 import { required, minLength, sameAs } from "../../utils/validators";
 import "./ForgotPassword.css";
 
+// Icon SVG nét mảnh (thay emoji) — tự đổi màu theo màu chữ
+const ICONS = {
+  lock: <><rect x="4" y="11" width="16" height="10" rx="1" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></>,
+  alert: <><path d="M12 3l10 18H2L12 3z" /><path d="M12 10v5M12 18v.01" /></>,
+  check: <><circle cx="12" cy="12" r="9" /><path d="M8 12.5l3 3 5-6" /></>,
+};
+const RecoveryIcon = ({ name }) => (
+  <span className="recovery-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      {ICONS[name]}
+    </svg>
+  </span>
+);
+
 // Luật kiểm tra — lỗi hiện chữ đỏ ngay dưới ô nhập
 const RULES = {
   newPassword: [
@@ -63,7 +77,7 @@ const ResetPassword = () => {
       <div className="recovery-page">
         <SEO title="Đặt lại mật khẩu" description="Đặt mật khẩu mới cho tài khoản LuxWood." />
         <div className="recovery-card">
-          <span className="recovery-icon">⚠️</span>
+          <RecoveryIcon name="alert" />
           <h1>Liên kết không hợp lệ</h1>
           <p className="recovery-desc">
             Liên kết đặt lại mật khẩu bị thiếu hoặc không đúng. Vui lòng yêu cầu gửi lại liên kết mới.
@@ -82,7 +96,7 @@ const ResetPassword = () => {
       <div className="recovery-page">
         <SEO title="Đặt lại mật khẩu" description="Đặt mật khẩu mới cho tài khoản LuxWood." />
         <div className="recovery-card">
-          <span className="recovery-icon">✅</span>
+          <RecoveryIcon name="check" />
           <h1>Đã đặt lại mật khẩu</h1>
           <p className="recovery-desc">Bạn có thể đăng nhập bằng mật khẩu mới ngay bây giờ.</p>
           <Link to="/login" className="recovery-btn">Đăng nhập</Link>
@@ -95,14 +109,14 @@ const ResetPassword = () => {
     <div className="recovery-page">
       <SEO title="Đặt lại mật khẩu" description="Đặt mật khẩu mới cho tài khoản LuxWood." />
       <div className="recovery-card">
-        <span className="recovery-icon">🔒</span>
+        <RecoveryIcon name="lock" />
         <h1>Đặt mật khẩu mới</h1>
         <p className="recovery-desc">Nhập mật khẩu mới cho tài khoản của bạn (tối thiểu 6 ký tự).</p>
 
         {error && (
-          <div className="recovery-error">
-            ⚠️ {error}{" "}
-            <Link to="/forgot-password" style={{ color: "#c0392b", fontWeight: 600 }}>Yêu cầu liên kết mới</Link>
+          <div className="recovery-error" role="alert">
+            {error}{" "}
+            <Link to="/forgot-password" className="recovery-error__link">Yêu cầu liên kết mới</Link>
           </div>
         )}
 

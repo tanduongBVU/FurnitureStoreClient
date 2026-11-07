@@ -72,7 +72,7 @@ const Register = () => {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
+      <div className="auth-card auth-card--wide">
         <div className="auth-logo">
           <span className="auth-logo-icon">⬡</span>
           <span className="auth-logo-text">LuxWood</span>
@@ -80,12 +80,13 @@ const Register = () => {
         <h1>Tạo tài khoản</h1>
         <p className="auth-desc">Đăng ký để theo dõi đơn hàng dễ dàng hơn</p>
 
-        {error && <div className="auth-error">⚠️ {error}</div>}
+        {error && <div className="auth-error" role="alert">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="auth-form" noValidate>
+        <form onSubmit={handleSubmit} className="auth-form auth-form--grid" noValidate>
           <div className="form-group">
-            <label>Họ và tên</label>
+            <label htmlFor="reg-name">Họ và tên</label>
             <input
+              id="reg-name"
               type="text"
               name="name"
               placeholder="Nguyễn Văn A"
@@ -98,22 +99,9 @@ const Register = () => {
             <FieldError message={errors.name} />
           </div>
           <div className="form-group">
-            <label>Email</label>
+            <label htmlFor="reg-phone">Số điện thoại</label>
             <input
-              type="email"
-              name="email"
-              placeholder="ban@email.com"
-              className={errors.email ? "is-invalid" : ""}
-              value={form.email}
-              onChange={e => set("email", e.target.value)}
-              onBlur={() => validateField("email", form)}
-              autoComplete="email"
-            />
-            <FieldError message={errors.email} />
-          </div>
-          <div className="form-group">
-            <label>Số điện thoại</label>
-            <input
+              id="reg-phone"
               type="tel"
               name="phone"
               placeholder="09xxxxxxxx"
@@ -125,9 +113,25 @@ const Register = () => {
             />
             <FieldError message={errors.phone} />
           </div>
-          <div className="form-group">
-            <label>Địa chỉ (không bắt buộc)</label>
+          <div className="form-group form-group--full">
+            <label htmlFor="reg-email">Email</label>
             <input
+              id="reg-email"
+              type="email"
+              name="email"
+              placeholder="ban@email.com"
+              className={errors.email ? "is-invalid" : ""}
+              value={form.email}
+              onChange={e => set("email", e.target.value)}
+              onBlur={() => validateField("email", form)}
+              autoComplete="email"
+            />
+            <FieldError message={errors.email} />
+          </div>
+          <div className="form-group form-group--full">
+            <label htmlFor="reg-address">Địa chỉ (không bắt buộc)</label>
+            <input
+              id="reg-address"
               type="text"
               name="address"
               placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố"
@@ -140,8 +144,9 @@ const Register = () => {
             <FieldError message={errors.address} />
           </div>
           <div className="form-group">
-            <label>Mật khẩu</label>
+            <label htmlFor="reg-password">Mật khẩu</label>
             <input
+              id="reg-password"
               type="password"
               name="password"
               placeholder="Tối thiểu 6 ký tự"
@@ -158,8 +163,9 @@ const Register = () => {
             <FieldError message={errors.password} />
           </div>
           <div className="form-group">
-            <label>Nhập lại mật khẩu</label>
+            <label htmlFor="reg-confirmPassword">Nhập lại mật khẩu</label>
             <input
+              id="reg-confirmPassword"
               type="password"
               name="confirmPassword"
               placeholder="••••••••"

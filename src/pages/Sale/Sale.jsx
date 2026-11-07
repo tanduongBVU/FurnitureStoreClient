@@ -5,7 +5,9 @@ import Reveal from "../../components/Reveal/Reveal";
 import WishlistButton from "../../components/WishlistButton/WishlistButton";
 import CompareButton from "../../components/CompareButton/CompareButton";
 import RatingStars from "../../components/RatingStars/RatingStars";
+// Dùng chung bộ style thẻ sản phẩm với trang Sản phẩm; Sale.css chỉ thêm phần riêng của trang này
 import "../Products/Products.css";
+import "./Sale.css";
 
 const Sale = () => {
   const [products, setProducts] = useState([]);
@@ -20,21 +22,36 @@ const Sale = () => {
   }, []);
 
   const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
-  const salePriceOf = (p) => p.price * (1 - p.discountPercent / 100);
+  // Làm tròn tới đồng — trước đây không làm tròn nên giá hiện số lẻ (VD "2.999.999.999,7 ₫")
+  const salePriceOf = (p) => Math.round(p.price * (1 - p.discountPercent / 100));
+
+  // Mức giảm cao nhất — hiện ở đầu trang như một điểm nhấn
+  const maxDiscount = products.reduce((m, p) => Math.max(m, p.discountPercent || 0), 0);
 
   return (
-    <div className="products-page">
-      <div className="products-hero" style={{ background: "#3b2a1a" }}>
+    <div className="products-page sale-page">
+      <div className="products-hero sale-hero">
         <div className="section-inner">
-          <span className="eyebrow" style={{ color: "#c8a96e" }}>Ưu đãi có hạn</span>
-          <h1 style={{ color: "#fff" }}>Khuyến Mãi</h1>
-          <p style={{ color: "rgba(255,255,255,0.75)" }}>
-            Săn ngay các sản phẩm đang giảm giá — số lượng có hạn
-          </p>
+          <span className="eyebrow">Ưu đãi có hạn</span>
+          <h1>Khuyến Mãi</h1>
+          <p>Săn ngay các sản phẩm đang giảm giá — số lượng có hạn</p>
+
+          {!loading && products.length > 0 && (
+            <div className="sale-hero__stats">
+              <div>
+                <strong>{products.length}</strong>
+                <span>Sản phẩm đang giảm giá</span>
+              </div>
+              <div>
+                <strong>-{maxDiscount}%</strong>
+                <span>Mức giảm cao nhất</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="section-inner">
+      <div className="section-inner sale-body">
         {error && <div className="error-box">⚠️ {error}</div>}
 
         {loading ? (
@@ -42,7 +59,7 @@ const Sale = () => {
         ) : products.length === 0 ? (
           <div className="empty-box">Hiện chưa có sản phẩm nào đang khuyến mãi. Quay lại sau nhé!</div>
         ) : (
-          <div className="client-products-grid" style={{ marginTop: 40 }}>
+          <div className="client-products-grid">
             {products.map((p, idx) => (
               <Reveal as="div" key={p.id} delay={Math.min((idx % 8) * 60, 400)}>
               <Link to={`/products/${p.id}`} className="product-card">
@@ -53,7 +70,7 @@ const Sale = () => {
                   }
                   {p.stock === 0
                     ? <span className="product-tag product-tag--out">Hết hàng</span>
-                    : <span className="product-tag" style={{ background: "#b91c1c" }}>-{p.discountPercent}%</span>
+                    : <span className="product-tag product-tag--sale">-{p.discountPercent}%</span>
                   }
                   <WishlistButton product={p} />
                   <CompareButton product={p} />
@@ -62,13 +79,11 @@ const Sale = () => {
                   <span className="product-cat">{p.category}</span>
                   <h3>{p.name}</h3>
                   <RatingStars avg={p.averageRating} count={p.reviewCount} />
-                  <div className="product-footer" style={{ flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
-                    <span style={{ textDecoration: "line-through", color: "#9a9a9a", fontSize: 13 }}>
-                      {formatPrice(p.price)}
-                    </span>
-                    <span className="product-price" style={{ color: "#b91c1c", fontWeight: 700 }}>
-                      {formatPrice(salePriceOf(p))}
-                    </span>
+                  <div className="product-footer">
+                    <div className="product-prices">
+                      <span className="product-price product-price--sale">{formatPrice(salePriceOf(p))}</span>
+                      <span className="product-price-original">{formatPrice(p.price)}</span>
+                    </div>
                   </div>
                 </div>
               </Link>

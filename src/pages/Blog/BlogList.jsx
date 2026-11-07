@@ -45,21 +45,27 @@ const BlogList = () => {
   const filtered = posts.filter(p => category === "Tất cả" || p.category === category);
   const formatDate = (d) => new Date(d).toLocaleDateString("vi-VN");
 
+  // Bài đầu tiên của danh sách đang hiển thị được làm "bài nổi bật" (khổ lớn), các bài còn lại xếp lưới bên dưới
+  const [featured, ...rest] = filtered;
+
   return (
     <div className="blog-page">
       <div className="blog-hero">
         <div className="section-inner">
-          <span className="eyebrow" style={{ color: "#c8a96e" }}>Cẩm nang LuxWood</span>
+          <span className="eyebrow">Cẩm nang LuxWood</span>
           <h1>Blog & Cẩm Nang Nội Thất</h1>
           <p>Mẹo hay, xu hướng và kiến thức chăm sóc nội thất từ đội ngũ LuxWood</p>
         </div>
       </div>
 
-      <div className="section-inner">
-        <div className="blog-category-tabs">
+      <div className="section-inner blog-list-body">
+        <div className="blog-category-tabs" role="tablist">
           {CATEGORIES.map(c => (
             <button
               key={c}
+              type="button"
+              role="tab"
+              aria-selected={category === c}
               className={`blog-cat-tab ${category === c ? "blog-cat-tab--active" : ""}`}
               onClick={() => handleCategoryClick(c)}
             >{c}</button>
@@ -73,30 +79,57 @@ const BlogList = () => {
         ) : filtered.length === 0 ? (
           <div className="empty-box">Chưa có bài viết nào ở chủ đề này. Quay lại sau nhé!</div>
         ) : (
-          <div className="blog-grid">
-            {filtered.map((post, idx) => (
-              <Reveal as="div" key={post.id} delay={Math.min((idx % 9) * 60, 400)}>
-              <Link to={`/blog/${post.id}`} className="blog-card">
-                <div className="blog-card-img">
-                  {post.thumbnail
-                    ? <img src={post.thumbnail} alt={post.title} onError={e => e.target.style.display = "none"} />
+          <>
+            {/* Bài nổi bật */}
+            <Reveal as="div" key={featured.id}>
+              <Link to={`/blog/${featured.id}`} className="blog-featured">
+                <div className="blog-featured-img">
+                  {featured.thumbnail
+                    ? <img src={featured.thumbnail} alt={featured.title} onError={e => e.target.style.display = "none"} />
                     : <span className="blog-card-img-placeholder">📝</span>
                   }
                 </div>
-                <div className="blog-card-body">
-                  <span className="blog-card-cat">{post.category}</span>
-                  <h3>{post.title}</h3>
-                  <p className="blog-card-excerpt">{post.excerpt}</p>
+                <div className="blog-featured-body">
+                  <span className="blog-card-cat">{featured.category}</span>
+                  <h2>{featured.title}</h2>
+                  <p className="blog-card-excerpt">{featured.excerpt}</p>
                   <div className="blog-card-meta">
-                    <span>{post.author || "LuxWood"}</span>
+                    <span>{featured.author || "LuxWood"}</span>
                     <span>•</span>
-                    <span>{formatDate(post.createdAt)}</span>
+                    <span>{formatDate(featured.createdAt)}</span>
                   </div>
+                  <span className="blog-readmore">Đọc bài viết <span aria-hidden="true">→</span></span>
                 </div>
               </Link>
-              </Reveal>
-            ))}
-          </div>
+            </Reveal>
+
+            {rest.length > 0 && (
+              <div className="blog-grid">
+                {rest.map((post, idx) => (
+                  <Reveal as="div" key={post.id} delay={Math.min((idx % 9) * 60, 400)}>
+                  <Link to={`/blog/${post.id}`} className="blog-card">
+                    <div className="blog-card-img">
+                      {post.thumbnail
+                        ? <img src={post.thumbnail} alt={post.title} onError={e => e.target.style.display = "none"} />
+                        : <span className="blog-card-img-placeholder">📝</span>
+                      }
+                    </div>
+                    <div className="blog-card-body">
+                      <span className="blog-card-cat">{post.category}</span>
+                      <h3>{post.title}</h3>
+                      <p className="blog-card-excerpt">{post.excerpt}</p>
+                      <div className="blog-card-meta">
+                        <span>{post.author || "LuxWood"}</span>
+                        <span>•</span>
+                        <span>{formatDate(post.createdAt)}</span>
+                      </div>
+                    </div>
+                  </Link>
+                  </Reveal>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

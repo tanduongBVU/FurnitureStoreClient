@@ -1,3 +1,4 @@
+/* Token dùng chung (giữ nguyên như bản gốc — các trang khác, vd. Tài khoản, có thể đang dùng) */
 :root {
   --walnut: #3b2a1a;
   --cream: #f5f0e8;
@@ -9,173 +10,138 @@
   --line: rgba(200,169,110,.28);
 }
 
-.myorders-page { width: 100%; min-height: 60vh; background: var(--paper); }
-
-.myorders-page .section-inner { max-width: 900px; margin: 0 auto; padding: 0 24px; }
-
-.myorders-page .eyebrow { display: block; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-d); margin-bottom: 10px; }
-
-/* Header: chừa đáy để danh sách "gác" lên mép nâu, giống trang Tài khoản */
-.myorders-header { background: var(--walnut); padding: 140px 0 96px; }
-.myorders-header h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 38px; color: #fff; margin: 0 0 10px; }
-.myorders-header p { color: rgba(255,255,255,.65); font-size: 15px; margin: 0; }
-
-/* Cùng độ đặc hiệu với ".myorders-page .section-inner" và đặt SAU nó để KHÔNG bị ghi đè padding */
-.myorders-page .myorders-body { margin: -48px auto 0; padding: 0 24px 96px; position: relative; }
-
-/* ── Thanh lọc trạng thái ── */
-.orders-filters {
-  display: flex; gap: 8px; flex-wrap: wrap;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 10px;
-  margin-bottom: 18px;
-  box-shadow: 0 8px 28px rgba(59,42,26,.08);
+/* ═══════════════════════════════════════════════════════════
+   ĐƠN HÀNG CỦA TÔI — phong cách tạp chí
+   ═══════════════════════════════════════════════════════════ */
+.myorders-page {
+  --mo-line: rgba(59, 42, 26, 0.14);
+  --mo-serif: 'Playfair Display', Georgia, serif;
+  width: 100%; min-height: 60vh; background: #fff;
 }
-.orders-filter {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 9px 16px;
-  border: none; border-radius: 10px;
-  background: transparent;
-  color: var(--text);
-  font-family: inherit; font-size: 13.5px; font-weight: 600;
-  cursor: pointer;
-  transition: background .2s, color .2s;
-}
-.orders-filter:hover { background: var(--cream); }
-.orders-filter--active, .orders-filter--active:hover { background: var(--walnut); color: var(--cream); }
-.orders-filter__count {
-  min-width: 20px; padding: 1px 7px;
-  border-radius: 20px;
-  background: rgba(200,169,110,.25);
-  color: var(--gold-d);
-  font-size: 11px; font-weight: 700; text-align: center;
-}
-.orders-filter--active .orders-filter__count { background: rgba(255,255,255,.18); color: var(--gold); }
+.myorders-page .section-inner { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
 
-/* ── Danh sách đơn ── */
-.orders-list { display: flex; flex-direction: column; gap: 14px; }
+.myorders-page .eyebrow { display: inline-flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+.myorders-page .eyebrow::before { content: ""; width: 36px; height: 1px; background: currentColor; }
 
-.order-card {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  box-shadow: 0 4px 18px rgba(59,42,26,.05);
-  overflow: hidden;
-  transition: border-color .2s, box-shadow .2s;
-}
-.order-card:hover { border-color: var(--gold); }
-.order-card--open { border-color: var(--gold); box-shadow: 0 10px 30px rgba(59,42,26,.1); }
+/* ── Đầu trang nền nâu đậm ── */
+.myorders-header { padding: 72px 0 56px; background: radial-gradient(ellipse at 85% 0%, rgba(200, 169, 110, 0.18), transparent 55%), linear-gradient(180deg, #2a1c10 0%, #3b2a1a 100%); }
+/* h1 phải khai báo color rõ ràng, nếu không rule "h1, h2" toàn cục sẽ đè (chữ đen) */
+.myorders-header h1 { font-family: var(--mo-serif); font-size: clamp(38px, 5vw, 64px); font-weight: 500; line-height: 1.05; letter-spacing: -0.03em; color: #fff; margin: 0 0 16px; }
+.myorders-header p { color: rgba(255, 255, 255, 0.72); font-size: 16px; line-height: 1.7; margin: 0; }
 
-.order-summary {
-  width: 100%;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-  padding: 20px 24px;
-  background: transparent; border: none;
-  font-family: inherit; text-align: left; color: var(--text);
-  cursor: pointer;
-}
-.order-summary__left { display: flex; flex-direction: column; gap: 4px; }
-.order-code { font-size: 15px; font-weight: 700; color: var(--walnut); }
-.order-date { font-size: 12.5px; color: var(--text-muted); }
-.order-summary__right { display: flex; align-items: center; gap: 16px; }
-.order-total { font-family: 'Playfair Display', Georgia, serif; font-size: 18px; color: var(--walnut); white-space: nowrap; }
-.order-chevron { display: inline-flex; color: var(--gold-d); transition: transform .25s; }
+/* 2 class + đặt SAU ".myorders-page .section-inner" để không bị padding: 0 32px ghi đè padding dọc */
+.myorders-page .myorders-body { padding-top: 0; padding-bottom: 112px; position: static; margin: 0 auto; min-height: 320px; }
+
+/* ── Bộ lọc: hàng chữ có gạch chân (giống thanh danh mục các trang khác) ── */
+.orders-filters { display: flex; gap: 36px; overflow-x: auto; border-bottom: 1px solid var(--mo-line); margin: 0 0 8px; scrollbar-width: none; background: none; border-radius: 0; padding: 0; box-shadow: none; flex-wrap: nowrap; }
+.orders-filters::-webkit-scrollbar { display: none; }
+.orders-filter { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; gap: 10px; padding: 22px 0; border: none; border-radius: 0; background: transparent; cursor: pointer; font-family: var(--mo-serif); font-size: 19px; font-weight: 400; color: var(--text-muted); transition: color .2s; }
+.orders-filter::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--walnut); transform: scaleX(0); transition: transform .3s cubic-bezier(0.22, 1, 0.36, 1); }
+.orders-filter:hover { background: transparent; color: var(--walnut); }
+.orders-filter--active, .orders-filter--active:hover { background: transparent; color: var(--walnut); }
+.orders-filter--active::after { transform: scaleX(1); }
+.orders-filter__count { font-family: 'Inter', system-ui, sans-serif; font-size: 11.5px; font-weight: 700; min-width: 22px; padding: 2px 8px; border-radius: 20px; text-align: center; background: var(--cream); color: var(--gold-d); font-variant-numeric: lining-nums; }
+.orders-filter--active .orders-filter__count { background: var(--walnut); color: #fff; }
+
+/* ── Danh sách: dạng bảng, hàng kẻ mảnh ── */
+.orders-list { display: flex; flex-direction: column; gap: 0; }
+.orders-list__head, .order-summary { display: grid; grid-template-columns: minmax(0, 1fr) 190px 190px 28px; align-items: center; column-gap: 24px; }
+.orders-list__head { padding: 18px 0 14px; border-bottom: 1px solid var(--mo-line); font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--text-muted); }
+.orders-list__head span:last-child { text-align: right; padding-right: 52px; }
+
+.orders-month { padding: 36px 0 12px; font-family: var(--mo-serif); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-d); }
+.orders-list__head + .orders-month { padding-top: 28px; }
+.order-card { background: none; border: none; border-bottom: 1px solid var(--mo-line); border-radius: 0; box-shadow: none; overflow: visible; transition: background .2s; }
+.order-card:hover { border-color: var(--mo-line); background: rgba(245, 240, 232, .45); }
+.order-card--open { border-color: var(--mo-line); box-shadow: none; background: transparent; }
+.order-card--open:hover { background: transparent; }
+
+.order-summary { width: 100%; padding: 24px 0; background: transparent; border: none; font-family: inherit; text-align: left; color: var(--text); cursor: pointer; flex-wrap: nowrap; }
+.order-summary:focus-visible { outline: 2px solid var(--gold-d); outline-offset: 2px; }
+.order-summary__left { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.order-code { font-family: var(--mo-serif); font-size: 20px; font-weight: 500; color: var(--walnut); }
+.order-date { font-size: 13px; color: var(--text-muted); font-variant-numeric: lining-nums; }
+/* Tổng tiền: font thường + số lining thẳng hàng, không xuống dòng — giá cực lớn (vd. 5.999.999.999 ₫) vẫn gọn */
+.order-total { font-variant-numeric: lining-nums tabular-nums; font-size: 17px; font-weight: 700; color: var(--walnut); white-space: nowrap; text-align: right; }
+.order-chevron { display: inline-flex; justify-content: flex-end; color: var(--gold-d); transition: transform .25s; }
 .order-card--open .order-chevron { transform: rotate(90deg); }
 
-/* Trạng thái */
-.order-status { display: inline-flex; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-.status--done { background: rgba(122,184,122,.18); color: #3f7a3f; }
-.status--shipping { background: rgba(79,114,227,.14); color: #3d5bc4; }
-.status--processing { background: rgba(224,160,48,.18); color: #b9770e; }
-.status--pending { background: rgba(122,106,88,.14); color: var(--text-muted); }
-.status--cancelled { background: rgba(224,122,122,.18); color: #b94141; }
+/* Trạng thái: chấm màu + chữ, không nền tô */
+.order-status { display: inline-flex; align-items: center; gap: 9px; justify-self: start; padding: 0; background: none; font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+.order-status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.status--done { background: none; color: #15803d; }
+.status--shipping { background: none; color: #2f55c7; }
+.status--processing { background: none; color: #b45309; }
+.status--pending { background: none; color: var(--text-muted); }
+.status--cancelled { background: none; color: #b91c1c; }
 
-/* ── Chi tiết đơn ── */
-.order-details {
-  border-top: 1px solid var(--line);
-  background: var(--paper);
-  padding: 8px 24px 24px;
-}
+/* ── Chi tiết đơn: sản phẩm bên trái, thông tin bên phải ── */
+.order-details { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 48px; align-items: start; border-top: none; background: none; padding: 4px 0 40px; }
 .order-items { display: flex; flex-direction: column; }
-.order-item {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--line);
-}
-.order-item__img {
-  width: 60px; height: 60px; flex-shrink: 0;
-  border-radius: 12px; overflow: hidden;
-  background: var(--cream);
-  display: flex; align-items: center; justify-content: center;
-}
+.order-item { display: flex; align-items: center; gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--mo-line); }
+.order-item:first-child { padding-top: 0; }
+.order-item__img { width: 72px; height: 72px; flex-shrink: 0; border-radius: 2px; overflow: hidden; background: var(--cream); display: flex; align-items: center; justify-content: center; }
 .order-item__img img { width: 100%; height: 100%; object-fit: cover; }
-.order-item__info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.order-item__name { font-size: 14px; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
-.order-item__qty { font-size: 12.5px; color: var(--text-muted); }
-.order-item__price { font-size: 14px; color: var(--walnut); white-space: nowrap; }
+.order-item__placeholder { font-size: 22px; }
+.order-item__info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.order-item__name { font-family: var(--mo-serif); font-size: 17px; font-weight: 500; line-height: 1.35; color: var(--walnut); overflow-wrap: anywhere; }
+.order-item__qty { font-size: 13px; color: var(--text-muted); font-variant-numeric: lining-nums tabular-nums; }
+.order-item__price { font-variant-numeric: lining-nums tabular-nums; font-size: 15px; font-weight: 600; color: var(--walnut); white-space: nowrap; }
 
-.order-meta {
-  margin-top: 18px;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 6px 18px;
-}
-.order-meta__row {
-  display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--line);
-  font-size: 13.5px;
-}
+.order-meta { margin-top: 0; background: var(--cream); border: none; border-radius: 4px; padding: 14px 28px; }
+.order-meta__row { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; padding: 13px 0; border-bottom: 1px solid var(--mo-line); font-size: 14px; }
 .order-meta__row:last-child { border-bottom: none; }
 .order-meta__row span { color: var(--text-muted); flex-shrink: 0; }
-.order-meta__row strong { color: var(--text); text-align: right; overflow-wrap: anywhere; }
-.order-meta__row--total { padding-top: 14px; }
+.order-meta__row strong { color: var(--text); font-weight: 600; text-align: right; overflow-wrap: anywhere; font-variant-numeric: lining-nums tabular-nums; }
+.order-meta__discount { color: #b3492f !important; }
+.order-meta__row--total { padding-top: 18px; }
 .order-meta__row--total span { font-weight: 600; color: var(--walnut); }
-.order-meta__row--total strong { font-family: 'Playfair Display', Georgia, serif; font-size: 20px; color: var(--walnut); }
+.order-meta__row--total strong { font-family: inherit; font-size: 22px; font-weight: 700; color: var(--walnut); white-space: nowrap; }
 
 /* ── Loading / rỗng / lỗi ── */
-.myorders-loading, .myorders-empty {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  box-shadow: 0 8px 28px rgba(59,42,26,.08);
-  padding: 56px 24px;
-  display: flex; flex-direction: column; align-items: center; gap: 14px;
-  text-align: center;
-  color: var(--text-muted); font-size: 14px;
-}
+.myorders-loading, .myorders-empty { background: none; border: none; border-radius: 0; box-shadow: none; padding: 80px 24px; display: flex; flex-direction: column; align-items: center; gap: 0; text-align: center; color: var(--text-muted); font-size: 15px; }
 .myorders-loading p, .myorders-empty p { margin: 0; }
-.myorders-empty--inline { padding: 36px 24px; box-shadow: none; }
+.myorders-empty { max-width: 520px; margin: 0 auto; padding-top: 96px; }
+.myorders-empty__svg { color: var(--gold); margin-bottom: 24px; }
+.myorders-empty__icon { font-size: 40px; margin-bottom: 14px; }
+.myorders-empty h2 { font-family: var(--mo-serif); font-size: clamp(26px, 3.2vw, 36px); font-weight: 500; letter-spacing: -0.02em; color: var(--walnut); margin: 0 0 14px; }
+.myorders-empty p { font-size: 16px; line-height: 1.7; margin-bottom: 30px; }
+.myorders-empty--inline { padding: 56px 24px; max-width: none; }
+.myorders-empty--inline p { margin: 0; }
 
-.myorders-page .spinner {
-  width: 30px; height: 30px;
-  border: 3px solid var(--line);
-  border-top-color: var(--gold-d);
-  border-radius: 50%;
-  animation: myorders-spin .8s linear infinite;
-}
+.myorders-page .spinner { width: 30px; height: 30px; margin-bottom: 14px; border: 3px solid var(--mo-line); border-top-color: var(--gold-d); border-radius: 50%; animation: myorders-spin .8s linear infinite; }
 @keyframes myorders-spin { to { transform: rotate(360deg); } }
 
-.myorders-page .btn-dark {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 13px 28px;
-  background: var(--walnut); color: var(--cream);
-  border-radius: 10px; font-size: 15px; font-weight: 600;
-  border: 2px solid var(--walnut);
-  text-decoration: none; cursor: pointer;
-  transition: background .2s, border-color .2s;
-  font-family: inherit;
-}
+.myorders-page .btn-dark { display: inline-flex; align-items: center; justify-content: center; padding: 16px 34px; background: var(--walnut); color: #fff; border-radius: 2px; font-size: 14px; font-weight: 600; letter-spacing: .04em; border: 1px solid var(--walnut); text-decoration: none; cursor: pointer; transition: background .25s, border-color .25s; font-family: inherit; }
 .myorders-page .btn-dark:hover { background: var(--gold-d); border-color: var(--gold-d); }
 
-@media (max-width: 600px) {
-  .myorders-header { padding: 120px 0 80px; }
-  .myorders-header h1 { font-size: 28px; }
-  .order-summary { padding: 16px 18px; }
-  .order-details { padding: 6px 18px 20px; }
-  .orders-filters { padding: 8px; }
-  .orders-filter { padding: 8px 12px; }
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .myorders-page .section-inner { padding-left: 24px; padding-right: 24px; }
+  .orders-list__head { display: none; }
+  .order-summary { grid-template-columns: minmax(0, 1fr) auto 24px; grid-template-areas: "left total chev" "status status status"; row-gap: 12px; column-gap: 16px; }
+  .order-summary__left { grid-area: left; }
+  .order-total { grid-area: total; }
+  .order-chevron { grid-area: chev; }
+  .order-status { grid-area: status; }
+  .order-details { grid-template-columns: 1fr; gap: 28px; padding-bottom: 32px; }
 }
+@media (max-width: 640px) {
+  .myorders-page .section-inner { padding-left: 20px; padding-right: 20px; }
+  .myorders-header { padding: 56px 0 40px; }
+  .myorders-page .myorders-body { padding-bottom: 72px; }
+  .orders-filters { gap: 24px; }
+  .orders-filter { font-size: 17px; padding: 18px 0; }
+  .order-summary { padding: 20px 0; }
+  .order-code { font-size: 18px; }
+  .order-meta { padding: 8px 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .myorders-page *, .myorders-page *::before, .myorders-page *::after { transition-duration: .01ms !important; } }
+
+/* ═══ Đầu trang GỌN (thu nhỏ để nhường chỗ cho nội dung chính) — đặt cuối file để thắng các rule cũ ═══ */
+.myorders-header { padding: 44px 0 40px; }
+.myorders-page .eyebrow { margin-bottom: 10px; }
+.myorders-header h1 { font-size: clamp(30px, 3.6vw, 42px); line-height: 1.1; margin: 0; }
+.myorders-header p { display: none; }
+
+@media (max-width: 640px) { .myorders-header { padding: 32px 0 28px; } .myorders-header h1 { font-size: clamp(28px, 7.5vw, 34px); } }

@@ -1,92 +1,88 @@
+/* ═══════════════════════════════════════════════════════════
+   ĐĂNG NHẬP / ĐĂNG KÝ — phong cách tạp chí
+   (Register.jsx và các trang auth khác dùng chung file này → giữ nguyên tên class)
+   ═══════════════════════════════════════════════════════════ */
 .auth-page {
-  min-height: 100svh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 48px 24px;
-  background: var(--cream, #f5f0e8);
+  --au-line: rgba(59, 42, 26, 0.16);
+  --au-serif: 'Playfair Display', Georgia, serif;
+  /* Có navbar + footer nên không dùng 100svh; đủ cao để thẻ nằm giữa vùng nhìn */
+  min-height: 78vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 72px 24px 96px;
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(200, 169, 110, 0.16), transparent 55%),
+    var(--cream, #f5f0e8);
 }
 
+/* Thẻ: vuông góc, viền mảnh, vạch nâu phía trên, không đổ bóng */
 .auth-card {
   background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 8px 40px rgba(59,42,26,.08);
-  padding: 40px;
-  width: 100%;
-  max-width: 420px;
+  border: 1px solid var(--au-line);
+  border-top: 2px solid var(--walnut, #3b2a1a);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 48px 48px 44px;
+  width: 100%; max-width: 460px;
 }
 
-.auth-logo { display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 24px; }
-.auth-logo-icon { font-size: 22px; color: var(--gold-d, #a8854a); }
-.auth-logo-text { font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 700; color: var(--walnut, #3b2a1a); }
+.auth-logo { display: flex; align-items: center; gap: 10px; justify-content: flex-start; margin-bottom: 28px; }
+.auth-logo-icon { font-size: 18px; color: var(--gold-d, #a8854a); }
+.auth-logo-text { font-family: 'Inter', system-ui, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .28em; text-transform: uppercase; color: var(--walnut, #3b2a1a); }
 
-.auth-card h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 26px; color: var(--walnut, #3b2a1a); text-align: center; margin: 0 0 8px; }
-.auth-desc { text-align: center; color: var(--text-muted, #7a6a58); font-size: 14px; margin: 0 0 28px; }
+/* h1 khai báo màu rõ ràng để không bị rule "h1, h2" toàn cục đè */
+.auth-card h1 { font-family: var(--au-serif); font-size: clamp(32px, 4vw, 40px); font-weight: 500; line-height: 1.1; letter-spacing: -0.02em; color: var(--walnut, #3b2a1a); text-align: left; margin: 0 0 12px; }
+.auth-desc { text-align: left; color: var(--text-muted, #7a6a58); font-size: 15px; line-height: 1.6; margin: 0 0 32px; }
 
-.auth-error { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 16px; color: #b91c1c; font-size: 13px; margin-bottom: 20px; text-align: center; }
+/* Thông báo lỗi: vạch đỏ bên trái, không viền hộp */
+.auth-error { background: #fbf1ef; border: none; border-left: 3px solid #b91c1c; border-radius: 0; padding: 13px 16px; color: #7f1d1d; font-size: 13.5px; line-height: 1.6; margin-bottom: 22px; text-align: left; }
 
-.auth-form { display: flex; flex-direction: column; gap: 16px; }
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-group label { font-size: 13px; font-weight: 600; color: var(--text, #2c1f10); }
-.form-group input {
-  padding: 12px 14px; border: 1.5px solid #e5ddd0; border-radius: 10px;
-  font-size: 14px; color: var(--text, #2c1f10); outline: none; font-family: inherit;
-  transition: border-color .2s; background: #ffffff; color-scheme: light;
+.auth-form { display: flex; flex-direction: column; gap: 22px; }
+/* .form-group là class toàn cục dùng ở nhiều trang → chỉ ghi đè bên trong .auth-page */
+.auth-page .form-group { display: flex; flex-direction: column; gap: 9px; }
+.auth-page .form-group label { font-size: 11.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--text-muted, #7a6a58); }
+.auth-page .form-group input {
+  width: 100%; box-sizing: border-box;
+  padding: 14px 16px; border: 1px solid var(--au-line); border-radius: 2px;
+  font-size: 15px; color: var(--text, #2c1f10); outline: none; font-family: inherit;
+  transition: border-color .2s, box-shadow .2s; background: #ffffff; color-scheme: light;
 }
-.form-group input:focus { border-color: var(--gold, #c8a96e); }
+.auth-page .form-group input::placeholder { color: #a99b8a; }
+.auth-page .form-group input:focus { border-color: var(--gold-d, #a8854a); box-shadow: 0 0 0 3px rgba(200, 169, 110, 0.2); }
+.auth-page .form-group input.is-invalid { border-color: #b91c1c; }
+
+.auth-forgot { text-align: right; margin-top: 2px; }
+.auth-forgot a { font-size: 13px; color: var(--gold-d, #a8854a); text-decoration: none; letter-spacing: .02em; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
+.auth-forgot a:hover { color: var(--walnut, #3b2a1a); border-color: currentColor; }
 
 .auth-btn {
-  margin-top: 8px;
-  padding: 13px; border-radius: 10px; font-size: 15px; font-weight: 600;
-  color: #fff; background: var(--gold-d, #a8854a); border: none; cursor: pointer;
-  transition: opacity .2s, transform .15s; font-family: inherit;
+  margin-top: 6px; width: 100%;
+  padding: 16px; border-radius: 2px; font-size: 14px; font-weight: 600; letter-spacing: .06em;
+  color: #fff; background: var(--walnut, #3b2a1a); border: 1px solid var(--walnut, #3b2a1a); cursor: pointer;
+  transition: background .25s, border-color .25s; font-family: inherit;
 }
-.auth-btn:hover:not(:disabled) { opacity: .88; transform: translateY(-1px); }
-.auth-btn:disabled { opacity: .6; cursor: not-allowed; }
+.auth-btn:hover:not(:disabled) { background: var(--gold-d, #a8854a); border-color: var(--gold-d, #a8854a); opacity: 1; transform: none; }
+.auth-btn:focus-visible { outline: 2px solid var(--gold-d, #a8854a); outline-offset: 3px; }
+.auth-btn:disabled { opacity: .6; cursor: wait; }
 
-.auth-switch { text-align: center; font-size: 14px; color: var(--text-muted, #7a6a58); margin: 24px 0 0; }
-.auth-switch a { color: var(--gold-d, #a8854a); font-weight: 600; text-decoration: none; }
-.auth-switch a:hover { text-decoration: underline; }
+.auth-switch { text-align: left; font-size: 14px; color: var(--text-muted, #7a6a58); margin: 28px 0 0; padding-top: 24px; border-top: 1px solid var(--au-line); }
+.auth-switch a { color: var(--walnut, #3b2a1a); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--walnut, #3b2a1a); padding-bottom: 1px; transition: color .2s, border-color .2s; }
+.auth-switch a:hover { color: var(--gold-d, #a8854a); border-color: var(--gold-d, #a8854a); text-decoration: none; }
 
-/* ══════════════════════════════════════════════════════
-   BỔ SUNG cho nút đăng nhập Google — dán thêm vào CUỐI
-   file Login.css hiện có (không thay thế, chỉ nối thêm).
-   ══════════════════════════════════════════════════════ */
+/* ── Nút đăng nhập Google + vạch "hoặc" ── */
+.auth-google-wrap { margin: 0 0 4px; display: flex; justify-content: center; }
+.auth-divider { display: flex; align-items: center; gap: 16px; margin: 24px 0; color: var(--text-muted, #7a6a58); font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; }
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--au-line); }
 
-.auth-google-wrap {
-  margin: 20px 0 4px;
-  display: flex;
-  justify-content: center;
+/* ── Đăng ký: thẻ rộng hơn, các ô xếp 2 cột (Register.jsx dùng chung file này) ── */
+.auth-card--wide { max-width: 600px; }
+.auth-form--grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 20px; }
+.auth-form--grid .form-group--full, .auth-form--grid .auth-btn { grid-column: 1 / -1; }
+.auth-page .form-group { min-width: 0; }
+
+/* ── Responsive ── */
+@media (max-width: 620px) { .auth-form--grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) {
+  .auth-page { padding: 40px 16px 64px; min-height: 0; }
+  .auth-card { padding: 34px 22px 32px; }
 }
-
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 20px 0;
-  color: var(--text-muted, #7a6a58);
-  font-size: 12px;
-}
-.auth-divider::before,
-.auth-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: #e5ddd0;
-}
-
-/* ══════════════════════════════════════════════════════
-   BỔ SUNG RESPONSIVE MOBILE — dán thêm vào CUỐI Login.css
-   hiện có (KHÔNG thay thế, chỉ nối thêm vào cuối file).
-   Register.jsx dùng chung file này nên tự động ăn theo,
-   không cần sửa riêng.
-   ══════════════════════════════════════════════════════ */
-
-@media (max-width: 420px) {
-  .auth-card {
-    padding: 28px 20px;
-  }
-  .auth-page {
-    padding: 32px 16px;
-  }
-}
+@media (prefers-reduced-motion: reduce) { .auth-page *, .auth-page *::before, .auth-page *::after { transition-duration: .01ms !important; } }

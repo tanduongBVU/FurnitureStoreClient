@@ -102,6 +102,10 @@ const Navbar = () => {
 
   const isServicesActive = location.pathname.startsWith("/services");
 
+  // Trang chủ: thanh menu TRONG SUỐT đè lên ảnh hero (chữ trắng); cuộn xuống hoặc mở menu mobile
+  // thì chuyển về nền kem như các trang khác. Chỉ là giao diện — không ảnh hưởng chức năng nào.
+  const overlay = location.pathname === "/" && !scrolled && !menuOpen;
+
   const handleLogout = () => {
     logout();
     setAccountOpen(false);
@@ -109,7 +113,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}>
+    <header className={`navbar ${scrolled ? "navbar--scrolled" : ""} ${overlay ? "navbar--overlay" : ""}`}>
       <div className="navbar__container">
         {/* Logo */}
         <Link to="/" className="navbar__logo">
