@@ -188,8 +188,8 @@ export default function MyOrders() {
                             {o.orderItems.map((item) => (
                               <div className="order-item" key={item.id}>
                                 <div className="order-item__img">
-                                  {item.product?.image ? (
-                                    <img src={item.product.image} alt={item.productName} />
+                                  {(item.productImage || item.product?.image) ? (
+                                    <img src={item.productImage || item.product.image} alt={item.productName} />
                                   ) : (
                                     <span className="order-item__placeholder">🪑</span>
                                   )}

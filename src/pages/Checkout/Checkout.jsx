@@ -126,7 +126,7 @@ const Checkout = () => {
     setCouponChecking(true);
     setCouponError("");
     try {
-      const res = await api.post("/Coupons/validate", { code, orderValue: totalPrice });
+      const res = await api.post("/Coupons/validate", { code, orderValue: totalPrice, userId: isLoggedIn ? user.id : null, phone: form.phone.trim() });
       setAppliedCoupon(res.data);
     } catch (err) {
       setAppliedCoupon(null);
@@ -147,6 +147,26 @@ const Checkout = () => {
     if (cart.length === 0) return;
     setError("");
     if (!validateAll(form)) return;
+
+    // Kiểm tra lại mã giảm giá với SĐT/tài khoản HIỆN TẠI trước khi đặt: khách có thể áp mã trước khi
+    // nhập SĐT, hoặc mã đã hết lượt/đã dùng rồi. Không hợp lệ → gỡ mã và báo rõ, không đặt đơn
+    // (tránh đơn bị lưu KHÔNG giảm giá mà khách vẫn tưởng đã giảm).
+    if (appliedCoupon) {
+      try {
+        await api.post("/Coupons/validate", {
+          code: appliedCoupon.code,
+          orderValue: totalPrice,
+          userId: isLoggedIn ? user.id : null,
+          phone: form.phone.trim(),
+        });
+      } catch (err) {
+        const msg = err.response?.data?.message || "Mã giảm giá không còn hợp lệ.";
+        setAppliedCoupon(null);
+        setCouponError(msg);
+        setError(`${msg} Mã đã được gỡ khỏi đơn — vui lòng kiểm tra lại tổng tiền rồi bấm đặt hàng.`);
+        return;
+      }
+    }
 
     setSaving(true);
     try {
@@ -178,7 +198,7 @@ const Checkout = () => {
       // giảm giá bị từ chối ngầm lúc lưu — lấy đúng object order trong cả 2 trường hợp.
       const order = res.data.order || res.data;
       // confirmCode do Backend trả về, dùng để chính khách này xác nhận chuyển khoản ở bước QR
-      setCreatedOrder({ id: order.id, total: order.total, confirmCode: res.data.confirmCode });
+      setCreatedOrder({ id: order.id, total: order.total, confirmCode: res.data.confirmCode, couponNote: res.data.couponNote || "" });
 
       if (paymentMethod === "QR" && qrEnabled) {
         // Thanh toán QR: đơn ĐÃ được tạo (để có mã DH… ghi vào nội dung chuyển khoản) nhưng
@@ -244,6 +264,9 @@ const Checkout = () => {
             <div className="checkout-qr__info">
               <span className="checkout-eyebrow">Đơn hàng #{createdOrder.id}</span>
               <h2>Thanh toán đơn hàng #{createdOrder.id}</h2>
+              {createdOrder.couponNote && (
+                <p className="checkout-error">Mã giảm giá chưa được áp dụng: {createdOrder.couponNote} Số tiền cần chuyển bên dưới là số tiền thực tế của đơn.</p>
+              )}
               <p>
                 Vui lòng quét mã QR bên cạnh bằng app ngân hàng để chuyển khoản. Chuyển xong,
                 bấm nút <strong>“Tôi đã chuyển khoản”</strong> để hoàn tất đặt hàng.
@@ -289,6 +312,9 @@ const Checkout = () => {
             </svg>
             <h2>Đặt hàng thành công!</h2>
             {createdOrder && <p>Mã đơn hàng của bạn: <strong>#{createdOrder.id}</strong></p>}
+            {createdOrder?.couponNote && (
+              <p className="checkout-error">Mã giảm giá chưa được áp dụng cho đơn này: {createdOrder.couponNote}</p>
+            )}
 
             {paidByQr ? (
               <p>Cảm ơn bạn đã thanh toán! Đơn hàng đã được ghi nhận và chúng tôi sẽ xử lý trong thời gian sớm nhất.</p>

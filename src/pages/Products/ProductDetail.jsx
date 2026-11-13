@@ -10,6 +10,7 @@ import Reveal from "../../components/Reveal/Reveal";
 import ProductReviews from "../../components/ProductReviews/ProductReviews";
 import SEO from "../../components/SEO/SEO";
 import { sanitizeRichHtml } from "../../utils/sanitizeHtml";
+import { originalPriceText, salePriceText } from "../../utils/priceRange";
 import "./ProductDetail.css";
 import "./ProductDetailContent.css";
 
@@ -314,13 +315,13 @@ const ProductDetail = () => {
                       {p.discountPercent > 0 ? (
                         <div className="pd-related__prices">
                           <span className="pd-related__price pd-related__price--sale">
-                            {formatPrice(Math.round(p.price * (1 - p.discountPercent / 100)))}
+                            {salePriceText(p)}
                           </span>
-                          <span className="pd-related__price-original">{formatPrice(p.price)}</span>
+                          <span className="pd-related__price-original">{originalPriceText(p)}</span>
                         </div>
                       ) : (
                         <div className="pd-related__prices">
-                          <span className="pd-related__price">{formatPrice(p.price)}</span>
+                          <span className="pd-related__price">{originalPriceText(p)}</span>
                         </div>
                       )}
                     </div>

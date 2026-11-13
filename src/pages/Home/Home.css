@@ -373,7 +373,7 @@
 .products-section { padding: 128px 0; background: var(--cream); }
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 40px 28px;
 }
 
@@ -517,11 +517,37 @@
 .home .section-header--light h2 { color: var(--cream); }
 .home .section-header--light .eyebrow { color: var(--gold); }
 
+/* Slider ngang: cuộn bằng ngón tay/chuột/mũi tên, mỗi lần dừng đúng đầu thẻ (scroll-snap) */
 .bundles-grid-home {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 28px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  /* chừa chỗ cho hiệu ứng nhấc thẻ + bóng đổ, không bị overflow cắt */
+  padding: 14px 0 40px;
+  margin: -14px 0 -40px;
 }
+.bundles-grid-home::-webkit-scrollbar { display: none; }
+.bundle-slide {
+  flex: 0 0 calc((100% - 56px) / 3);
+  min-width: 0;
+  scroll-snap-align: start;
+}
+.bundle-nav { display: flex; gap: 10px; }
+.bundle-nav button {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 240, 232, 0.4);
+  background: transparent;
+  color: var(--cream);
+  font-size: 20px;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s, opacity 0.25s;
+}
+.bundle-nav button:hover:not(:disabled) { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+.bundle-nav button:disabled { opacity: 0.3; cursor: default; }
 .bundle-card-home {
   display: flex;
   flex-direction: column;
@@ -852,8 +878,8 @@ a.promo-image-banner__link:hover {
   .trust-item:nth-child(n + 3) { border-top: 1px solid var(--line); }
   .about-section, .products-section, .bundles-section, .rooms-section, .contact-section { padding: 96px 0; }
   .about-section .section-inner { gap: 64px; }
-  .products-grid { grid-template-columns: repeat(2, 1fr); }
-  .bundles-grid-home { grid-template-columns: repeat(2, 1fr); }
+  .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bundle-slide { flex-basis: calc((100% - 28px) / 2); }
   .contact-inner { gap: 56px; }
 }
 @media (max-width: 768px) {
@@ -869,8 +895,10 @@ a.promo-image-banner__link:hover {
   .stat { padding-right: 24px; }
   .stat + .stat { padding-left: 24px; }
   .stat strong { font-size: 34px; }
-  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 32px 16px; }
-  .bundles-grid-home { grid-template-columns: 1fr; }
+  .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 16px; }
+  .bundles-grid-home { gap: 16px; }
+  .bundle-slide { flex-basis: 86%; }
+  .bundle-nav button { width: 42px; height: 42px; }
   .rooms-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 240px; gap: 12px; }
   .rooms-grid .room-cell:nth-child(n) { grid-column: span 1; }
   .rooms-grid .room-cell:nth-child(1) { grid-column: 1 / -1; }
@@ -898,4 +926,29 @@ a.promo-image-banner__link:hover {
 @media (prefers-reduced-motion: reduce) {
   .hero-bg-image, .hero-content__inner, .hero-progress i { animation: none; }
   .home *, .home *::before, .home *::after { transition-duration: 0.01ms !important; }
+}
+
+/* ── Khoảng giá "min – max" của sản phẩm có biến thể ──
+   Giá dài hơn nên: cột lưới dùng minmax(0,1fr) (không để nội dung giá kéo giãn cột → card không còn to nhỏ lệch nhau).
+   Mọi card dùng chung 1 bố cục: khối giá ở trên, nút ở hàng dưới cùng chiều rộng → nút luôn thẳng hàng giữa các card
+   dù giá là 1 số, 1 khoảng hay có giảm giá. */
+.home .product-footer {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: 12px;
+  min-height: 0;
+}
+.home .product-footer > .product-price,
+.home .product-footer > .product-prices {
+  min-height: 40px;            /* chừa chỗ 2 dòng (giá giảm + giá gốc) để nút của mọi card thẳng hàng */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+}
+.home .product-footer .btn-add { width: 100%; margin-left: 0; text-align: center; }
+.home .product-price-original { white-space: nowrap; }
+@media (max-width: 600px) {
+  .home .product-price { white-space: normal; }
 }

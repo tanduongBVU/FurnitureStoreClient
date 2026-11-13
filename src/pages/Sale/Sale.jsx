@@ -6,6 +6,7 @@ import WishlistButton from "../../components/WishlistButton/WishlistButton";
 import CompareButton from "../../components/CompareButton/CompareButton";
 import RatingStars from "../../components/RatingStars/RatingStars";
 // Dùng chung bộ style thẻ sản phẩm với trang Sản phẩm; Sale.css chỉ thêm phần riêng của trang này
+import { originalPriceText, salePriceText, needsVariantChoice } from "../../utils/priceRange";
 import "../Products/Products.css";
 import "./Sale.css";
 
@@ -81,8 +82,8 @@ const Sale = () => {
                   <RatingStars avg={p.averageRating} count={p.reviewCount} />
                   <div className="product-footer">
                     <div className="product-prices">
-                      <span className="product-price product-price--sale">{formatPrice(salePriceOf(p))}</span>
-                      <span className="product-price-original">{formatPrice(p.price)}</span>
+                      <span className="product-price product-price--sale">{salePriceText(p)}</span>
+                      <span className="product-price-original">{originalPriceText(p)}</span>
                     </div>
                   </div>
                 </div>

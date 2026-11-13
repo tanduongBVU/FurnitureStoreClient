@@ -12,7 +12,7 @@
 .wish-link:hover { color: var(--pp-gold-d); }
 
 /* Lưới 4 cột (Products.css dùng 3) — media query riêng vì selector này mạnh hơn .client-products-grid */
-.wishlist-page .client-products-grid { grid-template-columns: repeat(4, 1fr); gap: 28px 20px; }
+.wishlist-page .client-products-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 20px; }
 .wishlist-page .client-products-grid > * { min-width: 0; }
 
 .wish-card { position: relative; }
@@ -49,8 +49,8 @@
 .wish-btn-solid { display: inline-flex; align-items: center; padding: 16px 34px; border-radius: 2px; background: var(--pp-walnut); color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; letter-spacing: .04em; transition: background .25s; }
 .wish-btn-solid:hover { background: var(--pp-gold-d); }
 
-@media (max-width: 1200px) { .wishlist-page .client-products-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 900px) { .wishlist-page .client-products-grid { grid-template-columns: repeat(2, 1fr); gap: 20px 14px; } }
+@media (max-width: 1200px) { .wishlist-page .client-products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 900px) { .wishlist-page .client-products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 14px; } }
 @media (max-width: 640px) {
   .wishlist-page .wishlist-body { padding-top: 32px; padding-bottom: 72px; }
   .wish-toolbar { margin-bottom: 24px; }
@@ -59,3 +59,6 @@
 }
 @media (max-width: 400px) { .wishlist-page .client-products-grid { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .wishlist-page *, .wishlist-page *::before, .wishlist-page *::after { transition-duration: .01ms !important; } }
+
+/* Khoảng giá dài: cho phép xuống dòng trên màn hình hẹp */
+@media (max-width: 600px) { .wishlist-page .wish-prices .product-price { white-space: normal; } }

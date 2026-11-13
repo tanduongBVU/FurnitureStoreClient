@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCompare } from "../../contexts/CompareContext";
 import { useCart } from "../../contexts/CartContext";
 import Reveal from "../../components/Reveal/Reveal";
+import { originalPriceText, salePriceText, needsVariantChoice } from "../../utils/priceRange";
 import "./Compare.css";
 
 const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
@@ -16,11 +17,11 @@ const ROWS = [
     render: (p) =>
       p.discountPercent > 0 ? (
         <span className="compare-price">
-          <strong className="compare-price__sale">{formatPrice(salePriceOf(p))}</strong>
-          <span className="compare-price__old">{formatPrice(p.price)}</span>
+          <strong className="compare-price__sale">{salePriceText(p)}</strong>
+          <span className="compare-price__old">{originalPriceText(p)}</span>
         </span>
       ) : (
-        <strong className="compare-price__now">{formatPrice(p.price)}</strong>
+        <strong className="compare-price__now">{originalPriceText(p)}</strong>
       ),
   },
   {
@@ -108,10 +109,10 @@ const Compare = () => {
                       <button
                         type="button"
                         className="compare-product-add-btn"
-                        onClick={() => addToCart({ ...p, price: p.discountPercent > 0 ? salePriceOf(p) : p.price }, 1)}
+                        onClick={() => (needsVariantChoice(p) ? navigate(`/products/${p.id}`) : addToCart({ ...p, price: p.discountPercent > 0 ? salePriceOf(p) : p.price }, 1))}
                         disabled={p.stock === 0}
                       >
-                        {p.stock === 0 ? "Hết hàng" : "+ Thêm vào giỏ"}
+                        {p.stock === 0 ? "Hết hàng" : needsVariantChoice(p) ? "Chọn mẫu" : "+ Thêm vào giỏ"}
                       </button>
                     </div>
                   </th>

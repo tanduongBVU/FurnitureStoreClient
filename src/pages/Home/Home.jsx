@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import api from "../../services/api";
 import { useCart } from "../../contexts/CartContext";
@@ -8,6 +8,7 @@ import WishlistButton from "../../components/WishlistButton/WishlistButton";
 import CompareButton from "../../components/CompareButton/CompareButton";
 import RatingStars from "../../components/RatingStars/RatingStars";
 import SEO from "../../components/SEO/SEO";
+import { originalPriceText, salePriceText, needsVariantChoice } from "../../utils/priceRange";
 import "./Home.css";
 
 // "category" PHẢI khớp CHÍNH XÁC (kể cả hoa/thường) với mảng CATEGORIES trong
@@ -154,6 +155,29 @@ export default function Home() {
   const [loadingBundles, setLoadingBundles] = useState(true);
   // Thông báo ngắn ngay dưới nút của từng combo: { [bundleId]: { ok, text } }
   const [bundleNotice, setBundleNotice] = useState({});
+  // Slider combo: track cuộn ngang + trạng thái 2 mũi tên (hết đầu/cuối thì mờ đi)
+  const bundleTrackRef = useRef(null);
+  const [bundleEdge, setBundleEdge] = useState({ start: true, end: true });
+  const updateBundleEdge = useCallback(() => {
+    const el = bundleTrackRef.current;
+    if (!el) return;
+    setBundleEdge({
+      start: el.scrollLeft <= 4,
+      end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 4,
+    });
+  }, []);
+  const scrollBundles = (dir) => {
+    const el = bundleTrackRef.current;
+    if (!el) return;
+    const card = el.querySelector(".bundle-slide");
+    const step = card ? card.getBoundingClientRect().width + 28 : el.clientWidth;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
+  useEffect(() => {
+    updateBundleEdge();
+    window.addEventListener("resize", updateBundleEdge);
+    return () => window.removeEventListener("resize", updateBundleEdge);
+  }, [bundles, loadingBundles, updateBundleEdge]);
 
   const [contactForm, setContactForm] = useState({ name: "", phone: "", email: "", message: "" });
   const [contactSending, setContactSending] = useState(false);
@@ -195,7 +219,7 @@ export default function Home() {
   // riêng), để 1 API chậm/lỗi không làm phần còn lại của trang bị chặn theo.
   useEffect(() => {
     api.get("/Bundles")
-      .then(res => setBundles(res.data.slice(0, 3))) // chỉ hiện tối đa 3 combo ở trang chủ
+      .then(res => setBundles(res.data.slice(0, 12))) // slider: tối đa 12 combo, kéo/bấm mũi tên để xem
       .catch(() => setBundles([]))
       .finally(() => setLoadingBundles(false));
   }, []);
@@ -501,19 +525,21 @@ export default function Home() {
                       <div className="product-footer">
                         {hasDiscount ? (
                           <span className="product-prices">
-                            <strong className="product-price product-price--sale">{formatPrice(salePriceOf(p))}</strong>
-                            <span className="product-price-original">{formatPrice(p.price)}</span>
+                            <strong className="product-price product-price--sale">{salePriceText(p)}</strong>
+                            <span className="product-price-original">{originalPriceText(p)}</span>
                           </span>
                         ) : (
-                          <strong className="product-price">{formatPrice(p.price)}</strong>
+                          <strong className="product-price">{originalPriceText(p)}</strong>
                         )}
                         <button
                           className="btn-add"
                           onClick={(e) => {
+                            // Sản phẩm có biến thể: để click đi tiếp vào trang chi tiết (chọn chất liệu/màu)
+                            if (needsVariantChoice(p)) return;
                             e.preventDefault();
                             addToCart({ ...p, price: hasDiscount ? salePriceOf(p) : p.price }, 1);
                           }}
-                        >+ Thêm</button>
+                        >{needsVariantChoice(p) ? "Chọn mẫu" : "+ Thêm"}</button>
                       </div>
                     </div>
                   </Link>
@@ -538,14 +564,20 @@ export default function Home() {
                 <span className="eyebrow">Mua trọn bộ, tiết kiệm hơn</span>
                 <h2>Combo tiết kiệm</h2>
               </div>
+              {!bundleEdge.start || !bundleEdge.end ? (
+                <div className="bundle-nav">
+                  <button type="button" aria-label="Combo trước" disabled={bundleEdge.start} onClick={() => scrollBundles(-1)}>←</button>
+                  <button type="button" aria-label="Combo sau" disabled={bundleEdge.end} onClick={() => scrollBundles(1)}>→</button>
+                </div>
+              ) : null}
             </Reveal>
 
-            <div className="bundles-grid-home">
+            <div className="bundles-grid-home" ref={bundleTrackRef} onScroll={updateBundleEdge}>
               {bundles.map((b, idx) => {
                 const coverImage = b.image || b.items[0]?.productImage;
                 const notice = bundleNotice[b.id];
                 return (
-                  <Reveal as="div" key={b.id} delay={Math.min(idx * 90, 320)}>
+                  <Reveal as="div" key={b.id} className="bundle-slide" delay={Math.min(idx * 90, 320)}>
                     <div className="bundle-card-home">
                       <div className="bundle-card-home__img">
                         {coverImage
@@ -560,7 +592,7 @@ export default function Home() {
                         <h3>{b.name}</h3>
                         <ul className="bundle-card-home__items">
                           {b.items.slice(0, 3).map(item => (
-                            <li key={item.productId}>{item.productName} x{item.quantity}</li>
+                            <li key={`${item.productId}-${item.variantId ?? 0}`}>{item.productName} x{item.quantity}</li>
                           ))}
                           {b.items.length > 3 && <li>...và {b.items.length - 3} sản phẩm khác</li>}
                         </ul>

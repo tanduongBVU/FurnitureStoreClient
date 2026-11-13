@@ -200,7 +200,9 @@ export const CartProvider = ({ children }) => {
           if (item.variantId != null) {
             const v = (p.variants || []).find(x => x.id === item.variantId);
             if (v) {
-              price = v.price; // giá biến thể lấy từ database
+              // Giá biến thể lấy từ database, TRỪ giảm giá của sản phẩm (giảm giá áp cho mọi biến thể) —
+              // công thức trùng với server (PricingHelper.VariantSaleUnitPrice) và trang chi tiết sản phẩm.
+              price = Math.round(v.price * (1 - (p.discountPercent || 0) / 100));
               stock = v.stock;
             } else {
               removed = true; // biến thể đã bị xoá khỏi sản phẩm

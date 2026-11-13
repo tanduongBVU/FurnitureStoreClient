@@ -105,7 +105,7 @@
 .products-main { flex: 1; min-width: 0; }
 
 /* ── Lưới & thẻ sản phẩm (giống Trang chủ: thẻ trắng, ảnh vuông) ── */
-.client-products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px 24px; }
+.client-products-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 24px; }
 
 .products-page .product-card {
   display: flex; flex-direction: column; height: 100%; background: #fff;
@@ -173,7 +173,7 @@
 @media (max-width: 1100px) {
   .products-layout { gap: 40px; }
   .products-sidebar { width: 220px; }
-  .client-products-grid { grid-template-columns: repeat(2, 1fr); }
+  .client-products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 900px) {
   .products-page .section-inner { padding: 0 24px; }
@@ -191,7 +191,7 @@
 }
 @media (max-width: 640px) {
   .products-page .section-inner { padding: 0 20px; }
-  .client-products-grid { grid-template-columns: repeat(2, 1fr); gap: 16px 12px; }
+  .client-products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
   .products-page .product-info { padding: 14px; }
   .products-page .product-info h3 { font-size: 16px; }
   .products-page .product-price { font-size: 14px; }
@@ -214,3 +214,11 @@
 
 /* Wishlist: bỏ dòng mô tả cho gọn */
 .wishlist-page .products-hero p { display: none; }
+
+/* ── Khoảng giá "min – max" của sản phẩm có biến thể: không để giá dài kéo giãn cột lưới / tràn khỏi card ── */
+.products-page .product-footer { flex-wrap: wrap; gap: 6px 12px; }
+.products-page .product-prices { min-width: 0; }
+.products-page .product-price-original { white-space: nowrap; }
+@media (max-width: 600px) {
+  .products-page .product-price { white-space: normal; }
+}

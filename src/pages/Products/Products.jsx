@@ -5,6 +5,7 @@ import Reveal from "../../components/Reveal/Reveal";
 import WishlistButton from "../../components/WishlistButton/WishlistButton";
 import CompareButton from "../../components/CompareButton/CompareButton";
 import RatingStars from "../../components/RatingStars/RatingStars";
+import { originalPriceText, salePriceText, needsVariantChoice } from "../../utils/priceRange";
 import "./Products.css";
 
 const CATEGORIES = ["Tất cả", "Phòng khách", "Phòng ngủ", "Phòng ăn", "Phòng làm việc", "Phòng tắm", "Ban công"];
@@ -306,15 +307,15 @@ const Products = () => {
                         {p.discountPercent > 0 ? (
                           <div className="product-prices">
                             <span className="product-price product-price--sale">
-                              {formatPrice(Math.round(priceOf(p) * (1 - p.discountPercent / 100)))}
+                              {salePriceText(p)}
                             </span>
                             <span className="product-price-original">
-                              {formatPrice(priceOf(p))}
+                              {originalPriceText(p)}
                             </span>
                           </div>
                         ) : (
                           <span className="product-price">
-                            {p.hasVariants && "Từ "}{formatPrice(priceOf(p))}
+                            {originalPriceText(p)}
                           </span>
                         )}
                       </div>

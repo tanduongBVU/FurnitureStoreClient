@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useWishlist } from "../../contexts/WishlistContext";
 import { useCart } from "../../contexts/CartContext";
 import Reveal from "../../components/Reveal/Reveal";
+import { originalPriceText, salePriceText, needsVariantChoice } from "../../utils/priceRange";
 import "../Products/Products.css";
 import "./Wishlist.css";
 
@@ -17,6 +18,8 @@ const Wishlist = () => {
   const salePriceOf = (p) => Math.round(p.price * (1 - (p.discountPercent || 0) / 100));
 
   const handleAdd = (p, hasDiscount) => {
+    // Sản phẩm có biến thể: sang trang chi tiết để chọn chất liệu/màu, không thêm nhanh được
+    if (needsVariantChoice(p)) { navigate(`/products/${p.id}`); return; }
     addToCart({ ...p, price: hasDiscount ? salePriceOf(p) : p.price }, 1);
     setAddedId(p.id);
     setTimeout(() => setAddedId(cur => (cur === p.id ? null : cur)), 2000);
@@ -82,11 +85,11 @@ const Wishlist = () => {
                         <div className="wish-prices">
                           {hasDiscount ? (
                             <>
-                              <span className="product-price product-price--sale">{formatPrice(salePriceOf(p))}</span>
-                              <span className="product-price-original">{formatPrice(p.price)}</span>
+                              <span className="product-price product-price--sale">{salePriceText(p)}</span>
+                              <span className="product-price-original">{originalPriceText(p)}</span>
                             </>
                           ) : (
-                            <span className="product-price">{formatPrice(p.price)}</span>
+                            <span className="product-price">{originalPriceText(p)}</span>
                           )}
                         </div>
 
@@ -96,7 +99,7 @@ const Wishlist = () => {
                           disabled={out}
                           onClick={() => handleAdd(p, hasDiscount)}
                         >
-                          {out ? "Hết hàng" : addedId === p.id ? "✓ Đã thêm vào giỏ" : "Thêm vào giỏ hàng"}
+                          {out ? "Hết hàng" : needsVariantChoice(p) ? "Chọn mẫu" : addedId === p.id ? "✓ Đã thêm vào giỏ" : "Thêm vào giỏ hàng"}
                         </button>
                       </div>
                     </article>
