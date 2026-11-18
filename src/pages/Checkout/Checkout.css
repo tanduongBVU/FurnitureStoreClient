@@ -200,3 +200,35 @@
 @keyframes checkout-qr-spin {
   to { transform: rotate(360deg); }
 }
+
+
+/* ── Nút "Huỷ thanh toán" ở màn hình QR + thông báo sau khi huỷ ── */
+.checkout-qr__cancel {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 10px 22px;
+  background: transparent;
+  color: #7a6a5a;
+  border: 1px solid #c9b8a4;
+  border-radius: 2px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.checkout-qr__cancel:hover:not(:disabled) {
+  background: #fdf1ef;
+  color: #b91c1c;
+  border-color: #b91c1c;
+}
+.checkout-qr__cancel:disabled { opacity: .6; cursor: not-allowed; }
+
+.checkout-notice {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: #f4efe7;
+  border-left: 3px solid #8b6b4a;
+  color: #4a3b2c;
+  font-size: 14px;
+  line-height: 1.5;
+}

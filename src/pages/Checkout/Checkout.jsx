@@ -62,6 +62,8 @@ const Checkout = () => {
   const [createdOrder, setCreatedOrder] = useState(null); // { id, total, confirmCode } — dùng để dựng QR, hiện mã đơn và xác nhận chuyển khoản
   const [confirming, setConfirming] = useState(false); // đang gửi xác nhận "Tôi đã chuyển khoản"
   const [confirmError, setConfirmError] = useState("");
+  const [cancelling, setCancelling] = useState(false); // đang huỷ thanh toán ở màn hình QR
+  const [cancelNotice, setCancelNotice] = useState(""); // thông báo sau khi huỷ, hiện ở form đặt hàng
   const [autoConfirm, setAutoConfirm] = useState(false); // Backend đã bật tự động xác nhận qua ngân hàng (SePay)
   const { errors, validateField, validateAll, clearError } = useFormValidation(SHIPPING_RULES);
 
@@ -147,6 +149,7 @@ const Checkout = () => {
     e.preventDefault();
     if (cart.length === 0) return;
     setError("");
+    setCancelNotice("");
     if (!validateAll(form)) return;
 
     // Kiểm tra lại mã giảm giá với SĐT/tài khoản HIỆN TẠI trước khi đặt: khách có thể áp mã trước khi
@@ -279,6 +282,26 @@ const Checkout = () => {
     }
   };
 
+  // Khách bấm "Huỷ thanh toán" ở màn hình QR: huỷ đơn vừa tạo (Backend hoàn lại tồn kho và lượt dùng mã giảm giá),
+  // giữ nguyên giỏ hàng và quay về form đặt hàng để khách đổi ý (chọn COD hoặc đặt lại). Bước tạo đơn đã dừng
+  // vòng hỏi trạng thái vì createdOrder về null.
+  const handleCancelPayment = async () => {
+    if (!window.confirm(
+      `Huỷ thanh toán đơn hàng #${createdOrder.id}?\n\nNếu bạn ĐÃ chuyển khoản, vui lòng KHÔNG huỷ — hãy đợi hệ thống ghi nhận hoặc liên hệ cửa hàng.`
+    )) return;
+    setConfirmError("");
+    setCancelling(true);
+    try {
+      await api.post(`/Orders/${createdOrder.id}/cancel-payment`, { code: createdOrder.confirmCode });
+      setCancelNotice(`Đã huỷ thanh toán đơn hàng #${createdOrder.id}. Giỏ hàng của bạn vẫn được giữ lại, bạn có thể đặt lại hoặc chọn cách thanh toán khác.`);
+      setCreatedOrder(null);
+    } catch (err) {
+      setConfirmError(err.response?.data?.message || "Không huỷ được thanh toán. Vui lòng thử lại hoặc liên hệ cửa hàng.");
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   // ── Bước 2 của QR: đơn đã tạo, đang chờ khách quét mã & chuyển khoản ──
   if (createdOrder && paymentMethod === "QR" && qrEnabled && !success) {
     // Nội dung chuyển khoản dùng chữ KHÔNG DẤU, có mã đơn — an toàn với mọi app ngân hàng
@@ -354,6 +377,15 @@ const Checkout = () => {
                   </p>
                 </>
               )}
+
+              <button
+                type="button"
+                className="checkout-qr__cancel"
+                onClick={handleCancelPayment}
+                disabled={cancelling || confirming}
+              >
+                {cancelling ? "Đang huỷ..." : "Huỷ thanh toán"}
+              </button>
             </div>
           </div>
         </div>
@@ -427,6 +459,7 @@ const Checkout = () => {
               <h3>Thông tin giao hàng</h3>
             </div>
 
+            {cancelNotice && <div className="checkout-notice">{cancelNotice}</div>}
             {error && <div className="checkout-error">⚠️ {error}</div>}
 
             <div className="form-group">
