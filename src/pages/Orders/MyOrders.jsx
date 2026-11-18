@@ -56,6 +56,8 @@ export default function MyOrders() {
   const [error, setError] = useState("");
   const [openId, setOpenId] = useState(null);
   const [filter, setFilter] = useState("all");
+  const [cancellingId, setCancellingId] = useState(null); // đơn đang gửi yêu cầu huỷ
+  const [cancelError, setCancelError] = useState({ id: null, message: "" });
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -70,6 +72,24 @@ export default function MyOrders() {
   }, [isLoggedIn, navigate]);
 
   const toggleOrder = (id) => setOpenId((cur) => (cur === id ? null : id));
+
+  // Khách tự huỷ đơn — chỉ đơn "Chờ xác nhận" (Backend kiểm tra lại, không tin nút này).
+  const handleCancel = async (order) => {
+    if (!window.confirm(`Bạn chắc chắn muốn huỷ đơn hàng #${order.id}? Thao tác này không thể hoàn tác.`)) return;
+    setCancellingId(order.id);
+    setCancelError({ id: null, message: "" });
+    try {
+      await api.post(`/Orders/${order.id}/cancel`);
+      setOrders((prev) => prev.map((o) => (o.id === order.id ? { ...o, status: "Huỷ" } : o)));
+    } catch (err) {
+      setCancelError({
+        id: order.id,
+        message: err.response?.data?.message || "Không thể huỷ đơn hàng. Vui lòng thử lại sau.",
+      });
+    } finally {
+      setCancellingId(null);
+    }
+  };
 
   const changeFilter = (key) => {
     setFilter(key);
@@ -244,6 +264,23 @@ export default function MyOrders() {
                               <strong>{formatPrice(o.total)}</strong>
                             </div>
                           </div>
+
+                          {/* Chỉ đơn còn "Chờ xác nhận" mới huỷ được */}
+                          {o.status === "Chờ xác nhận" && (
+                            <div className="order-cancel">
+                              <button
+                                type="button"
+                                className="order-cancel__btn"
+                                onClick={() => handleCancel(o)}
+                                disabled={cancellingId === o.id}
+                              >
+                                {cancellingId === o.id ? "Đang huỷ..." : "Huỷ đơn hàng"}
+                              </button>
+                              {cancelError.id === o.id && (
+                                <p className="order-cancel__error">⚠️ {cancelError.message}</p>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                     </Reveal>

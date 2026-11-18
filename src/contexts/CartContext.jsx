@@ -77,7 +77,7 @@ export const CartProvider = ({ children }) => {
   // Trả về { ok, message } để nơi gọi báo lỗi cho khách khi combo hết hàng / vượt tồn kho.
   const addBundleToCart = (bundle, quantity = 1) => {
     if (!bundle.isAvailable) {
-      const names = bundle.outOfStockItems?.length ? `: ${bundle.outOfStockItems.join(", ")}` : "";
+      const names = bundle.outOfStockItems?.length ? `: ${bundle.outOfStockItems.join(", ")}` : ""; //Lấy sản phẩm hết hàng trong combo
       return { ok: false, message: `Combo tạm hết hàng${names}.` };
     }
 

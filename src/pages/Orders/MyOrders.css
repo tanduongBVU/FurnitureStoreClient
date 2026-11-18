@@ -145,3 +145,38 @@
 .myorders-header p { display: none; }
 
 @media (max-width: 640px) { .myorders-header { padding: 32px 0 28px; } .myorders-header h1 { font-size: clamp(28px, 7.5vw, 34px); } }
+
+/* ── Nút khách tự huỷ đơn (dán thêm vào cuối MyOrders.css) ── */
+.order-cancel {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.order-cancel__btn {
+  padding: 9px 22px;
+  border: 1px solid #b3392f;
+  border-radius: 6px;
+  background: transparent;
+  color: #b3392f;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.order-cancel__btn:hover:not(:disabled) {
+  background: #b3392f;
+  color: #fff;
+}
+.order-cancel__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.order-cancel__error {
+  margin: 0;
+  font-size: 13px;
+  color: #b3392f;
+}

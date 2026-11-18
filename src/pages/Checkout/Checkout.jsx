@@ -62,6 +62,7 @@ const Checkout = () => {
   const [createdOrder, setCreatedOrder] = useState(null); // { id, total, confirmCode } — dùng để dựng QR, hiện mã đơn và xác nhận chuyển khoản
   const [confirming, setConfirming] = useState(false); // đang gửi xác nhận "Tôi đã chuyển khoản"
   const [confirmError, setConfirmError] = useState("");
+  const [autoConfirm, setAutoConfirm] = useState(false); // Backend đã bật tự động xác nhận qua ngân hàng (SePay)
   const { errors, validateField, validateAll, clearError } = useFormValidation(SHIPPING_RULES);
 
   // Gõ lại thì xoá lỗi của chính ô đó
@@ -220,6 +221,47 @@ const Checkout = () => {
     }
   };
 
+  // Ở màn hình QR: hỏi Backend mỗi 3 giây xem ngân hàng đã báo nhận tiền chưa (webhook SePay ghi
+  // "Đã thanh toán"). Thấy rồi thì tự xoá giỏ và chuyển sang màn hình hoàn tất — khách không phải bấm gì.
+  // Dừng khi rời trang / đã xong / quá 30 phút. Lỗi mạng tạm thời thì bỏ qua, lần sau hỏi lại.
+  useEffect(() => {
+    if (!createdOrder || paymentMethod !== "QR" || !qrEnabled || success) return;
+    let stopped = false;
+    const startedAt = Date.now();
+
+    const check = async () => {
+      try {
+        const res = await api.get(`/Orders/${createdOrder.id}/payment-status`, {
+          params: { code: createdOrder.confirmCode },
+        });
+        if (stopped) return;
+        setAutoConfirm(Boolean(res.data.autoConfirm));
+        if (res.data.paymentStatus === "Đã thanh toán") {
+          stopped = true;
+          clearCart();
+          setSuccess(true);
+        }
+      } catch {
+        /* bỏ qua, lần sau thử lại */
+      }
+    };
+
+    check();
+    const timer = setInterval(() => {
+      if (Date.now() - startedAt > 30 * 60 * 1000) {
+        clearInterval(timer);
+        return;
+      }
+      check();
+    }, 3000);
+
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [createdOrder, paymentMethod, qrEnabled, success]);
+
   // Khách xác nhận đã chuyển khoản xong → báo cho Backend ghi nhận đơn "Đã thanh toán" (Admin không
   // cần bấm xác nhận nữa), rồi mới báo "Đặt hàng thành công" + xoá giỏ hàng. Lỗi thì giữ nguyên màn hình QR
   // để khách bấm lại, không mất mã QR.
@@ -268,8 +310,13 @@ const Checkout = () => {
                 <p className="checkout-error">Mã giảm giá chưa được áp dụng: {createdOrder.couponNote} Số tiền cần chuyển bên dưới là số tiền thực tế của đơn.</p>
               )}
               <p>
-                Vui lòng quét mã QR bên cạnh bằng app ngân hàng để chuyển khoản. Chuyển xong,
-                bấm nút <strong>“Tôi đã chuyển khoản”</strong> để hoàn tất đặt hàng.
+                {autoConfirm ? (
+                  <>Vui lòng quét mã QR bên cạnh bằng app ngân hàng để chuyển khoản. Chuyển xong,
+                  trang sẽ <strong>tự động chuyển</strong> khi chúng tôi nhận được tiền.</>
+                ) : (
+                  <>Vui lòng quét mã QR bên cạnh bằng app ngân hàng để chuyển khoản. Chuyển xong,
+                  bấm nút <strong>“Tôi đã chuyển khoản”</strong> để hoàn tất đặt hàng.</>
+                )}
               </p>
 
               <dl className="checkout-qr__facts">
@@ -279,18 +326,34 @@ const Checkout = () => {
 
               {confirmError && <div className="checkout-error">⚠️ {confirmError}</div>}
 
-              <button
-                type="button"
-                className="btn-primary-solid"
-                onClick={handleConfirmTransfer}
-                disabled={confirming}
-              >
-                {confirming ? "Đang xác nhận..." : "Tôi đã chuyển khoản"}
-              </button>
-              <p className="checkout-qr__note">
-                Vui lòng không đóng trang này trước khi bấm nút xác nhận. Bấm xác nhận sau khi bạn
-                đã chuyển khoản xong, đơn hàng sẽ được ghi nhận đã thanh toán và chuyển đi xử lý.
-              </p>
+              {autoConfirm ? (
+                <>
+                  <div className="checkout-qr__waiting">
+                    <span className="checkout-qr__spinner" aria-hidden="true" />
+                    Đang chờ ngân hàng báo đã nhận tiền...
+                  </div>
+                  <p className="checkout-qr__note">
+                    Vui lòng không đóng trang này. Khi nhận được tiền, đơn hàng sẽ được ghi nhận đã
+                    thanh toán và bạn sẽ được chuyển sang màn hình hoàn tất. Nếu đã chuyển khoản nhưng
+                    sau vài phút chưa thấy chuyển trang, vui lòng liên hệ cửa hàng kèm mã đơn #{createdOrder.id}.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="btn-primary-solid"
+                    onClick={handleConfirmTransfer}
+                    disabled={confirming}
+                  >
+                    {confirming ? "Đang xác nhận..." : "Tôi đã chuyển khoản"}
+                  </button>
+                  <p className="checkout-qr__note">
+                    Vui lòng không đóng trang này trước khi bấm nút xác nhận. Bấm xác nhận sau khi bạn
+                    đã chuyển khoản xong, đơn hàng sẽ được ghi nhận đã thanh toán và chuyển đi xử lý.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
