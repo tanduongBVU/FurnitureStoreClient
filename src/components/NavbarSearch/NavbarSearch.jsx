@@ -4,6 +4,19 @@ import api from "../../services/api";
 import "./NavbarSearch.css";
 
 const formatPrice = (n) => Number(n).toLocaleString("vi-VN") + " ₫";
+
+// Khoảng giá nhỏ nhất – lớn nhất (đã trừ giảm giá của sản phẩm). Sản phẩm có biến thể thì giá nằm ở từng
+// biến thể, KHÔNG phải ở p.price — giống cách trang Sản phẩm hiển thị.
+const priceRange = (p) => {
+  const prices = p.hasVariants && p.variants?.length
+    ? p.variants.map((v) => v.price)
+    : [p.price];
+  const d = 1 - (p.discountPercent || 0) / 100;
+  const lo = Math.round(Math.min(...prices) * d);
+  const hi = Math.round(Math.max(...prices) * d);
+  return lo === hi ? formatPrice(lo) : `${formatPrice(lo)} – ${formatPrice(hi)}`;
+};
+
 const DEBOUNCE_MS = 300;
 const MIN_CHARS = 2;
 
@@ -126,11 +139,7 @@ const NavbarSearch = () => {
                   </div>
                   <div className="navbar-search__item-info">
                     <span className="navbar-search__item-name">{p.name}</span>
-                    <span className="navbar-search__item-price">
-                      {p.discountPercent > 0
-                        ? formatPrice(p.price * (1 - p.discountPercent / 100))
-                        : formatPrice(p.price)}
-                    </span>
+                    <span className="navbar-search__item-price">{priceRange(p)}</span>
                   </div>
                 </button>
               ))

@@ -108,10 +108,10 @@ const ChatWidget = () => {
                         </div>
                         <div className="chatw-product-info">
                           <span className="chatw-product-name">{p.name}</span>
+                          {/* Backend trả sẵn giá đã trừ giảm giá: sản phẩm có biến thể hiện khoảng giá nhỏ nhất – lớn nhất */}
                           <span className="chatw-product-price">
-                            {p.discountPercent > 0
-                              ? formatPrice(Math.round(p.price * (1 - p.discountPercent / 100)))
-                              : formatPrice(p.price)}
+                            {formatPrice(p.displayPrice ?? p.price)}
+                            {p.displayPriceMax > p.displayPrice && ` – ${formatPrice(p.displayPriceMax)}`}
                           </span>
                         </div>
                       </Link>
